@@ -108,17 +108,23 @@ async def handle_command(request: CommandRequest):
         return {"response": welcome_msg, "status": "info"}
     
     if command == "HELP":
-        available = ", ".join(session["unlocked_commands"])
+        # Construire la liste des commandes disponibles sans duplication
+        all_commands = set(session["unlocked_commands"])
+        
         if session["level"] >= 1:
-            available += ", SCAN, DECODE, ACCESS"
+            all_commands.update(["SCAN", "DECODE", "ACCESS"])
         if session["level"] >= 2:
-            available += ", ACTIVATE, NETWORK, ANALYZE, BYPASS"
+            all_commands.update(["ACTIVATE", "NETWORK", "ANALYZE", "BYPASS"])
         if session["level"] >= 3:
-            available += ", CONNECT, RESTORE, SOLVE"
+            all_commands.update(["CONNECT", "RESTORE", "SOLVE"])
         if session["level"] >= 6:
-            available += ", NVIM, MAN"
+            all_commands.update(["NVIM", "MAN"])
         if DEV_MODE:
-            available += ", DEV"
+            all_commands.add("DEV")
+        
+        # Trier pour un affichage cohérent
+        sorted_commands = sorted(all_commands)
+        available = ", ".join(sorted_commands)
         
         help_msg = f"Commands available: {available}"
         if lang == "FR":
@@ -223,21 +229,41 @@ async def handle_command(request: CommandRequest):
     elif command == "DECODE" and session["level"] >= 1:
         if not args:
             if lang == "FR":
-                return {"response": "Usage: DECODE <texte_base64>\nExemple: DECODE VGhpcyBpcyBhIHRlc3Q=", "status": "info"}
+                return {"response": "Usage: DECODE <texte_base64> ou DECODE <nom_fichier>\nExemple: DECODE VGhpcyBpcyBhIHRlc3Q=\nExemple: DECODE corrupted_data.b64", "status": "info"}
             else:
-                return {"response": "Usage: DECODE <base64_text>\nExample: DECODE VGhpcyBpcyBhIHRlc3Q=", "status": "info"}
+                return {"response": "Usage: DECODE <base64_text> or DECODE <filename>\nExample: DECODE VGhpcyBpcyBhIHRlc3Q=\nExample: DECODE corrupted_data.b64", "status": "info"}
         
-        try:
-            decoded = base64.b64decode(args).decode('utf-8')
-            if lang == "FR":
-                return {"response": f"Décodé: {decoded}", "status": "success"}
-            else:
-                return {"response": f"Decoded: {decoded}", "status": "success"}
-        except:
-            if lang == "FR":
-                return {"response": "Échec du décodage. Format invalide.", "status": "error"}
-            else:
-                return {"response": "Decoding failed. Invalid format.", "status": "error"}
+        # Vérifier si c'est un nom de fichier
+        files = chapter.get("files", {})
+        filename = args.lower().strip()
+        
+        if filename in files:
+            # C'est un nom de fichier, décoder son contenu
+            file_content = files[filename]
+            try:
+                decoded = base64.b64decode(file_content).decode('utf-8')
+                if lang == "FR":
+                    return {"response": f"Fichier {filename} décodé:\n\n{decoded}", "status": "success"}
+                else:
+                    return {"response": f"File {filename} decoded:\n\n{decoded}", "status": "success"}
+            except:
+                if lang == "FR":
+                    return {"response": f"Le fichier {filename} ne contient pas de Base64 valide.", "status": "error"}
+                else:
+                    return {"response": f"File {filename} does not contain valid Base64.", "status": "error"}
+        else:
+            # C'est du Base64 direct
+            try:
+                decoded = base64.b64decode(args).decode('utf-8')
+                if lang == "FR":
+                    return {"response": f"Décodé: {decoded}", "status": "success"}
+                else:
+                    return {"response": f"Decoded: {decoded}", "status": "success"}
+            except:
+                if lang == "FR":
+                    return {"response": "Échec du décodage. Format invalide ou fichier introuvable.", "status": "error"}
+                else:
+                    return {"response": "Decoding failed. Invalid format or file not found.", "status": "error"}
     
     elif command == "ACTIVATE" and session["level"] >= 1:
         if not args:
