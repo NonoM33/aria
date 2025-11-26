@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import axios from 'axios'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -7,7 +7,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
-  'RESTORE', 'SOLVE', 'CAT'
+  'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS'
 ]
 
 export const useTerminal = () => {
@@ -18,6 +19,7 @@ export const useTerminal = () => {
   const [commandHistory, setCommandHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [autocompleteOptions, setAutocompleteOptions] = useState([])
+  const [availableFiles, setAvailableFiles] = useState([])
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -26,6 +28,34 @@ export const useTerminal = () => {
   if (!localStorage.getItem('session_id')) {
     localStorage.setItem('session_id', sessionIdRef.current)
   }
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
+        currentLanguage = currentLanguage.toUpperCase()
+        if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
+          currentLanguage = 'FR'
+        }
+        
+        const response = await axios.get(`${API_URL}/api/files`, {
+          params: {
+            session_id: sessionIdRef.current,
+            language: currentLanguage
+          }
+        })
+        if (response.data && response.data.files) {
+          setAvailableFiles(response.data.files)
+        }
+      } catch (error) {
+        // Silently fail, files will be empty
+      }
+    }
+    
+    fetchFiles()
+    const interval = setInterval(fetchFiles, 5000)
+    return () => clearInterval(interval)
+  }, [language])
 
   const addToHistory = useCallback((type, content) => {
     setHistory(prev => [...prev, {
@@ -50,12 +80,49 @@ export const useTerminal = () => {
   }, [])
 
   const getAutocompleteOptions = useCallback((partial) => {
-    if (!partial) return []
-    const upper = partial.toUpperCase()
-    return AVAILABLE_COMMANDS.filter(cmd => 
-      cmd.startsWith(upper) && cmd !== upper
-    )
-  }, [])
+    if (!partial || !partial.trim()) return []
+    
+    const trimmed = partial.trim()
+    const parts = trimmed.split(/\s+/)
+    const command = parts[0]?.toUpperCase() || ''
+    const arg = parts.slice(1).join(' ') || ''
+    
+    // Auto-complétion pour ACCESS <fichier>
+    if (command === 'ACCESS') {
+      if (arg) {
+        const lowerArg = arg.toLowerCase()
+        const matches = availableFiles.filter(file => 
+          file.toLowerCase().startsWith(lowerArg) && file.toLowerCase() !== lowerArg
+        )
+        return matches
+      } else {
+        // Si juste "ACCESS " (avec espace), retourner tous les fichiers
+        return availableFiles
+      }
+    }
+    
+    // Auto-complétion pour MAN <commande>
+    if (command === 'MAN') {
+      if (arg) {
+        const upperArg = arg.toUpperCase()
+        return AVAILABLE_COMMANDS.filter(cmd => 
+          cmd.startsWith(upperArg) && cmd !== upperArg
+        )
+      } else {
+        return AVAILABLE_COMMANDS
+      }
+    }
+    
+    // Auto-complétion pour les commandes simples
+    if (command && !arg) {
+      const upper = command.toUpperCase()
+      return AVAILABLE_COMMANDS.filter(cmd => 
+        cmd.startsWith(upper) && cmd !== upper
+      )
+    }
+    
+    return []
+  }, [availableFiles])
 
   const sendCommand = useCallback(async (command) => {
     if (isTyping) return
@@ -91,6 +158,25 @@ export const useTerminal = () => {
       })
 
       const systemResponse = response.data.response || 'No response from system.'
+      
+      // Mettre à jour les fichiers disponibles après SCAN ou LOGIN
+      if (userCommand.toUpperCase().startsWith('SCAN') || userCommand.toUpperCase().startsWith('LOGIN')) {
+        setTimeout(async () => {
+          try {
+            const fileResponse = await axios.get(`${API_URL}/api/files`, {
+              params: {
+                session_id: sessionIdRef.current,
+                language: currentLanguage
+              }
+            })
+            if (fileResponse.data && fileResponse.data.files) {
+              setAvailableFiles(fileResponse.data.files)
+            }
+          } catch (error) {
+            // Silently fail
+          }
+        }, 100)
+      }
       
       setHistory(prev => [...prev, {
         type: 'system',
@@ -134,7 +220,7 @@ export const useTerminal = () => {
         })
       })
     }
-  }, [addToHistory, typeText, isTyping, language])
+  }, [addToHistory, typeText, isTyping, language, setAvailableFiles])
 
   const navigateHistory = useCallback((direction) => {
     if (commandHistory.length === 0) return
@@ -166,13 +252,66 @@ export const useTerminal = () => {
   }, [commandHistory, historyIndex])
 
   const handleTab = useCallback((currentInput) => {
-    const options = getAutocompleteOptions(currentInput)
-    if (options.length > 0) {
-      setInput(options[0].toLowerCase())
-      setAutocompleteOptions(options)
+    if (!currentInput || !currentInput.trim()) {
+      return false
     }
-    return options.length > 0
-  }, [getAutocompleteOptions])
+    
+    const options = getAutocompleteOptions(currentInput)
+    
+    if (options.length === 0) {
+      return false
+    }
+    
+    const trimmed = currentInput.trim()
+    const parts = trimmed.split(/\s+/)
+    const command = parts[0]?.toUpperCase() || ''
+    const arg = parts.slice(1).join(' ') || ''
+    
+    if (options.length === 1) {
+      // Une seule option : compléter automatiquement
+      if (command === 'ACCESS') {
+        if (arg) {
+          // Remplacer l'argument partiel par le fichier complet
+          setInput(`ACCESS ${options[0]}`)
+        } else {
+          // Juste "ACCESS " -> ajouter le premier fichier
+          setInput(`ACCESS ${options[0]}`)
+        }
+      } else if (command === 'MAN') {
+        if (arg) {
+          setInput(`MAN ${options[0]}`)
+        } else {
+          setInput(`MAN ${options[0]}`)
+        }
+      } else {
+        // Commande simple
+        setInput(options[0])
+      }
+      setAutocompleteOptions([])
+      return true
+    } else if (options.length > 1) {
+      // Plusieurs options : afficher la liste
+      setAutocompleteOptions(options)
+      
+      if (command === 'ACCESS') {
+        if (arg) {
+          // Si on a déjà tapé quelque chose, compléter avec le premier match
+          setInput(`ACCESS ${options[0]}`)
+          addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
+        } else {
+          // Juste "ACCESS " -> montrer tous les fichiers
+          addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
+        }
+      } else if (command === 'MAN') {
+        addToHistory('system', `Commandes disponibles: ${options.join(', ')}`)
+      } else {
+        addToHistory('system', `Suggestions: ${options.join(', ')}`)
+      }
+      return true
+    }
+    
+    return false
+  }, [getAutocompleteOptions, addToHistory, setInput])
 
   return {
     history,

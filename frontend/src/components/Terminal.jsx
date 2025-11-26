@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTerminal } from '../hooks/useTerminal'
 import { useLanguage } from '../contexts/LanguageContext'
 import LanguageMenu from './LanguageMenu'
+import ManPage from './ManPage'
 
 const Terminal = () => {
   const { 
@@ -19,6 +20,7 @@ const Terminal = () => {
   const historyEndRef = useRef(null)
   const [showInput, setShowInput] = useState(true)
   const [welcomeShown, setWelcomeShown] = useState(false)
+  const [manPageCommand, setManPageCommand] = useState(null)
 
   useEffect(() => {
     if (!welcomeShown && history.length === 0) {
@@ -78,10 +80,26 @@ const Terminal = () => {
     }
   }
 
+  useEffect(() => {
+    const lastUserCommand = history.filter(e => e.type === 'user').slice(-1)[0]
+    if (lastUserCommand && lastUserCommand.content.toUpperCase().startsWith('MAN ')) {
+      const command = lastUserCommand.content.split(' ')[1]?.toUpperCase()
+      if (command) {
+        setManPageCommand(command)
+      }
+    }
+  }, [history])
+
   return (
     <div className="terminal-container">
       <div className="scanlines"></div>
       <LanguageMenu />
+      {manPageCommand && (
+        <ManPage 
+          command={manPageCommand} 
+          onClose={() => setManPageCommand(null)} 
+        />
+      )}
       <div className="terminal-content">
         <div className="terminal-history">
           {history.map((entry, index) => (

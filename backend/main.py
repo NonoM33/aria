@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Optional
 import base64
-from adventure_data import ADVENTURE_DATA
+import os
+from adventures.adventure_data import get_adventure_data
+from adventures.global_state import GlobalState
+from man_pages import MAN_PAGES
+
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
+global_state = GlobalState()
 
 app = FastAPI()
 
@@ -24,7 +30,9 @@ def get_session(session_id: str, language: str = "FR") -> Dict:
     if lang_upper not in ["FR", "EN"]:
         lang_upper = "FR"
     
-    if session_id not in sessions:
+    is_new_session = session_id not in sessions
+    
+    if is_new_session:
         sessions[session_id] = {
             "level": 0,
             "chapter": "chapter_1",
@@ -36,6 +44,7 @@ def get_session(session_id: str, language: str = "FR") -> Dict:
             "flags": [],
             "language": lang_upper
         }
+        global_state.add_player()
     
     sessions[session_id]["language"] = lang_upper
     return sessions[session_id]
@@ -81,7 +90,10 @@ async def handle_command(request: CommandRequest):
     session["language"] = requested_lang
     lang = requested_lang
     
-    data = ADVENTURE_DATA.get(lang, ADVENTURE_DATA["FR"])
+    adventure_data = get_adventure_data(lang)
+    if lang not in adventure_data:
+        lang = "FR"
+    data = adventure_data.get(lang, {})
     chapter_id = session.get("chapter", "chapter_1")
     chapter = data["chapters"].get(chapter_id, {})
     
@@ -103,12 +115,18 @@ async def handle_command(request: CommandRequest):
             available += ", ACTIVATE, NETWORK, ANALYZE, BYPASS"
         if session["level"] >= 3:
             available += ", CONNECT, RESTORE, SOLVE"
+        if session["level"] >= 6:
+            available += ", NVIM, MAN"
+        if DEV_MODE:
+            available += ", DEV"
         
         help_msg = f"Commands available: {available}"
         if lang == "FR":
             help_msg += "\n\nTapez STATUS pour voir l'état du système."
+            help_msg += f"\n[GLOBAL] Intégrité mondiale: {global_state._state['global_integrity']}%"
         else:
             help_msg += "\n\nType STATUS to see system status."
+            help_msg += f"\n[GLOBAL] World integrity: {global_state._state['global_integrity']}%"
         return {"response": help_msg, "status": "success"}
     
     elif command == "STATUS":
@@ -143,13 +161,17 @@ async def handle_command(request: CommandRequest):
             if "SCAN" not in session["unlocked_commands"]:
                 session["unlocked_commands"].extend(["SCAN", "DECODE", "ACCESS"])
             
+            global_state.update_integrity(global_state._state["global_integrity"] + 1)
+            global_state.unlock_chapter("chapter_2")
+            
             chapter_2_data = data["chapters"].get("chapter_2", {})
             intro = chapter_2_data.get("intro", "")
             
+            global_integrity = global_state._state["global_integrity"]
             if lang == "FR":
-                intro += "\n\nNouvelles commandes: SCAN, DECODE, ACCESS"
+                intro += f"\n\nNouvelles commandes: SCAN, DECODE, ACCESS\n\n[GLOBAL] Intégrité mondiale: {global_integrity}% ({global_state._state['players_online']} joueurs actifs)"
             else:
-                intro += "\n\nNew commands: SCAN, DECODE, ACCESS"
+                intro += f"\n\nNew commands: SCAN, DECODE, ACCESS\n\n[GLOBAL] World integrity: {global_integrity}% ({global_state._state['players_online']} active players)"
             
             return {"response": intro, "status": "success"}
         else:
@@ -406,39 +428,142 @@ Password is the reverse of "VOID"."""
         
         if args.upper().strip() == puzzle.get("solution", "").upper():
             session["level"] = 6
+            session["chapter"] = "chapter_6"
             session["flags"].append("adventure_complete")
+            if "NVIM" not in session["unlocked_commands"]:
+                session["unlocked_commands"].extend(["NVIM", "MAN"])
             
             if lang == "FR":
                 return {"response": """FÉLICITATIONS!
 ================
 
-Vous avez complété SYSTEM_VOID!
-L'intégrité du système est restaurée à 100%.
-Tous les fichiers ont été récupérés.
-La mission est un succès.
+Vous avez complété la première partie de SYSTEM_VOID!
+L'intégrité du système est restaurée à 50%.
+Nouvelles commandes débloquées: NVIM, MAN
 
-Temps estimé: 1 heure
-Votre temps: Variable
+Chapitre 6: L'Exploration
+Utilisez NVIM pour explorer le système de fichiers.
 
-Merci d'avoir joué!""", "status": "success"}
+Tapez MAN NVIM pour apprendre à utiliser le gestionnaire de fichiers.""", "status": "success"}
             else:
                 return {"response": """CONGRATULATIONS!
 ==================
 
-You have completed SYSTEM_VOID!
-System integrity restored to 100%.
-All files have been recovered.
-Mission successful.
+You have completed the first part of SYSTEM_VOID!
+System integrity restored to 50%.
+New commands unlocked: NVIM, MAN
 
-Estimated time: 1 hour
-Your time: Variable
+Chapter 6: The Exploration
+Use NVIM to explore the file system.
 
-Thank you for playing!""", "status": "success"}
+Type MAN NVIM to learn how to use the file manager.""", "status": "success"}
         else:
             if lang == "FR":
                 return {"response": "Réponse incorrecte. Réessayez.", "status": "error"}
             else:
                 return {"response": "Incorrect answer. Try again.", "status": "error"}
+    
+    elif command == "MAN":
+        if not args:
+            if lang == "FR":
+                return {"response": "Usage: MAN <commande>\nExemple: MAN HELP", "status": "info"}
+            else:
+                return {"response": "Usage: MAN <command>\nExample: MAN HELP", "status": "info"}
+        
+        command_name = args.upper().strip()
+        man_pages = MAN_PAGES.get(lang, MAN_PAGES["FR"])
+        
+        if command_name in man_pages:
+            return {"response": man_pages[command_name], "status": "success"}
+        else:
+            if lang == "FR":
+                return {"response": f"Aucune page de manuel trouvée pour '{command_name}'.\n\nUtilisez MAN HELP pour voir les commandes disponibles.", "status": "error"}
+            else:
+                return {"response": f"No manual page found for '{command_name}'.\n\nUse MAN HELP to see available commands.", "status": "error"}
+    
+    elif command == "DEV" and DEV_MODE:
+        if not args:
+            if lang == "FR":
+                return {"response": """MODE DÉVELOPPEMENT
+==================
+
+Commandes disponibles:
+- DEV JUMP <chapter_id> : Aller à un chapitre
+- DEV LEVEL <niveau> : Définir le niveau
+- DEV GLOBAL : Voir l'état global
+- DEV RESET : Réinitialiser la session
+- DEV LIST : Lister tous les chapitres
+
+Exemple: DEV JUMP chapter_6""", "status": "info"}
+            else:
+                return {"response": """DEVELOPMENT MODE
+==================
+
+Available commands:
+- DEV JUMP <chapter_id> : Jump to a chapter
+- DEV LEVEL <level> : Set level
+- DEV GLOBAL : View global state
+- DEV RESET : Reset session
+- DEV LIST : List all chapters
+
+Example: DEV JUMP chapter_6""", "status": "info"}
+        
+        dev_parts = args.split(" ", 1)
+        dev_command = dev_parts[0].upper()
+        dev_args = dev_parts[1] if len(dev_parts) > 1 else ""
+        
+        if dev_command == "JUMP":
+            if not dev_args:
+                return {"response": "Usage: DEV JUMP <chapter_id>\nExemple: DEV JUMP chapter_6", "status": "error"}
+            chapter_id = dev_args.lower().strip()
+            from adventures.adventure_loader import get_chapter
+            chapter_data = get_chapter(chapter_id, lang)
+            if chapter_data:
+                session["chapter"] = chapter_id
+                session["level"] = int(chapter_id.split("_")[1]) if "_" in chapter_id else 0
+                if lang == "FR":
+                    return {"response": f"Chapitre changé: {chapter_id}\n\n{chapter_data.get('intro', '')}", "status": "success"}
+                else:
+                    return {"response": f"Chapter changed: {chapter_id}\n\n{chapter_data.get('intro', '')}", "status": "success"}
+            else:
+                return {"response": f"Chapitre '{chapter_id}' introuvable.", "status": "error"}
+        
+        elif dev_command == "LEVEL":
+            if not dev_args:
+                return {"response": "Usage: DEV LEVEL <niveau>", "status": "error"}
+            try:
+                level = int(dev_args)
+                session["level"] = level
+                return {"response": f"Niveau défini à {level}", "status": "success"}
+            except:
+                return {"response": "Niveau invalide", "status": "error"}
+        
+        elif dev_command == "GLOBAL":
+            state = global_state.get_state()
+            return {"response": f"""ÉTAT GLOBAL
+============
+
+Intégrité globale: {state['global_integrity']}%
+Joueurs totaux: {state['total_players']}
+Joueurs en ligne: {state['players_online']}
+Chapitres débloqués: {', '.join(state['chapters_unlocked']) if state['chapters_unlocked'] else 'Aucun'}
+État du monde: {state['world_state']}
+Dernière mise à jour: {state['last_update']}""", "status": "success"}
+        
+        elif dev_command == "RESET":
+            session_id = request.session_id
+            if session_id in sessions:
+                del sessions[session_id]
+            return {"response": "Session réinitialisée", "status": "success"}
+        
+        elif dev_command == "LIST":
+            from adventures.adventure_loader import load_all_chapters
+            all_chapters = load_all_chapters(lang)
+            chapter_list = "\n".join([f"- {cid}: {ch.get('title', 'N/A')}" for cid, ch in all_chapters.items()])
+            return {"response": f"CHAPITRES DISPONIBLES:\n\n{chapter_list}", "status": "success"}
+        
+        else:
+            return {"response": f"Commande DEV inconnue: {dev_command}", "status": "error"}
     
     else:
         if lang == "FR":
@@ -446,8 +571,55 @@ Thank you for playing!""", "status": "success"}
         else:
             return {"response": "Unknown command. Access Denied.\n\nType HELP to see available commands.", "status": "error"}
 
+@app.get("/api/man/{command}")
+async def get_man_page(command: str, language: str = "FR"):
+    lang = language.upper().strip() if language else "FR"
+    if lang not in ["FR", "EN"]:
+        lang = "FR"
+    
+    command_upper = command.upper()
+    man_pages = MAN_PAGES.get(lang, MAN_PAGES["FR"])
+    
+    if command_upper in man_pages:
+        return {
+            "command": command_upper,
+            "content": man_pages[command_upper],
+            "language": lang
+        }
+    else:
+        if lang == "FR":
+            return {
+                "command": command_upper,
+                "content": f"MAN(1)                    Manuel SYSTEM_VOID                   MAN(1)\n\nAucune page de manuel trouvée pour '{command_upper}'.\n\nUtilisez MAN HELP pour voir les commandes disponibles.",
+                "language": lang
+            }
+        else:
+            return {
+                "command": command_upper,
+                "content": f"MAN(1)                    SYSTEM_VOID Manual                   MAN(1)\n\nNo manual page found for '{command_upper}'.\n\nUse MAN HELP to see available commands.",
+                "language": lang
+            }
+
+@app.get("/api/files")
+async def get_available_files(session_id: str, language: str = "FR"):
+    requested_lang = (language or "FR").upper().strip()
+    if requested_lang not in ["FR", "EN"]:
+        requested_lang = "FR"
+    
+    session = get_session(session_id, requested_lang)
+    chapter_id = session.get("chapter", "chapter_1")
+    
+    adventure_data = get_adventure_data(requested_lang)
+    data = adventure_data.get(requested_lang, {})
+    chapter = data["chapters"].get(chapter_id, {})
+    
+    files = list(chapter.get("files", {}).keys())
+    return {"files": files}
+
 @app.get("/api/global-status")
 async def get_global_status(session_id: str = None):
+    global_state_data = global_state.get_state()
+    
     if session_id and session_id in sessions:
         session = sessions[session_id]
         integrity = 34 + (session["level"] * 15)
@@ -455,17 +627,24 @@ async def get_global_status(session_id: str = None):
             integrity = 100
         return {
             "system_integrity": integrity,
-            "active_users": 127,
+            "global_integrity": global_state_data["global_integrity"],
+            "active_users": global_state_data["players_online"],
+            "total_players": global_state_data["total_players"],
             "security_level": "CRITICAL" if session["level"] < 3 else "BREACHED",
             "access_level": session["level"],
             "chapter": session.get("chapter", "chapter_1"),
-            "last_update": "2024-01-15T10:23:45Z"
+            "world_state": global_state_data["world_state"],
+            "chapters_unlocked": global_state_data["chapters_unlocked"],
+            "last_update": global_state_data["last_update"]
         }
     return {
         "system_integrity": 34,
-        "active_users": 127,
+        "global_integrity": global_state_data["global_integrity"],
+        "active_users": global_state_data["players_online"],
+        "total_players": global_state_data["total_players"],
         "security_level": "CRITICAL",
-        "last_update": "2024-01-15T10:23:45Z"
+        "world_state": global_state_data["world_state"],
+        "last_update": global_state_data["last_update"]
     }
 
 @app.get("/")

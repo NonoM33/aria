@@ -33,20 +33,37 @@ npm install
 
 ### Backend
 
-Depuis la racine du projet :
+**Méthode 1 : Script automatique (recommandé)**
 
 ```bash
 cd backend
-uvicorn main:app --reload --port 8000
+./start.sh
 ```
 
-Ou si vous êtes déjà dans le répertoire `backend` :
+**Méthode 2 : Manuelle**
 
 ```bash
+cd backend
+
+# Créer/activer le venv
+python3 -m venv venv
+source venv/bin/activate
+
+# Installer les dépendances
+pip install -r requirements.txt
+
+# Démarrer le serveur
 uvicorn main:app --reload --port 8000
 ```
 
 L'API sera accessible sur `http://localhost:8000`
+
+**Mode DEV** (pour tester rapidement) :
+
+```bash
+export DEV_MODE=true
+./start.sh
+```
 
 ### Frontend
 
@@ -171,6 +188,43 @@ Les tests couvrent :
 - Les énigmes et leurs solutions
 
 Voir `backend/README_TESTS.md` pour plus de détails.
+
+## Structure Modulaire
+
+L'histoire est maintenant modulaire ! Chaque chapitre est dans un fichier séparé :
+
+- `backend/adventures/chapters/chapter_X.py`
+- Facile à maintenir et étendre
+- Parfait pour les DLC !
+
+## Mode Développement
+
+Pour activer le mode dev et tester rapidement :
+
+```bash
+export DEV_MODE=true
+cd backend
+uvicorn main:app --reload
+```
+
+Puis dans le terminal :
+
+- `DEV JUMP chapter_6` - Aller à un chapitre
+- `DEV LEVEL 5` - Définir le niveau
+- `DEV GLOBAL` - Voir l'état global
+- `DEV LIST` - Lister tous les chapitres
+
+Voir `backend/DEV_MODE.md` pour plus de détails.
+
+## Système Multi-Joueur Global
+
+Tous les joueurs partagent le même état global :
+
+- Intégrité mondiale augmentée collectivement
+- Chapitres débloqués pour tous
+- Impact des actions sur le monde entier
+
+Voir `backend/adventures/README.md` pour la structure modulaire.
 
 ## Génération d'Aventures
 

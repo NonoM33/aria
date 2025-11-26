@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from main import app, get_session, ENCRYPTION_KEY
-from adventure_data import ADVENTURE_DATA
+from adventures.adventure_data import get_adventure_data
 
 client = TestClient(app)
 
@@ -407,21 +407,22 @@ def test_chapter_files_availability():
     assert any(f in data["response"] for f in files_mentioned)
 
 def test_adventure_data_structure():
-    assert "FR" in ADVENTURE_DATA
-    assert "EN" in ADVENTURE_DATA
-    
     for lang in ["FR", "EN"]:
-        assert "chapters" in ADVENTURE_DATA[lang]
-        assert "system_messages" in ADVENTURE_DATA[lang]
-        assert "chapter_1" in ADVENTURE_DATA[lang]["chapters"]
-        assert "chapter_2" in ADVENTURE_DATA[lang]["chapters"]
-        assert "chapter_3" in ADVENTURE_DATA[lang]["chapters"]
-        assert "chapter_4" in ADVENTURE_DATA[lang]["chapters"]
-        assert "chapter_5" in ADVENTURE_DATA[lang]["chapters"]
+        adventure_data = get_adventure_data(lang)
+        data = adventure_data.get(lang, {})
+        assert "chapters" in data
+        assert "system_messages" in data
+        assert "chapter_1" in data["chapters"]
+        assert "chapter_2" in data["chapters"]
+        assert "chapter_3" in data["chapters"]
+        assert "chapter_4" in data["chapters"]
+        assert "chapter_5" in data["chapters"]
 
 def test_all_puzzles_have_solutions():
     for lang in ["FR", "EN"]:
-        chapters = ADVENTURE_DATA[lang]["chapters"]
+        adventure_data = get_adventure_data(lang)
+        data = adventure_data.get(lang, {})
+        chapters = data["chapters"]
         for chapter_id, chapter_data in chapters.items():
             if "puzzles" in chapter_data:
                 for puzzle_id, puzzle_data in chapter_data["puzzles"].items():
@@ -430,12 +431,111 @@ def test_all_puzzles_have_solutions():
 
 def test_all_files_have_content():
     for lang in ["FR", "EN"]:
-        chapters = ADVENTURE_DATA[lang]["chapters"]
+        adventure_data = get_adventure_data(lang)
+        data = adventure_data.get(lang, {})
+        chapters = data["chapters"]
         for chapter_id, chapter_data in chapters.items():
             if "files" in chapter_data:
                 for filename, content in chapter_data["files"].items():
                     assert content, f"File {filename} in {chapter_id} is empty"
                     assert isinstance(content, str), f"File {filename} in {chapter_id} is not a string"
+
+def test_get_available_files_endpoint():
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "files" in data
+    assert isinstance(data["files"], list)
+    assert len(data["files"]) > 0
+    assert "corrupted_data.b64" in data["files"]
+    assert "protocol_xyz.txt" in data["files"]
+
+def test_file_autocomplete_after_scan():
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    client.post("/api/command", json={
+        "command": "SCAN",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    files = data["files"]
+    
+    assert len(files) >= 3
+    assert all(isinstance(f, str) for f in files)
+
+def test_file_autocomplete_different_chapters():
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    chapter_2_files = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    }).json()["files"]
+    
+    assert "corrupted_data.b64" in chapter_2_files
+    
+    client.post("/api/command", json={
+        "command": "ACTIVATE PROTOCOL_XYZ",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    chapter_3_files = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    }).json()["files"]
+    
+    assert "matrix.txt" in chapter_3_files or len(chapter_3_files) > 0
+
+def test_file_autocomplete_language_support():
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "EN"
+    })
+    
+    response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "EN"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "files" in data
+    assert len(data["files"]) > 0
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
