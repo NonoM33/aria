@@ -1,0 +1,141 @@
+{
+  "adventure_schema": {
+    "metadata": {
+      "title": "string - Title of the adventure",
+      "estimated_duration_minutes": "number - Estimated completion time",
+      "difficulty": "string - EASY, MEDIUM, HARD",
+      "language": "string - FR or EN"
+    },
+    "chapters": [
+      {
+        "chapter_id": "string - Unique chapter identifier",
+        "chapter_number": "number - Chapter order",
+        "title": "string - Chapter title",
+        "description": "string - Brief chapter description",
+        "objectives": [
+          "string - List of objectives to complete"
+        ],
+        "triggers": {
+          "command": "string - Command that triggers this chapter",
+          "conditions": {
+            "level": "number - Minimum level required",
+            "completed_chapters": ["string - Required completed chapter IDs"],
+            "items_collected": ["string - Required items"],
+            "flags": ["string - Required flags set"]
+          }
+        },
+        "content": {
+          "intro_message": "string - Initial message when chapter starts",
+          "files": {
+            "filename": {
+              "content": "string - File content",
+              "hint": "string - Optional hint about this file",
+              "unlocks": {
+                "commands": ["string - Commands unlocked"],
+                "items": ["string - Items given"],
+                "flags": ["string - Flags set"],
+                "next_chapter": "string - Next chapter ID to unlock"
+              }
+            }
+          },
+          "puzzles": [
+            {
+              "puzzle_id": "string - Unique puzzle ID",
+              "type": "string - DECODE, RIDDLE, MATH, SEQUENCE, etc.",
+              "question": "string - Puzzle question/description",
+              "hints": [
+                "string - Progressive hints"
+              ],
+              "solution": "string - Correct answer",
+              "solution_variants": ["string - Alternative accepted answers"],
+              "unlocks": {
+                "commands": ["string - Commands unlocked"],
+                "items": ["string - Items given"],
+                "flags": ["string - Flags set"],
+                "next_chapter": "string - Next chapter ID"
+              },
+              "command": "string - Command to solve (e.g., SOLVE, DECODE, RIDDLE)"
+            }
+          ],
+          "hidden_commands": [
+            {
+              "command": "string - Hidden command name",
+              "response": "string - Response when command is used",
+              "unlocks": {
+                "commands": ["string"],
+                "items": ["string"],
+                "flags": ["string"],
+                "next_chapter": "string"
+              }
+            }
+          ]
+        },
+        "completion": {
+          "message": "string - Completion message",
+          "rewards": {
+            "level_increase": "number - Level gained",
+            "items": ["string - Items received"],
+            "flags": ["string - Flags set"],
+            "unlocks_next_chapter": "string - Next chapter ID"
+          }
+        }
+      }
+    ],
+    "items": {
+      "item_id": {
+        "name": "string - Item name",
+        "description": "string - Item description",
+        "use_case": "string - How to use this item",
+        "unlocks": {
+          "commands": ["string"],
+          "chapters": ["string"]
+        }
+      }
+    },
+    "commands": {
+      "command_name": {
+        "description": "string - Command description",
+        "usage": "string - Usage example",
+        "unlocked_at_level": "number - Level when command unlocks",
+        "requires_items": ["string - Required items"],
+        "requires_flags": ["string - Required flags"]
+      }
+    },
+    "translations": {
+      "FR": {
+        "command_responses": {
+          "command_name": "string - French response"
+        },
+        "system_messages": {
+          "message_key": "string - French system message"
+        },
+        "file_contents": {
+          "filename": "string - French file content"
+        }
+      },
+      "EN": {
+        "command_responses": {
+          "command_name": "string - English response"
+        },
+        "system_messages": {
+          "message_key": "string - English system message"
+        },
+        "file_contents": {
+          "filename": "string - English file content"
+        }
+      }
+    }
+  },
+  "example_usage": {
+    "description": "This template can be used by an AI to generate new adventures",
+    "steps": [
+      "1. Define metadata (title, duration, difficulty)",
+      "2. Create chapters with objectives and triggers",
+      "3. Add content (files, puzzles, hidden commands)",
+      "4. Define items and their uses",
+      "5. Specify command behaviors",
+      "6. Add translations for FR and EN"
+    ]
+  }
+}
+
