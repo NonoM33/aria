@@ -46,9 +46,10 @@ export const useTerminal = () => {
         })
         if (response.data && response.data.files) {
           setAvailableFiles(response.data.files)
+          console.log('Files loaded:', response.data.files)
         }
       } catch (error) {
-        // Silently fail, files will be empty
+        console.error('Error loading files:', error)
       }
     }
     
@@ -87,8 +88,11 @@ export const useTerminal = () => {
     const command = parts[0]?.toUpperCase() || ''
     const arg = parts.slice(1).join(' ') || ''
     
-    // Auto-complétion pour ACCESS <fichier>
-    if (command === 'ACCESS') {
+    // Commandes qui prennent des noms de fichiers en argument
+    const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT']
+    
+    // Auto-complétion pour les commandes de fichiers
+    if (fileCommands.includes(command)) {
       if (arg) {
         const lowerArg = arg.toLowerCase()
         const matches = availableFiles.filter(file => 
@@ -96,8 +100,8 @@ export const useTerminal = () => {
         )
         return matches
       } else {
-        // Si juste "ACCESS " (avec espace), retourner tous les fichiers
-        return availableFiles
+        // Si juste "COMMANDE " (avec espace), retourner tous les fichiers
+        return availableFiles.length > 0 ? availableFiles : []
       }
     }
     
@@ -171,9 +175,10 @@ export const useTerminal = () => {
             })
             if (fileResponse.data && fileResponse.data.files) {
               setAvailableFiles(fileResponse.data.files)
+              console.log('Files updated after command:', fileResponse.data.files)
             }
           } catch (error) {
-            // Silently fail
+            console.error('Error updating files:', error)
           }
         }, 100)
       }
@@ -252,37 +257,35 @@ export const useTerminal = () => {
   }, [commandHistory, historyIndex])
 
   const handleTab = useCallback((currentInput) => {
-    if (!currentInput || !currentInput.trim()) {
+    if (!currentInput) {
       return false
     }
     
-    const options = getAutocompleteOptions(currentInput)
+    const trimmed = currentInput.trim()
+    if (!trimmed) {
+      return false
+    }
+    
+    const options = getAutocompleteOptions(trimmed)
+    console.log('Tab pressed, input:', trimmed, 'options:', options, 'availableFiles:', availableFiles)
     
     if (options.length === 0) {
       return false
     }
     
-    const trimmed = currentInput.trim()
     const parts = trimmed.split(/\s+/)
     const command = parts[0]?.toUpperCase() || ''
     const arg = parts.slice(1).join(' ') || ''
     
+    // Commandes qui prennent des fichiers
+    const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT']
+    
     if (options.length === 1) {
       // Une seule option : compléter automatiquement
-      if (command === 'ACCESS') {
-        if (arg) {
-          // Remplacer l'argument partiel par le fichier complet
-          setInput(`ACCESS ${options[0]}`)
-        } else {
-          // Juste "ACCESS " -> ajouter le premier fichier
-          setInput(`ACCESS ${options[0]}`)
-        }
+      if (fileCommands.includes(command)) {
+        setInput(`${command} ${options[0]}`)
       } else if (command === 'MAN') {
-        if (arg) {
-          setInput(`MAN ${options[0]}`)
-        } else {
-          setInput(`MAN ${options[0]}`)
-        }
+        setInput(`MAN ${options[0]}`)
       } else {
         // Commande simple
         setInput(options[0])
@@ -290,28 +293,29 @@ export const useTerminal = () => {
       setAutocompleteOptions([])
       return true
     } else if (options.length > 1) {
-      // Plusieurs options : afficher la liste
+      // Plusieurs options : compléter avec le premier et afficher la liste
       setAutocompleteOptions(options)
       
-      if (command === 'ACCESS') {
+      if (fileCommands.includes(command)) {
         if (arg) {
           // Si on a déjà tapé quelque chose, compléter avec le premier match
-          setInput(`ACCESS ${options[0]}`)
-          addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
-        } else {
-          // Juste "ACCESS " -> montrer tous les fichiers
-          addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
+          setInput(`${command} ${options[0]}`)
         }
+        addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
       } else if (command === 'MAN') {
+        if (arg) {
+          setInput(`MAN ${options[0]}`)
+        }
         addToHistory('system', `Commandes disponibles: ${options.join(', ')}`)
       } else {
+        setInput(options[0])
         addToHistory('system', `Suggestions: ${options.join(', ')}`)
       }
       return true
     }
     
     return false
-  }, [getAutocompleteOptions, addToHistory, setInput])
+  }, [getAutocompleteOptions, addToHistory])
 
   return {
     history,

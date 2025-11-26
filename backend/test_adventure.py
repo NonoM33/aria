@@ -537,6 +537,272 @@ def test_file_autocomplete_language_support():
     assert "files" in data
     assert len(data["files"]) > 0
 
+def test_help_no_duplicate_commands():
+    """Test de non-régression : HELP ne doit pas afficher de commandes en double"""
+    session_id = get_test_session_id()
+    
+    # Login pour débloquer les commandes de niveau 1
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    help_text = data["response"]
+    
+    # Extraire la liste des commandes
+    commands_line = help_text.split("\n")[0]
+    commands_str = commands_line.split("Commands available: ")[1]
+    commands_list = [cmd.strip() for cmd in commands_str.split(",")]
+    
+    # Vérifier qu'il n'y a pas de doublons
+    assert len(commands_list) == len(set(commands_list)), f"Doublons détectés: {commands_list}"
+    
+    # Vérifier que SCAN, DECODE, ACCESS sont présents une seule fois
+    assert commands_list.count("SCAN") == 1, "SCAN apparaît plusieurs fois"
+    assert commands_list.count("DECODE") == 1, "DECODE apparaît plusieurs fois"
+    assert commands_list.count("ACCESS") == 1, "ACCESS apparaît plusieurs fois"
+
+def test_help_commands_sorted():
+    """Test de non-régression : Les commandes dans HELP doivent être triées"""
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    help_text = data["response"]
+    
+    commands_line = help_text.split("\n")[0]
+    commands_str = commands_line.split("Commands available: ")[1]
+    commands_list = [cmd.strip() for cmd in commands_str.split(",")]
+    
+    # Vérifier que la liste est triée
+    assert commands_list == sorted(commands_list), "Les commandes ne sont pas triées"
+
+def test_file_autocomplete_after_login():
+    """Test de non-régression : Les fichiers doivent être disponibles après LOGIN"""
+    session_id = get_test_session_id()
+    
+    # Login
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # Vérifier que les fichiers sont disponibles
+    response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "files" in data
+    assert isinstance(data["files"], list)
+    assert len(data["files"]) > 0
+
+def test_file_autocomplete_consistency():
+    """Test de non-régression : Les fichiers doivent être cohérents entre SCAN et /api/files"""
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # Faire un SCAN
+    scan_response = client.post("/api/command", json={
+        "command": "SCAN",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # Récupérer les fichiers via l'API
+    files_response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert files_response.status_code == 200
+    files_data = files_response.json()
+    api_files = set(files_data["files"])
+    
+    # Extraire les fichiers mentionnés dans SCAN
+    scan_text = scan_response.json()["response"]
+    scan_files = set()
+    for line in scan_text.split("\n"):
+        if line.strip().startswith("- "):
+            filename = line.strip()[2:].strip()
+            scan_files.add(filename)
+    
+    # Les fichiers doivent correspondre
+    assert api_files == scan_files, f"Fichiers incohérents: API={api_files}, SCAN={scan_files}"
+
+def test_autocomplete_empty_input():
+    """Test de non-régression : L'auto-complétion ne doit pas planter avec une entrée vide"""
+    session_id = get_test_session_id()
+    
+    # Tester avec une commande vide
+    response = client.post("/api/command", json={
+        "command": "",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "response" in data
+
+def test_autocomplete_invalid_file():
+    """Test de non-régression : ACCESS avec un fichier invalide doit retourner une erreur"""
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.post("/api/command", json={
+        "command": "ACCESS nonexistent_file.txt",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "error"
+    assert "introuvable" in data["response"].lower() or "not found" in data["response"].lower()
+
+def test_help_commands_at_different_levels():
+    """Test de non-régression : HELP doit afficher les bonnes commandes selon le niveau"""
+    session_id = get_test_session_id()
+    
+    # Niveau 0
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    data = response.json()
+    level_0_commands = data["response"].split("Commands available: ")[1].split("\n")[0]
+    assert "HELP" in level_0_commands
+    assert "STATUS" in level_0_commands
+    assert "LOGIN" in level_0_commands
+    assert "SCAN" not in level_0_commands
+    
+    # Niveau 1
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    data = response.json()
+    level_1_commands = data["response"].split("Commands available: ")[1].split("\n")[0]
+    assert "SCAN" in level_1_commands
+    assert "DECODE" in level_1_commands
+    assert "ACCESS" in level_1_commands
+
+def test_file_autocomplete_for_decode():
+    """Test de non-régression : L'auto-complétion doit fonctionner pour DECODE"""
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # Vérifier que les fichiers sont disponibles
+    response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "files" in data
+    files = data["files"]
+    assert "corrupted_data.b64" in files
+    
+    # Vérifier que DECODE fonctionne avec du Base64 direct
+    decode_response = client.post("/api/command", json={
+        "command": "DECODE VGhlIG5leHQgc3RlcCBpcyB0byBkZWNvZGUgdGhlIGZpbGUgY29kZWQgaW4gYmFzZTY0LgpUaGUgYW5zd2VyIGlzOiBQUk9UT0NPTF9YWVo=",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert decode_response.status_code == 200
+    decode_data = decode_response.json()
+    assert decode_data["status"] in ["success", "info"]
+    
+    # Vérifier que DECODE fonctionne avec un nom de fichier
+    decode_file_response = client.post("/api/command", json={
+        "command": "DECODE corrupted_data.b64",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert decode_file_response.status_code == 200
+    decode_file_data = decode_file_response.json()
+    assert decode_file_data["status"] == "success"
+    assert "décodé" in decode_file_data["response"].lower() or "decoded" in decode_file_data["response"].lower()
+
+def test_file_autocomplete_multiple_commands():
+    """Test de non-régression : L'auto-complétion doit fonctionner pour toutes les commandes de fichiers"""
+    session_id = get_test_session_id()
+    
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.get("/api/files", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    files = data["files"]
+    assert len(files) > 0
+    
+    # Tester que tous les fichiers sont accessibles
+    for filename in files:
+        access_response = client.post("/api/command", json={
+            "command": f"ACCESS {filename}",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert access_response.status_code == 200
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 
