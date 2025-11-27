@@ -1,11 +1,37 @@
 from typing import Dict, Optional, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session as DBSession
 from config import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES
 from auth.player_service import get_player_by_username, get_player_by_id, player_to_session_dict
 from adventures.global_state import GlobalState
 
 global_state = GlobalState()
 sessions: Dict[str, Dict] = {}
+
+
+def track_connection(session_id: str, db: Optional[DBSession] = None):
+    if db:
+        try:
+            from database import Connection
+            existing = db.query(Connection).filter(Connection.session_id == session_id).first()
+            if not existing:
+                connection = Connection(session_id=session_id)
+                db.add(connection)
+                db.commit()
+        except Exception:
+            pass
+
+
+def mark_connection_converted(session_id: str, player_id: int, db: Optional[DBSession] = None):
+    if db:
+        try:
+            from database import Connection
+            connection = db.query(Connection).filter(Connection.session_id == session_id).first()
+            if connection:
+                connection.converted = True
+                connection.player_id = player_id
+                db.commit()
+        except Exception:
+            pass
 
 def normalize_language(language: Optional[str]) -> str:
     if not language:
@@ -18,7 +44,7 @@ def normalize_language(language: Optional[str]) -> str:
 def get_session(
     session_id: str,
     language: str = DEFAULT_LANGUAGE,
-    db: Optional[Session] = None,
+    db: Optional[DBSession] = None,
     username: Optional[str] = None,
     token: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -34,6 +60,8 @@ def get_session(
                 existing_path = existing_session.get("current_path")
                 existing_aliases = existing_session.get("aliases")
                 existing_voidrc = existing_session.get("voidrc")
+                existing_admin_mode = existing_session.get("admin_mode")
+                existing_admin_pending = existing_session.get("admin_pending")
                 session_dict = player_to_session_dict(player)
                 session_dict["language"] = lang
                 if ssh_pending_username:
@@ -44,6 +72,10 @@ def get_session(
                     session_dict["aliases"] = existing_aliases
                 if existing_voidrc:
                     session_dict["voidrc"] = existing_voidrc
+                if existing_admin_mode:
+                    session_dict["admin_mode"] = existing_admin_mode
+                if existing_admin_pending:
+                    session_dict["admin_pending"] = existing_admin_pending
                 sessions[session_id] = session_dict
                 return session_dict
         except:
@@ -59,6 +91,8 @@ def get_session(
                     existing_path = existing_session.get("current_path")
                     existing_aliases = existing_session.get("aliases")
                     existing_voidrc = existing_session.get("voidrc")
+                    existing_admin_mode = existing_session.get("admin_mode")
+                    existing_admin_pending = existing_session.get("admin_pending")
                     session_dict = player_to_session_dict(player)
                     session_dict["language"] = lang
                     if ssh_pending_username:
@@ -69,6 +103,10 @@ def get_session(
                         session_dict["aliases"] = existing_aliases
                     if existing_voidrc:
                         session_dict["voidrc"] = existing_voidrc
+                    if existing_admin_mode:
+                        session_dict["admin_mode"] = existing_admin_mode
+                    if existing_admin_pending:
+                        session_dict["admin_pending"] = existing_admin_pending
                     sessions[session_id] = session_dict
                     return session_dict
         except:
@@ -78,6 +116,7 @@ def get_session(
     
     if is_new_session:
         sessions[session_id] = {
+            "session_id": session_id,
             "level": 0,
             "chapter": "chapter_0",
             "logged_in": False,
@@ -103,6 +142,7 @@ def get_session(
             "voidrc": ""
         }
         global_state.add_player()
+        track_connection(session_id, db)
     
     sessions[session_id]["language"] = lang
     return sessions[session_id]

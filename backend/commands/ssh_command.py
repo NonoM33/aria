@@ -263,9 +263,9 @@ class SshCommand(BaseCommand):
                 return {"response": f"\nSSH connection error: {str(e)}", "status": "error"}
     
     def _handle_root_access(self) -> Dict[str, Any]:
-        current_user = self.session.get("username", "")
+        current_user = self.session.get("username") or ""
         
-        if current_user.lower() not in [u.lower() for u in ADMIN_USERS]:
+        if not current_user or current_user.lower() not in [u.lower() for u in ADMIN_USERS]:
             if self.lang == "FR":
                 return {
                     "response": "root@system-void.local: Acces refuse.\nAutorisation ROOT requise.\n\n[SECURITE] Tentative d'acces non autorise enregistree.",

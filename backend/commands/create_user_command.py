@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
 from auth.ssh_auth import hack_database_and_create_user
+from services.session_service import mark_connection_converted
 
 class CreateUserCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
@@ -43,12 +44,17 @@ class CreateUserCommand(BaseCommand):
         
         if result.get("success"):
             token = result.get("token")
+            player_id = result.get("player_id")
             self.update_session({
                 "username": result["username"],
-                "player_id": result.get("player_id"),
+                "player_id": player_id,
                 "logged_in": True,
                 "ssh_token": token
             })
+            
+            session_id = self.session.get("session_id")
+            if session_id and player_id:
+                mark_connection_converted(session_id, player_id, self.db)
             
             if self.lang == "FR":
                 return {

@@ -319,6 +319,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 existing_aliases = existing_session_data.get("aliases")
                 existing_voidrc = existing_session_data.get("voidrc")
                 existing_admin_mode = existing_session_data.get("admin_mode")
+                existing_admin_pending = existing_session_data.get("admin_pending")
                 session = get_session(session_id, lang, db, username, token)
                 if existing_current_path:
                     session["current_path"] = existing_current_path
@@ -328,9 +329,11 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                     session["voidrc"] = existing_voidrc
                 if existing_admin_mode:
                     session["admin_mode"] = existing_admin_mode
+                if existing_admin_pending:
+                    session["admin_pending"] = existing_admin_pending
                 session["language"] = lang
                 
-                if password and session.get("ssh_pending_username"):
+                if password and (session.get("ssh_pending_username") or session.get("admin_pending")):
                     result = handle_command("", password, session, db, lang, token)
                     result = extract_aria_message(result)
                     
@@ -360,11 +363,15 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                         except Exception as e:
                             db.rollback()
                     
-                    await manager.send_personal_message({
+                    response_msg = {
                         "type": "command_response",
                         "response": result.get("response", ""),
                         "status": result.get("status", "info")
-                    }, connection_id)
+                    }
+                    if result.get("admin_mode"):
+                        response_msg["admin_mode"] = True
+                    
+                    await manager.send_personal_message(response_msg, connection_id)
                     
                     await send_session_updates(connection_id, session_id, session, lang, db)
                     continue

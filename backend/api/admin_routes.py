@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from database import Player, SessionLocal
 from api.dependencies import get_database
 from services.session_service import sessions
@@ -10,6 +10,16 @@ from datetime import datetime, timedelta
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 ADMIN_USERS = ["nono92"]
+
+
+def verify_admin_access(session_id: Optional[str] = None) -> bool:
+    if not session_id:
+        return False
+    session_data = sessions.get(session_id, {})
+    username = session_data.get("username", "")
+    is_admin_mode = session_data.get("admin_mode", False)
+    is_admin_user = username and username.lower() in [u.lower() for u in ADMIN_USERS]
+    return is_admin_mode and is_admin_user
 
 
 def get_online_sessions() -> List[Dict[str, Any]]:
@@ -28,7 +38,12 @@ def get_online_sessions() -> List[Dict[str, Any]]:
 
 
 @router.get("/stats")
-async def get_admin_stats(db: Session = Depends(get_database)) -> Dict[str, Any]:
+async def get_admin_stats(
+    session_id: Optional[str] = Query(None),
+    db: Session = Depends(get_database)
+) -> Dict[str, Any]:
+    if not verify_admin_access(session_id):
+        raise HTTPException(status_code=403, detail="Admin access required")
     total_players = db.query(func.count(Player.id)).scalar() or 0
     
     online_sessions = get_online_sessions()
@@ -97,7 +112,9 @@ async def get_admin_stats(db: Session = Depends(get_database)) -> Dict[str, Any]
 
 
 @router.get("/online")
-async def get_online_players() -> Dict[str, Any]:
+async def get_online_players(session_id: Optional[str] = Query(None)) -> Dict[str, Any]:
+    if not verify_admin_access(session_id):
+        raise HTTPException(status_code=403, detail="Admin access required")
     online = get_online_sessions()
     return {
         "count": len(online),
@@ -108,10 +125,13 @@ async def get_online_players() -> Dict[str, Any]:
 
 @router.get("/players")
 async def get_all_players(
+    session_id: Optional[str] = Query(None),
     db: Session = Depends(get_database),
     limit: int = 50,
     offset: int = 0
 ) -> Dict[str, Any]:
+    if not verify_admin_access(session_id):
+        raise HTTPException(status_code=403, detail="Admin access required")
     total = db.query(func.count(Player.id)).scalar() or 0
     
     players = db.query(Player).order_by(Player.last_login.desc()).offset(offset).limit(limit).all()
@@ -143,8 +163,12 @@ async def get_all_players(
 @router.get("/player/{username}")
 async def get_player_details(
     username: str,
+    session_id: Optional[str] = Query(None),
     db: Session = Depends(get_database)
 ) -> Dict[str, Any]:
+    if not verify_admin_access(session_id):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
     player = db.query(Player).filter(Player.username == username).first()
     
     if not player:
