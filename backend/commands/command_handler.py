@@ -58,6 +58,17 @@ def handle_command(
 ) -> Dict[str, Any]:
     command_upper = command.upper()
     
+    if session.get("ssh_pending_username") and command_upper == "":
+        if "SSH" in COMMAND_MAP:
+            cmd_class = COMMAND_MAP["SSH"]
+            cmd_instance = cmd_class(session, db, lang)
+            if token and hasattr(cmd_instance, 'token'):
+                cmd_instance.token = token
+            elif session.get("ssh_token") and hasattr(cmd_instance, 'token'):
+                cmd_instance.token = session.get("ssh_token")
+            if hasattr(cmd_instance, 'execute_password'):
+                return cmd_instance.execute_password(args)
+    
     if command_upper in COMMAND_MAP:
         cmd_class = COMMAND_MAP[command_upper]
         cmd_instance = cmd_class(session, db, lang)
