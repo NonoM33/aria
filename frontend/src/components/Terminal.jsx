@@ -420,7 +420,7 @@ const Terminal = () => {
               {entry.type === 'user' && (
                 <div className="terminal-line">
                   <span className="prompt">
-                    {username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `}
+                    {username ? `${username}@system-void:${entry.path || currentPath}$ ` : `guest:${entry.path || currentPath}$ `}
                   </span>
                   <span className="terminal-text">{entry.content}</span>
                 </div>
