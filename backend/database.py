@@ -27,6 +27,15 @@ class Player(Base):
     language = Column(String, default="FR")
     installed_packages = Column(JSON, default=list)
     
+    choices = Column(JSON, default=dict)
+    aria_trust = Column(Integer, default=50)
+    puzzle_attempts = Column(JSON, default=dict)
+    narrative_flags = Column(JSON, default=list)
+    discovered_secrets = Column(JSON, default=list)
+    aria_dialogue_progress = Column(Integer, default=0)
+    ending = Column(String, nullable=True)
+    game_completed = Column(Boolean, default=False)
+    
     total_commands = Column(Integer, default=0)
     total_playtime = Column(Integer, default=0)
     achievements = Column(JSON, default=list)
@@ -74,13 +83,27 @@ def _migrate_installed_packages():
         if os.path.exists(db_path):
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
-            try:
-                cursor.execute("SELECT installed_packages FROM players LIMIT 1")
-            except sqlite3.OperationalError:
-                cursor.execute("ALTER TABLE players ADD COLUMN installed_packages TEXT DEFAULT '[]'")
-                conn.commit()
-            finally:
-                conn.close()
+            
+            new_columns = [
+                ("installed_packages", "TEXT DEFAULT '[]'"),
+                ("choices", "TEXT DEFAULT '{}'"),
+                ("aria_trust", "INTEGER DEFAULT 50"),
+                ("puzzle_attempts", "TEXT DEFAULT '{}'"),
+                ("narrative_flags", "TEXT DEFAULT '[]'"),
+                ("discovered_secrets", "TEXT DEFAULT '[]'"),
+                ("aria_dialogue_progress", "INTEGER DEFAULT 0"),
+                ("ending", "TEXT"),
+                ("game_completed", "BOOLEAN DEFAULT 0"),
+            ]
+            
+            for col_name, col_def in new_columns:
+                try:
+                    cursor.execute(f"SELECT {col_name} FROM players LIMIT 1")
+                except sqlite3.OperationalError:
+                    cursor.execute(f"ALTER TABLE players ADD COLUMN {col_name} {col_def}")
+                    conn.commit()
+            
+            conn.close()
     except Exception:
         pass
 

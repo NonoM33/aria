@@ -21,6 +21,7 @@ from commands.create_user_command import CreateUserCommand
 from commands.pkg_command import PkgCommand
 from commands.exit_command import ExitCommand
 from commands.ls_command import LsCommand
+from commands.talk_command import TalkCommand, AriaCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -46,6 +47,8 @@ COMMAND_MAP = {
     "PKG": PkgCommand,
     "EXIT": ExitCommand,
     "LS": LsCommand,
+    "TALK": TalkCommand,
+    "ARIA": AriaCommand,
 }
 
 def handle_command(

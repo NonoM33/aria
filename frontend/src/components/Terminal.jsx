@@ -349,8 +349,22 @@ const Terminal = () => {
     return () => clearTimeout(timeoutId)
   }, [history, installedPackages, isTyping])
 
+  const isAriaMessage = (content) => {
+    return content && (content.includes('[ARIA]') || content.startsWith('ARIA:'))
+  }
+
+  if (showIntro) {
+    return (
+      <IntroSequence 
+        language={language}
+        onComplete={handleIntroComplete}
+        skipIntro={false}
+      />
+    )
+  }
+
   return (
-    <div className="terminal-container">
+    <div className={`terminal-container ${glitchActive ? 'terminal-glitch' : ''}`}>
       <div className="scanlines"></div>
       <LanguageMenu />
       {manPageCommand && (

@@ -71,7 +71,15 @@ def get_session(
             "language": lang,
             "username": None,
             "player_id": None,
-            "installed_packages": []
+            "installed_packages": [],
+            "choices": {},
+            "aria_trust": 50,
+            "puzzle_attempts": {},
+            "narrative_flags": [],
+            "discovered_secrets": [],
+            "aria_dialogue_progress": 0,
+            "ending": None,
+            "game_completed": False
         }
         global_state.add_player()
     

@@ -59,6 +59,46 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
     except (AttributeError, KeyError):
         installed_packages = []
     
+    try:
+        choices = player.choices or {}
+    except (AttributeError, KeyError):
+        choices = {}
+    
+    try:
+        aria_trust = player.aria_trust if player.aria_trust is not None else 50
+    except (AttributeError, KeyError):
+        aria_trust = 50
+    
+    try:
+        puzzle_attempts = player.puzzle_attempts or {}
+    except (AttributeError, KeyError):
+        puzzle_attempts = {}
+    
+    try:
+        narrative_flags = player.narrative_flags or []
+    except (AttributeError, KeyError):
+        narrative_flags = []
+    
+    try:
+        discovered_secrets = player.discovered_secrets or []
+    except (AttributeError, KeyError):
+        discovered_secrets = []
+    
+    try:
+        aria_dialogue_progress = player.aria_dialogue_progress or 0
+    except (AttributeError, KeyError):
+        aria_dialogue_progress = 0
+    
+    try:
+        ending = player.ending
+    except (AttributeError, KeyError):
+        ending = None
+    
+    try:
+        game_completed = player.game_completed or False
+    except (AttributeError, KeyError):
+        game_completed = False
+    
     return {
         "level": player.level,
         "chapter": player.chapter,
@@ -71,6 +111,14 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
         "language": player.language or "FR",
         "username": player.username,
         "player_id": player.id,
-        "installed_packages": installed_packages
+        "installed_packages": installed_packages,
+        "choices": choices,
+        "aria_trust": aria_trust,
+        "puzzle_attempts": puzzle_attempts,
+        "narrative_flags": narrative_flags,
+        "discovered_secrets": discovered_secrets,
+        "aria_dialogue_progress": aria_dialogue_progress,
+        "ending": ending,
+        "game_completed": game_completed
     }
 

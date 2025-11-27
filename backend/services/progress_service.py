@@ -34,6 +34,54 @@ def save_session_to_db(db: Session, session: Dict[str, Any], player: Optional[Pl
             except (AttributeError, KeyError):
                 pass
         
+        if hasattr(player, 'choices'):
+            try:
+                player.choices = session.get("choices", {})
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'aria_trust'):
+            try:
+                player.aria_trust = session.get("aria_trust", 50)
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'puzzle_attempts'):
+            try:
+                player.puzzle_attempts = session.get("puzzle_attempts", {})
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'narrative_flags'):
+            try:
+                player.narrative_flags = session.get("narrative_flags", [])
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'discovered_secrets'):
+            try:
+                player.discovered_secrets = session.get("discovered_secrets", [])
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'aria_dialogue_progress'):
+            try:
+                player.aria_dialogue_progress = session.get("aria_dialogue_progress", 0)
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'ending'):
+            try:
+                player.ending = session.get("ending", None)
+            except (AttributeError, KeyError):
+                pass
+        
+        if hasattr(player, 'game_completed'):
+            try:
+                player.game_completed = session.get("game_completed", False)
+            except (AttributeError, KeyError):
+                pass
+        
         save_player_progress(db, player)
         return True
     except Exception as e:

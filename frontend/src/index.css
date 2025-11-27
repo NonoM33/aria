@@ -617,3 +617,545 @@ body {
   opacity: 0.7;
 }
 
+/* ==========================================
+   ARIA DISPLAY STYLES
+   ========================================== */
+
+.aria-display {
+  position: relative;
+  background: #000000;
+  border: 2px solid #00FFFF;
+  margin-bottom: 20px;
+  padding: 0;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  overflow: hidden;
+}
+
+.aria-display.glitch {
+  animation: aria-glitch 0.3s ease;
+}
+
+@keyframes aria-glitch {
+  0% { transform: translate(0); filter: hue-rotate(0deg); }
+  20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  40% { transform: translate(2px, -2px); filter: hue-rotate(180deg); }
+  60% { transform: translate(-1px, 1px); filter: hue-rotate(270deg); }
+  80% { transform: translate(1px, -1px); filter: hue-rotate(360deg); }
+  100% { transform: translate(0); filter: hue-rotate(0deg); }
+}
+
+.aria-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #001111;
+  border-bottom: 1px solid #00FFFF;
+}
+
+.aria-status {
+  color: #00FFFF;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.aria-minimize-btn {
+  background: transparent;
+  border: 1px solid #00FFFF;
+  color: #00FFFF;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.aria-minimize-btn:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+
+.aria-ascii {
+  color: #00FFFF;
+  font-size: 10px;
+  line-height: 1.1;
+  white-space: pre;
+  padding: 10px;
+  margin: 0;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.aria-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 255, 255, 0.02) 50%
+  );
+  background-size: 100% 3px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.aria-minimized {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #001111;
+  border: 1px solid #00FFFF;
+  color: #00FFFF;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+
+.aria-minimized:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.aria-minimized-icon {
+  animation: aria-pulse 2s ease-in-out infinite;
+}
+
+@keyframes aria-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ARIA Dialogue Styles in Terminal */
+.aria-dialogue {
+  color: #00FFFF !important;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  border-left: 2px solid #00FFFF;
+  padding-left: 10px;
+  margin: 10px 0;
+}
+
+.aria-dialogue-header {
+  color: #00FFFF;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* ==========================================
+   INTRO SEQUENCE STYLES
+   ========================================== */
+
+.intro-sequence {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.intro-sequence.glitch-active {
+  animation: intro-glitch 0.2s ease;
+}
+
+@keyframes intro-glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.intro-content {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 700px;
+  padding: 30px;
+  border: 2px solid #00FF00;
+  background: rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+}
+
+.intro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #00FF00;
+}
+
+.intro-title {
+  color: #00FF00;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.intro-version {
+  color: #00AA00;
+  font-size: 12px;
+}
+
+.intro-terminal {
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 300px;
+}
+
+.intro-line {
+  color: #00FF00;
+  margin-bottom: 2px;
+  min-height: 20px;
+}
+
+.intro-line.whisper {
+  color: #00FFFF;
+  font-style: italic;
+  opacity: 0.8;
+  animation: whisper-fade 2s ease-in-out infinite;
+}
+
+@keyframes whisper-fade {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.intro-line.warning {
+  color: #FFAA00;
+  font-weight: bold;
+}
+
+.intro-line.important {
+  color: #FF5555;
+  font-weight: bold;
+}
+
+.intro-line.glitch-text {
+  animation: text-glitch 0.5s ease;
+}
+
+@keyframes text-glitch {
+  0% { transform: translate(0); opacity: 1; }
+  20% { transform: translate(-5px, 0); opacity: 0.8; }
+  40% { transform: translate(5px, 0); opacity: 0.6; }
+  60% { transform: translate(-3px, 0); opacity: 0.8; }
+  80% { transform: translate(3px, 0); opacity: 0.9; }
+  100% { transform: translate(0); opacity: 1; }
+}
+
+.intro-cursor {
+  animation: cursor-blink 0.5s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.intro-skip {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #00AA00;
+  font-size: 11px;
+  opacity: 0.7;
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 0.7; }
+}
+
+.intro-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 255, 0, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.intro-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ==========================================
+   GLITCH EFFECTS FOR TERMINAL
+   ========================================== */
+
+.terminal-glitch {
+  animation: terminal-glitch-effect 0.3s ease;
+}
+
+@keyframes terminal-glitch-effect {
+  0% { 
+    transform: translate(0);
+    filter: none;
+  }
+  10% { 
+    transform: translate(-2px, 1px);
+    filter: hue-rotate(90deg);
+  }
+  20% { 
+    transform: translate(2px, -1px);
+    filter: hue-rotate(180deg);
+  }
+  30% { 
+    transform: translate(-1px, 2px);
+    filter: hue-rotate(270deg);
+  }
+  40% { 
+    transform: translate(1px, -2px);
+    filter: none;
+  }
+  50% {
+    transform: translate(0);
+    clip-path: inset(30% 0 40% 0);
+  }
+  60% {
+    clip-path: inset(70% 0 10% 0);
+  }
+  70% {
+    clip-path: inset(10% 0 60% 0);
+  }
+  80% {
+    clip-path: inset(50% 0 20% 0);
+  }
+  90% {
+    clip-path: none;
+  }
+  100% { 
+    transform: translate(0);
+    filter: none;
+    clip-path: none;
+  }
+}
+
+/* ARIA text in terminal */
+.terminal-entry-system.aria-message {
+  color: #00FFFF;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.terminal-entry-system.aria-message::before {
+  content: "[ARIA] ";
+  color: #00FFFF;
+  font-weight: bold;
+}
+
+/* Choice prompts */
+.choice-prompt {
+  margin: 15px 0;
+  padding: 15px;
+  border: 1px solid #FFAA00;
+  background: rgba(255, 170, 0, 0.05);
+}
+
+.choice-prompt-title {
+  color: #FFAA00;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.choice-option {
+  color: #00FF00;
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.choice-option::before {
+  content: "> ";
+  color: #FFAA00;
+}
+
+/* Attempts warning */
+.attempts-warning {
+  color: #FF5555;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #FF5555;
+  background: rgba(255, 85, 85, 0.1);
+  animation: warning-pulse 1s ease-in-out infinite;
+}
+
+@keyframes warning-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Trust indicator */
+.trust-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid #00FFFF;
+  background: rgba(0, 255, 255, 0.05);
+  font-size: 11px;
+  color: #00FFFF;
+}
+
+.trust-bar {
+  width: 100px;
+  height: 8px;
+  background: #111;
+  border: 1px solid #00FFFF;
+  overflow: hidden;
+}
+
+.trust-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF5555, #FFAA00, #00FF00);
+  transition: width 0.5s ease;
+}
+
+/* Secret found animation */
+.secret-found {
+  animation: secret-reveal 1s ease;
+  border: 2px solid #FFD700;
+  background: rgba(255, 215, 0, 0.1);
+  padding: 15px;
+  margin: 10px 0;
+}
+
+@keyframes secret-reveal {
+  0% { 
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(5px);
+  }
+  50% {
+    filter: blur(2px);
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.secret-found-title {
+  color: #FFD700;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Achievement popup */
+.achievement-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #000;
+  border: 2px solid #FFD700;
+  padding: 15px 20px;
+  z-index: 10000;
+  animation: achievement-slide 0.5s ease, achievement-fade 3s ease 2s forwards;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes achievement-slide {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes achievement-fade {
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+.achievement-icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.achievement-title {
+  color: #FFD700;
+  font-weight: bold;
+}
+
+.achievement-description {
+  color: #AAAAAA;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Ending screen styles */
+.ending-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ending-fade-in 2s ease;
+}
+
+@keyframes ending-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ending-content {
+  text-align: center;
+  padding: 40px;
+  max-width: 800px;
+}
+
+.ending-title {
+  font-size: 36px;
+  color: #00FFFF;
+  margin-bottom: 30px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  animation: ending-glow 2s ease-in-out infinite;
+}
+
+@keyframes ending-glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+  50% { text-shadow: 0 0 40px rgba(0, 255, 255, 0.8); }
+}
+
+.ending-text {
+  color: #00FF00;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
