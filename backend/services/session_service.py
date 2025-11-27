@@ -24,12 +24,18 @@ def get_session(
 ) -> Dict[str, Any]:
     lang = normalize_language(language)
     
+    existing_session = sessions.get(session_id, {})
+    ssh_pending_username = existing_session.get("ssh_pending_username")
+    
     if username and db:
         try:
             player = get_player_by_username(db, username)
             if player:
                 session_dict = player_to_session_dict(player)
                 session_dict["language"] = lang
+                if ssh_pending_username:
+                    session_dict["ssh_pending_username"] = ssh_pending_username
+                sessions[session_id] = session_dict
                 return session_dict
         except:
             pass
@@ -43,6 +49,9 @@ def get_session(
                 if player:
                     session_dict = player_to_session_dict(player)
                     session_dict["language"] = lang
+                    if ssh_pending_username:
+                        session_dict["ssh_pending_username"] = ssh_pending_username
+                    sessions[session_id] = session_dict
                     return session_dict
         except:
             pass
