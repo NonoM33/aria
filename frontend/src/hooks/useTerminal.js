@@ -31,105 +31,6 @@ export const useTerminal = () => {
     localStorage.setItem('session_id', sessionIdRef.current)
   }
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
-        currentLanguage = currentLanguage.toUpperCase()
-        if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
-          currentLanguage = 'FR'
-        }
-        
-        const token = localStorage.getItem('system_void_token')
-        const headers = {}
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`
-        }
-        
-        const response = await axios.get(`${API_URL}/api/files`, {
-          params: {
-            session_id: sessionIdRef.current,
-            language: currentLanguage
-          },
-          headers
-        })
-        if (response.data && response.data.files) {
-          setAvailableFiles(response.data.files)
-        }
-      } catch (error) {
-        // Silently fail
-      }
-    }
-    
-    const fetchCommands = async () => {
-      try {
-        let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
-        currentLanguage = currentLanguage.toUpperCase()
-        if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
-          currentLanguage = 'FR'
-        }
-        
-        const token = localStorage.getItem('system_void_token')
-        const headers = {}
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`
-        }
-        
-        const response = await axios.get(`${API_URL}/api/unlocked-commands`, {
-          params: {
-            session_id: sessionIdRef.current,
-            language: currentLanguage
-          },
-          headers
-        })
-        if (response.data && response.data.commands) {
-          setUnlockedCommands(response.data.commands)
-        }
-      } catch (error) {
-        // Silently fail
-      }
-    }
-    
-    const fetchPackages = async () => {
-      try {
-        let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
-        currentLanguage = currentLanguage.toUpperCase()
-        if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
-          currentLanguage = 'FR'
-        }
-        
-        const token = localStorage.getItem('system_void_token')
-        const headers = {}
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`
-        }
-        
-        const response = await axios.get(`${API_URL}/api/packages`, {
-          params: {
-            session_id: sessionIdRef.current,
-            language: currentLanguage
-          },
-          headers
-        })
-        if (response.data && response.data.packages) {
-          setInstalledPackages(response.data.packages)
-        }
-      } catch (error) {
-        // Silently fail
-      }
-    }
-    
-    fetchFiles()
-    fetchCommands()
-    fetchPackages()
-    const interval = setInterval(() => {
-      fetchFiles()
-      fetchCommands()
-      fetchPackages()
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [language])
-
   const addToHistory = useCallback((type, content) => {
     setHistory(prev => [...prev, {
       type,
@@ -152,6 +53,70 @@ export const useTerminal = () => {
     }, 30)
   }, [])
 
+  const handleWebSocketMessage = useCallback((data) => {
+    if (data.type === 'command_response') {
+      const systemResponse = data.response || 'No response from system.'
+      
+      setHistory(prev => [...prev, {
+        type: 'system',
+        content: '',
+        timestamp: new Date().toISOString()
+      }])
+      
+      typeText(systemResponse, (partialText) => {
+        setHistory(prev => {
+          const newHistory = [...prev]
+          const lastIndex = newHistory.length - 1
+          if (lastIndex >= 0 && newHistory[lastIndex].type === 'system') {
+            newHistory[lastIndex] = {
+              ...newHistory[lastIndex],
+              content: partialText
+            }
+          }
+          return newHistory
+        })
+      })
+    } else if (data.type === 'token_update') {
+      if (data.token) {
+        localStorage.setItem('system_void_token', data.token)
+        window.dispatchEvent(new Event('localStorageChange'))
+      }
+    } else if (data.type === 'username_update') {
+      if (data.username) {
+        localStorage.setItem('system_void_username', data.username)
+        window.dispatchEvent(new Event('localStorageChange'))
+      }
+    } else if (data.type === 'logout') {
+      localStorage.removeItem('system_void_username')
+      localStorage.removeItem('system_void_token')
+      window.dispatchEvent(new Event('localStorageChange'))
+    } else if (data.type === 'files_update') {
+      if (data.files) {
+        setAvailableFiles(data.files)
+      }
+    } else if (data.type === 'commands_update') {
+      if (data.commands) {
+        setUnlockedCommands(data.commands)
+      }
+    } else if (data.type === 'packages_update') {
+      if (data.packages) {
+        setInstalledPackages(data.packages)
+      }
+    }
+  }, [typeText])
+
+  const { isConnected, sendCommand: wsSendCommand, subscribe } = useWebSocket(
+    sessionIdRef.current,
+    language,
+    handleWebSocketMessage
+  )
+
+  useEffect(() => {
+    if (isConnected) {
+      subscribe(['files', 'commands', 'packages'])
+    }
+  }, [isConnected, subscribe])
+
   const getAutocompleteOptions = useCallback((partial) => {
     if (!partial || !partial.trim()) return []
     
@@ -163,16 +128,21 @@ export const useTerminal = () => {
     // Commandes qui prennent des noms de fichiers en argument
     const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT']
     
+    // Auto-complétion pour LS (liste les fichiers)
+    if (command === 'LS') {
+      return availableFiles.length > 0 ? availableFiles : []
+    }
+    
     // Auto-complétion pour les commandes de fichiers
     if (fileCommands.includes(command)) {
-      if (arg) {
-        const lowerArg = arg.toLowerCase()
+      if (arg && arg.trim()) {
+        const lowerArg = arg.toLowerCase().trim()
         const matches = availableFiles.filter(file => 
           file.toLowerCase().startsWith(lowerArg) && file.toLowerCase() !== lowerArg
         )
         return matches
-      } else {
-        // Si juste "COMMANDE " (avec espace), retourner tous les fichiers
+      } else if (trimmed.endsWith(' ') || arg === '') {
+        // Si juste "COMMANDE " (avec espace) ou commande complète sans arg, retourner tous les fichiers
         return availableFiles.length > 0 ? availableFiles : []
       }
     }
@@ -221,7 +191,7 @@ export const useTerminal = () => {
     return []
   }, [availableFiles, unlockedCommands])
 
-  const sendCommand = useCallback(async (command) => {
+  const sendCommand = useCallback((command) => {
     if (isTyping) return
     
     const userCommand = command.trim()
@@ -241,177 +211,26 @@ export const useTerminal = () => {
     setInput('')
     setAutocompleteOptions([])
 
-    try {
-      // Toujours utiliser la langue du contexte, avec fallback
-      let currentLanguage = language
-      if (!currentLanguage) {
-        currentLanguage = localStorage.getItem('system_void_language') || 'FR'
-      }
-      currentLanguage = currentLanguage.toUpperCase().trim()
-      if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
-        currentLanguage = 'FR'
-      }
-      
-      // S'assurer que la langue est bien stockée dans localStorage
-      localStorage.setItem('system_void_language', currentLanguage)
-      
-      // Récupérer le username et token depuis localStorage si présent
-      const username = localStorage.getItem('system_void_username')
-      const token = localStorage.getItem('system_void_token')
-      
-      const headers = {}
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-      
-      const response = await axios.post(`${API_URL}/api/command`, {
-        command: userCommand,
-        session_id: sessionIdRef.current,
-        language: currentLanguage,
-        username: username || null
-      }, { headers })
-
-          const systemResponse = response.data.response || 'No response from system.'
-          
-          // Si la réponse contient un token (après SSH ou CREATE_USER), le sauvegarder
-          if (response.data.token) {
-            localStorage.setItem('system_void_token', response.data.token)
-          }
-          
-          // Si la réponse contient un username (après REGISTER, LOGIN, SSH, CREATE_USER), le sauvegarder
-          if (response.data.username) {
-            localStorage.setItem('system_void_username', response.data.username)
-            window.dispatchEvent(new Event('localStorageChange'))
-          }
-          
-          // Si la réponse contient une session (après LOGIN), mettre à jour le localStorage
-          if (response.data.session) {
-            localStorage.setItem('system_void_username', response.data.session.username)
-            if (response.data.session.token) {
-              localStorage.setItem('system_void_token', response.data.session.token)
-            }
-            window.dispatchEvent(new Event('localStorageChange'))
-          }
-          
-          // Mettre à jour les commandes débloquées après chaque commande
-      setTimeout(async () => {
-        try {
-          const token = localStorage.getItem('system_void_token')
-          const headers = {}
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`
-          }
-          
-          const commandsResponse = await axios.get(`${API_URL}/api/unlocked-commands`, {
-            params: {
-              session_id: sessionIdRef.current,
-              language: currentLanguage
-            },
-            headers
-          })
-          if (commandsResponse.data && commandsResponse.data.commands) {
-            setUnlockedCommands(commandsResponse.data.commands)
-          }
-        } catch (error) {
-          // Silently fail
-        }
-      }, 100)
-      
-      // Mettre à jour les fichiers disponibles après SCAN ou LOGIN
-      if (userCommand.toUpperCase().startsWith('SCAN') || userCommand.toUpperCase().startsWith('LOGIN')) {
-        setTimeout(async () => {
-          try {
-            const token = localStorage.getItem('system_void_token')
-            const headers = {}
-            if (token) {
-              headers['Authorization'] = `Bearer ${token}`
-            }
-            
-            const fileResponse = await axios.get(`${API_URL}/api/files`, {
-              params: {
-                session_id: sessionIdRef.current,
-                language: currentLanguage
-              },
-              headers
-            })
-            if (fileResponse.data && fileResponse.data.files) {
-              setAvailableFiles(fileResponse.data.files)
-            }
-          } catch (error) {
-            // Silently fail
-          }
-        }, 100)
-      }
-      
-      // Mettre à jour les packages après PKG
-      if (userCommand.toUpperCase().startsWith('PKG')) {
-        setTimeout(async () => {
-          try {
-            const token = localStorage.getItem('system_void_token')
-            const headers = {}
-            if (token) {
-              headers['Authorization'] = `Bearer ${token}`
-            }
-            
-            const packagesResponse = await axios.get(`${API_URL}/api/packages`, {
-              params: {
-                session_id: sessionIdRef.current,
-                language: currentLanguage
-              },
-              headers
-            })
-            if (packagesResponse.data && packagesResponse.data.packages) {
-              setInstalledPackages(packagesResponse.data.packages)
-            }
-          } catch (error) {
-            // Silently fail
-          }
-        }, 100)
-      }
-      
+    if (!isConnected) {
       setHistory(prev => [...prev, {
         type: 'system',
-        content: '',
+        content: 'ERROR: WebSocket not connected. Please wait...',
         timestamp: new Date().toISOString()
       }])
-      
-      typeText(systemResponse, (partialText) => {
-        setHistory(prev => {
-          const newHistory = [...prev]
-          const lastIndex = newHistory.length - 1
-          if (lastIndex >= 0 && newHistory[lastIndex].type === 'system') {
-            newHistory[lastIndex] = {
-              ...newHistory[lastIndex],
-              content: partialText
-            }
-          }
-          return newHistory
-        })
-      })
-    } catch (error) {
-      const errorMessage = error.response?.data?.detail || error.message || 'Connection failed.'
-      
-      setHistory(prev => [...prev, {
-        type: 'system',
-        content: '',
-        timestamp: new Date().toISOString()
-      }])
-      
-      typeText(`ERROR: ${errorMessage}`, (partialText) => {
-        setHistory(prev => {
-          const newHistory = [...prev]
-          const lastIndex = newHistory.length - 1
-          if (lastIndex >= 0 && newHistory[lastIndex].type === 'system') {
-            newHistory[lastIndex] = {
-              ...newHistory[lastIndex],
-              content: partialText
-            }
-          }
-          return newHistory
-        })
-      })
+      return
     }
-  }, [addToHistory, typeText, isTyping, language, setAvailableFiles])
+
+    const token = localStorage.getItem('system_void_token')
+    const sent = wsSendCommand(userCommand, token)
+    
+    if (!sent) {
+      setHistory(prev => [...prev, {
+        type: 'system',
+        content: 'ERROR: Failed to send command. WebSocket may be disconnected.',
+        timestamp: new Date().toISOString()
+      }])
+    }
+  }, [addToHistory, isTyping, isConnected, wsSendCommand])
 
   const navigateHistory = useCallback((direction) => {
     if (commandHistory.length === 0) return
@@ -452,18 +271,23 @@ export const useTerminal = () => {
       return false
     }
     
-    const options = getAutocompleteOptions(trimmed)
+    const options = getAutocompleteOptions(currentInput)
     
     if (options.length === 0) {
       return false
     }
     
-    const parts = trimmed.split(/\s+/)
+    const parts = currentInput.trim().split(/\s+/)
     const command = parts[0]?.toUpperCase() || ''
     const arg = parts.slice(1).join(' ') || ''
     
     // Commandes qui prennent des fichiers
     const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT']
+    
+    // Auto-complétion pour LS (retourne les fichiers disponibles)
+    if (command === 'LS') {
+      return availableFiles.length > 0 ? availableFiles : []
+    }
     
     if (options.length === 1) {
       // Une seule option : compléter automatiquement
@@ -471,6 +295,18 @@ export const useTerminal = () => {
         setInput(`${command} ${options[0]}`)
       } else if (command === 'MAN') {
         setInput(`MAN ${options[0]}`)
+      } else if (command === 'PKG') {
+        const subcommand = arg.split(' ')[0]?.toUpperCase()
+        if (subcommand === 'INSTALL' || subcommand === 'UNINSTALL') {
+          const packageArg = arg.split(' ').slice(1).join(' ')
+          if (packageArg) {
+            setInput(`${command} ${subcommand} ${options[0]}`)
+          } else {
+            setInput(`${command} ${subcommand} ${options[0]}`)
+          }
+        } else {
+          setInput(`${command} ${options[0]}`)
+        }
       } else {
         // Commande simple
         setInput(options[0])
@@ -482,14 +318,19 @@ export const useTerminal = () => {
       setAutocompleteOptions(options)
       
       if (fileCommands.includes(command)) {
-        if (arg) {
+        if (arg && arg.trim()) {
           // Si on a déjà tapé quelque chose, compléter avec le premier match
           setInput(`${command} ${options[0]}`)
+        } else {
+          // Si juste la commande, ne pas compléter mais afficher les options
+          setInput(currentInput)
         }
         addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
       } else if (command === 'MAN') {
         if (arg) {
           setInput(`MAN ${options[0]}`)
+        } else {
+          setInput(currentInput)
         }
         addToHistory('system', `Commandes disponibles: ${options.join(', ')}`)
       } else {
@@ -500,7 +341,7 @@ export const useTerminal = () => {
     }
     
     return false
-  }, [getAutocompleteOptions, addToHistory])
+  }, [getAutocompleteOptions, addToHistory, availableFiles])
 
   return {
     history,
