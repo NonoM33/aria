@@ -290,7 +290,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 
                 existing_current_path = sessions.get(session_id, {}).get("current_path")
                 session = get_session(session_id, lang, db, username, token)
-                if existing_current_path and existing_current_path != "/":
+                if existing_current_path:
                     session["current_path"] = existing_current_path
                 session["language"] = lang
                 

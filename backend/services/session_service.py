@@ -31,10 +31,13 @@ def get_session(
         try:
             player = get_player_by_username(db, username)
             if player:
+                existing_path = existing_session.get("current_path")
                 session_dict = player_to_session_dict(player)
                 session_dict["language"] = lang
                 if ssh_pending_username:
                     session_dict["ssh_pending_username"] = ssh_pending_username
+                if existing_path:
+                    session_dict["current_path"] = existing_path
                 sessions[session_id] = session_dict
                 return session_dict
         except:
@@ -47,10 +50,13 @@ def get_session(
             if payload:
                 player = get_player_by_id(db, payload.get("player_id"))
                 if player:
+                    existing_path = existing_session.get("current_path")
                     session_dict = player_to_session_dict(player)
                     session_dict["language"] = lang
                     if ssh_pending_username:
                         session_dict["ssh_pending_username"] = ssh_pending_username
+                    if existing_path:
+                        session_dict["current_path"] = existing_path
                     sessions[session_id] = session_dict
                     return session_dict
         except:
