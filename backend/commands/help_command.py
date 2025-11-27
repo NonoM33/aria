@@ -11,9 +11,9 @@ class HelpCommand(BaseCommand):
         level = self.session.get("level", 0)
         
         if not is_logged_in:
-            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN"}
+            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "EDIT", "ALIAS"}
         else:
-            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "STATUS", "TALK", "ARIA"}
+            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "STATUS", "TALK", "ARIA", "EDIT", "ALIAS"}
             all_commands.update(self.session.get("unlocked_commands", []))
             
             if level >= 1:

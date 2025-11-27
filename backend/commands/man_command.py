@@ -17,7 +17,7 @@ class ManCommand(BaseCommand):
         is_logged_in = self.session.get("logged_in", False)
         level = self.session.get("level", 0)
         
-        base_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "MAN", "ALIAS"}
+        base_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "MAN", "ALIAS", "EDIT"}
         if is_logged_in:
             base_commands.update(["STATUS", "TALK", "ARIA"])
         
