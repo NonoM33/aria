@@ -62,13 +62,15 @@ class SshCommand(BaseCommand):
                     return {
                         "response": f"Connexion SSH établie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nVous êtes maintenant connecté. Votre progression est sauvegardée.",
                         "status": "success",
-                        "token": new_token
+                        "token": new_token,
+                        "username": result["username"]
                     }
                 else:
                     return {
                         "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nYou are now connected. Your progress is saved.",
                         "status": "success",
-                        "token": new_token
+                        "token": new_token,
+                        "username": result["username"]
                     }
             else:
                 if self.lang == "FR":
