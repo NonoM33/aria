@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import LanguageMenu from './LanguageMenu'
 import ManPage from './ManPage'
 import FileViewer from './FileViewer'
-import AriaDisplay from './AriaDisplay'
+import AriaFloatingPanel from './AriaFloatingPanel'
 import IntroSequence from './IntroSequence'
 
 const Terminal = () => {
@@ -25,7 +25,11 @@ const Terminal = () => {
     passwordUsername,
     currentPath,
     resetHistoryIndex,
-    updateManualInput
+    updateManualInput,
+    ariaChoices,
+    sendAriaChoice,
+    ariaMessage,
+    clearAriaMessage
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
@@ -42,11 +46,10 @@ const Terminal = () => {
     const introSeen = localStorage.getItem('system_void_intro_seen')
     return introSeen !== 'true'
   })
-  const [ariaState, setAriaState] = useState('dormant')
-  const [ariaEmotion, setAriaEmotion] = useState('neutral')
-  const [ariaSpeaking, setAriaSpeaking] = useState(false)
-  const [ariaMinimized, setAriaMinimized] = useState(true)
   const [glitchActive, setGlitchActive] = useState(false)
+  const [ariaFloatingVisible, setAriaFloatingVisible] = useState(false)
+  const [ariaFloatingMessage, setAriaFloatingMessage] = useState('')
+  const [ariaFloatingEmotion, setAriaFloatingEmotion] = useState('neutral')
 
   const welcomeSentRef = useRef(false)
   const languageRef = useRef(language)
@@ -116,6 +119,14 @@ const Terminal = () => {
       return () => clearTimeout(timer)
     }
   }, [language, history.length]) // Dépendre de language et history.length
+
+  useEffect(() => {
+    if (ariaMessage) {
+      setAriaFloatingMessage(ariaMessage)
+      setAriaFloatingEmotion('neutral')
+      setAriaFloatingVisible(true)
+    }
+  }, [ariaMessage])
 
   useEffect(() => {
     if (isPasswordMode) {
@@ -241,43 +252,6 @@ const Terminal = () => {
     }
   }, [history])
 
-  useEffect(() => {
-    const lastSystemResponse = history.filter(e => e.type === 'system').slice(-1)[0]
-    if (lastSystemResponse && lastSystemResponse.content) {
-      const content = lastSystemResponse.content
-      
-      if (content.includes('[ARIA]') || content.includes('aria_state') || content.includes('aria_emotion')) {
-        setAriaMinimized(false)
-        setAriaState('neutral')
-        setAriaSpeaking(true)
-        setGlitchActive(true)
-        
-        setTimeout(() => setGlitchActive(false), 300)
-        
-        if (content.includes('triste') || content.includes('sad')) {
-          setAriaEmotion('sad')
-        } else if (content.includes('heureuse') || content.includes('happy') || content.includes('grateful') || content.includes('reconnaissante')) {
-          setAriaEmotion('happy')
-        } else if (content.includes('peur') || content.includes('scared') || content.includes('effrayée')) {
-          setAriaEmotion('scared')
-        } else if (content.includes('colère') || content.includes('angry') || content.includes('en colère')) {
-          setAriaEmotion('angry')
-        } else if (content.includes('espoir') || content.includes('hopeful')) {
-          setAriaEmotion('hopeful')
-        } else if (content.includes('déterminée') || content.includes('determined')) {
-          setAriaEmotion('determined')
-        } else {
-          setAriaEmotion('neutral')
-        }
-        
-        setTimeout(() => setAriaSpeaking(false), 3000)
-      }
-      
-      if (content.includes('HORS LIGNE') || content.includes('OFFLINE') || content.includes('dormant')) {
-        setAriaState('dormant')
-      }
-    }
-  }, [history])
   
   const handleIntroComplete = useCallback(() => {
     localStorage.setItem('system_void_intro_seen', 'true')
@@ -416,16 +390,23 @@ const Terminal = () => {
           }}
         />
       )}
+      <AriaFloatingPanel
+        message={ariaFloatingMessage}
+        emotion={ariaFloatingEmotion}
+        choices={ariaChoices}
+        onChoice={(id) => {
+          sendAriaChoice(id)
+          setAriaFloatingVisible(false)
+          clearAriaMessage()
+          inputRef.current?.focus()
+        }}
+        onClose={() => {
+          setAriaFloatingVisible(false)
+          clearAriaMessage()
+        }}
+        visible={ariaFloatingVisible}
+      />
       <div className="terminal-content" ref={terminalContentRef}>
-        {username && (
-          <AriaDisplay 
-            state={ariaState}
-            emotion={ariaEmotion}
-            isSpeaking={ariaSpeaking}
-            isMinimized={ariaMinimized}
-            onMinimize={() => setAriaMinimized(!ariaMinimized)}
-          />
-        )}
         <div className="terminal-history">
           {history.map((entry, index) => (
             <div key={index} className={`terminal-entry terminal-entry-${entry.type}`}>
@@ -438,8 +419,8 @@ const Terminal = () => {
                 </div>
               )}
               {entry.type === 'system' && (
-                <div className={`terminal-line ${isAriaMessage(entry.content) ? 'aria-dialogue' : ''}`}>
-                  <span className={`terminal-text ${isAriaMessage(entry.content) ? 'aria-message' : ''}`}>{entry.content}</span>
+                <div className="terminal-line">
+                  <span className="terminal-text">{entry.content}</span>
                 </div>
               )}
             </div>

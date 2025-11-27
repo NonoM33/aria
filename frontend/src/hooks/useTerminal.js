@@ -71,6 +71,8 @@ export const useTerminal = () => {
   const [passwordUsername, setPasswordUsername] = useState(null)
   const [currentPath, setCurrentPath] = useState('/')
   const currentPathRef = useRef('/')
+  const [ariaChoices, setAriaChoices] = useState([])
+  const [ariaMessage, setAriaMessage] = useState(null)
   const lastManualInputRef = useRef('')
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
@@ -199,6 +201,16 @@ export const useTerminal = () => {
           return newHistory
         })
       })
+      
+      if (data.aria_message) {
+        setAriaMessage(data.aria_message)
+      }
+      
+      if (data.aria_choices && data.aria_choices.length > 0) {
+        setAriaChoices(data.aria_choices)
+      } else {
+        setAriaChoices([])
+      }
     } else if (data.type === 'token_update') {
       if (data.token) {
         localStorage.setItem('system_void_token', data.token)
@@ -621,6 +633,15 @@ export const useTerminal = () => {
     lastManualInputRef.current = value
   }, [])
 
+  const sendAriaChoice = useCallback((choiceId) => {
+    setAriaChoices([])
+    sendCommand(choiceId)
+  }, [sendCommand])
+
+  const clearAriaChoices = useCallback(() => {
+    setAriaChoices([])
+  }, [])
+
   return {
     history,
     input,
@@ -638,7 +659,12 @@ export const useTerminal = () => {
     passwordUsername,
     currentPath,
     resetHistoryIndex,
-    updateManualInput
+    updateManualInput,
+    ariaChoices,
+    sendAriaChoice,
+    clearAriaChoices,
+    ariaMessage,
+    clearAriaMessage: () => setAriaMessage(null)
   }
 }
 
