@@ -441,32 +441,94 @@ export const useTerminal = () => {
     }
   }, [addToHistory, isTyping, isConnected, wsSendCommand, isPasswordMode])
 
-  const navigateHistory = useCallback((direction) => {
+  const navigateHistory = useCallback((direction, currentInput = '') => {
     if (commandHistory.length === 0) return
     
-    let newIndex = historyIndex
+    const isManualInput = currentInput !== '' && currentInput === lastManualInputRef.current
+    const shouldFilter = isManualInput && currentInput.trim() !== ''
+    
+    let historyToUse = commandHistory
+    let useFiltered = false
+    
+    if (shouldFilter) {
+      const inputPrefix = currentInput.trim().toUpperCase()
+      const filtered = commandHistory.filter(cmd => 
+        cmd.toUpperCase().startsWith(inputPrefix)
+      )
+      if (filtered.length > 0) {
+        historyToUse = filtered
+        useFiltered = true
+      }
+    }
+    
+    if (historyToUse.length === 0) return
+    
+    let currentIndex = historyIndex
+    if (useFiltered && historyIndex !== -1) {
+      const currentCommand = commandHistory[historyIndex]
+      currentIndex = historyToUse.findIndex(cmd => cmd === currentCommand)
+      if (currentIndex === -1) {
+        currentIndex = historyIndex
+      }
+    }
+    
+    let newIndex
     if (direction === 'up') {
-      if (historyIndex === -1) {
-        newIndex = commandHistory.length - 1
+      if (useFiltered) {
+        if (currentIndex === -1) {
+          newIndex = historyToUse.length - 1
+        } else {
+          newIndex = Math.max(0, currentIndex - 1)
+        }
       } else {
-        newIndex = Math.max(0, historyIndex - 1)
+        if (historyIndex === -1) {
+          newIndex = commandHistory.length - 1
+        } else {
+          newIndex = Math.max(0, historyIndex - 1)
+        }
       }
     } else if (direction === 'down') {
-      if (historyIndex === -1) {
-        return
+      if (useFiltered) {
+        if (currentIndex === -1) {
+          return
+        } else {
+          newIndex = currentIndex + 1
+          if (newIndex >= historyToUse.length) {
+            newIndex = -1
+          }
+        }
       } else {
-        newIndex = historyIndex + 1
-        if (newIndex >= commandHistory.length) {
-          newIndex = -1
+        if (historyIndex === -1) {
+          return
+        } else {
+          newIndex = historyIndex + 1
+          if (newIndex >= commandHistory.length) {
+            newIndex = -1
+          }
         }
       }
     }
     
-    setHistoryIndex(newIndex)
     if (newIndex === -1) {
-      setInput('')
+      setHistoryIndex(-1)
+      if (shouldFilter) {
+        setInput(currentInput)
+      } else {
+        setInput('')
+      }
+      lastManualInputRef.current = ''
     } else {
-      setInput(commandHistory[newIndex])
+      let selectedCommand
+      if (useFiltered) {
+        selectedCommand = historyToUse[newIndex]
+        const actualIndex = commandHistory.findIndex(cmd => cmd === selectedCommand)
+        setHistoryIndex(actualIndex)
+      } else {
+        selectedCommand = commandHistory[newIndex]
+        setHistoryIndex(newIndex)
+      }
+      setInput(selectedCommand)
+      lastManualInputRef.current = ''
     }
   }, [commandHistory, historyIndex])
 
@@ -551,6 +613,14 @@ export const useTerminal = () => {
     setAutocompleteIndex(-1)
   }, [])
 
+  const resetHistoryIndex = useCallback(() => {
+    setHistoryIndex(-1)
+  }, [])
+
+  const updateManualInput = useCallback((value) => {
+    lastManualInputRef.current = value
+  }, [])
+
   return {
     history,
     input,
@@ -566,7 +636,9 @@ export const useTerminal = () => {
     installedPackages,
     isPasswordMode,
     passwordUsername,
-    currentPath
+    currentPath,
+    resetHistoryIndex,
+    updateManualInput
   }
 }
 

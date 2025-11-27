@@ -23,7 +23,9 @@ const Terminal = () => {
     installedPackages,
     isPasswordMode,
     passwordUsername,
-    currentPath
+    currentPath,
+    resetHistoryIndex,
+    updateManualInput
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
@@ -207,14 +209,14 @@ const Terminal = () => {
       if (autocompleteOptions.length > 0) {
         handleTab(input, true)
       } else {
-        navigateHistory('up')
+        navigateHistory('up', input)
       }
     } else if (e.key === 'ArrowDown' && !isPasswordMode) {
       e.preventDefault()
       if (autocompleteOptions.length > 0) {
         handleTab(input, false)
       } else {
-        navigateHistory('down')
+        navigateHistory('down', input)
       }
     } else if (e.key === 'Tab' && !isPasswordMode) {
       e.preventDefault()
@@ -443,8 +445,11 @@ const Terminal = () => {
                   type={isPasswordMode ? "password" : "text"}
                   value={input}
                   onChange={(e) => {
-                    setInput(e.target.value)
+                    const newValue = e.target.value
+                    setInput(newValue)
                     cancelAutocomplete()
+                    resetHistoryIndex()
+                    updateManualInput(newValue)
                   }}
                   onKeyDown={handleKeyDown}
                   disabled={isTyping}
