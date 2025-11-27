@@ -326,6 +326,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                     session["aliases"] = existing_aliases
                 if existing_voidrc:
                     session["voidrc"] = existing_voidrc
+                if existing_admin_mode:
+                    session["admin_mode"] = existing_admin_mode
                 session["language"] = lang
                 
                 if password and session.get("ssh_pending_username"):
