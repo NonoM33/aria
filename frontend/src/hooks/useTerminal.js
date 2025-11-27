@@ -61,6 +61,7 @@ export const useTerminal = () => {
   const [commandHistory, setCommandHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [autocompleteOptions, setAutocompleteOptions] = useState([])
+  const [autocompleteIndex, setAutocompleteIndex] = useState(-1)
   const [availableFiles, setAvailableFiles] = useState([])
   const [availableDirs, setAvailableDirs] = useState([])
   const [filesystem, setFilesystem] = useState({})
@@ -464,22 +465,48 @@ export const useTerminal = () => {
     }
   }, [commandHistory, historyIndex])
 
-  const handleTab = useCallback((currentInput) => {
+  const handleTab = useCallback((currentInput, shiftKey = false) => {
     if (!currentInput) {
+      setAutocompleteOptions([])
+      setAutocompleteIndex(-1)
       return false
     }
     
     const trimmed = currentInput.trim()
     if (!trimmed) {
+      setAutocompleteOptions([])
+      setAutocompleteIndex(-1)
       return false
     }
     
     const options = getAutocompleteOptions(currentInput)
     
     if (options.length === 0) {
+      setAutocompleteOptions([])
+      setAutocompleteIndex(-1)
       return false
     }
     
+    if (options.length === 1) {
+      selectAutocompleteOption(currentInput, options[0])
+      return true
+    }
+    
+    if (autocompleteOptions.length > 0 && JSON.stringify(autocompleteOptions) === JSON.stringify(options)) {
+      if (shiftKey) {
+        setAutocompleteIndex(prev => prev <= 0 ? options.length - 1 : prev - 1)
+      } else {
+        setAutocompleteIndex(prev => prev >= options.length - 1 ? 0 : prev + 1)
+      }
+    } else {
+      setAutocompleteOptions(options)
+      setAutocompleteIndex(0)
+    }
+    
+    return true
+  }, [getAutocompleteOptions, autocompleteOptions])
+
+  const selectAutocompleteOption = useCallback((currentInput, option) => {
     const parts = currentInput.trim().split(/\s+/)
     const command = parts[0]?.toUpperCase() || ''
     const arg = parts.slice(1).join(' ') || ''
@@ -488,39 +515,36 @@ export const useTerminal = () => {
     const dirCommands = ['CD', 'LS']
     const allNavCommands = [...fileCommands, ...dirCommands]
     
-    if (options.length === 1) {
-      if (allNavCommands.includes(command)) {
-        setInput(`${command} ${options[0]}`)
-      } else if (command === 'MAN') {
-        setInput(`MAN ${options[0]}`)
-      } else if (command === 'PKG') {
-        const subcommand = arg.split(' ')[0]?.toUpperCase()
-        if (subcommand === 'INSTALL' || subcommand === 'UNINSTALL') {
-          setInput(`${command} ${subcommand} ${options[0]}`)
-        } else {
-          setInput(`${command} ${options[0]}`)
-        }
+    if (allNavCommands.includes(command)) {
+      setInput(`${command} ${option}`)
+    } else if (command === 'MAN') {
+      setInput(`MAN ${option}`)
+    } else if (command === 'PKG') {
+      const subcommand = arg.split(' ')[0]?.toUpperCase()
+      if (subcommand === 'INSTALL' || subcommand === 'UNINSTALL') {
+        setInput(`${command} ${subcommand} ${option}`)
       } else {
-        setInput(options[0])
+        setInput(`${command} ${option}`)
       }
-      setAutocompleteOptions([])
-      return true
-    } else if (options.length > 1) {
-      setAutocompleteOptions(options)
-      
-      if (allNavCommands.includes(command)) {
-        const displayOptions = options.map(o => o.split('/').filter(p => p).pop() + (o.endsWith('/') ? '/' : ''))
-        addToHistory('system', `${displayOptions.join('  ')}`)
-      } else if (command === 'MAN') {
-        addToHistory('system', `${options.join('  ')}`)
-      } else {
-        addToHistory('system', `${options.join('  ')}`)
-      }
+    } else {
+      setInput(option)
+    }
+    setAutocompleteOptions([])
+    setAutocompleteIndex(-1)
+  }, [])
+
+  const confirmAutocomplete = useCallback(() => {
+    if (autocompleteOptions.length > 0 && autocompleteIndex >= 0) {
+      selectAutocompleteOption(input, autocompleteOptions[autocompleteIndex])
       return true
     }
-    
     return false
-  }, [getAutocompleteOptions, addToHistory])
+  }, [autocompleteOptions, autocompleteIndex, input, selectAutocompleteOption])
+
+  const cancelAutocomplete = useCallback(() => {
+    setAutocompleteOptions([])
+    setAutocompleteIndex(-1)
+  }, [])
 
   return {
     history,
@@ -531,6 +555,9 @@ export const useTerminal = () => {
     navigateHistory,
     handleTab,
     autocompleteOptions,
+    autocompleteIndex,
+    confirmAutocomplete,
+    cancelAutocomplete,
     installedPackages,
     isPasswordMode,
     passwordUsername,
