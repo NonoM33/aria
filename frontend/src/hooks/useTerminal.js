@@ -73,6 +73,7 @@ export const useTerminal = () => {
   const currentPathRef = useRef('/')
   const [ariaChoices, setAriaChoices] = useState([])
   const [ariaMessage, setAriaMessage] = useState(null)
+  const [isAdminMode, setIsAdminMode] = useState(false)
   const lastManualInputRef = useRef('')
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
@@ -122,6 +123,14 @@ export const useTerminal = () => {
       if (data.current_path) {
         setCurrentPath(data.current_path)
         currentPathRef.current = data.current_path
+      }
+      
+      if (data.admin_mode) {
+        setIsAdminMode(true)
+      }
+      
+      if (data.admin_exit) {
+        setIsAdminMode(false)
       }
       
       if (systemResponse.includes("Vous n'êtes pas connecté") || 

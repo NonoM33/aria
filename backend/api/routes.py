@@ -318,6 +318,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 existing_current_path = existing_session_data.get("current_path")
                 existing_aliases = existing_session_data.get("aliases")
                 existing_voidrc = existing_session_data.get("voidrc")
+                existing_admin_mode = existing_session_data.get("admin_mode")
                 session = get_session(session_id, lang, db, username, token)
                 if existing_current_path:
                     session["current_path"] = existing_current_path
@@ -453,6 +454,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                         response_message["aria_emotion"] = result.get("aria_emotion", "neutral")
                     if result.get("aria_choices"):
                         response_message["aria_choices"] = result.get("aria_choices")
+                    if result.get("admin_mode"):
+                        response_message["admin_mode"] = True
+                    if result.get("admin_exit"):
+                        response_message["admin_exit"] = True
                     
                     await manager.send_personal_message(response_message, connection_id)
                     

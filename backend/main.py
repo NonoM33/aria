@@ -5,6 +5,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from config import CORS_ORIGINS, CORS_ALLOW_ALL
 from database import init_db
 from api.routes import router
+from api.admin_routes import router as admin_router
 
 
 class CORSWebSocketMiddleware:
@@ -63,3 +64,4 @@ except Exception as e:
     pass
 
 app.include_router(router)
+app.include_router(admin_router)

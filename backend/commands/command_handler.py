@@ -26,6 +26,10 @@ from commands.cd_command import CdCommand
 from commands.pwd_command import PwdCommand
 from commands.alias_command import AliasCommand
 from commands.edit_command import EditCommand
+from commands.admin_command import (
+    AdminStatsCommand, AdminOnlineCommand, 
+    AdminListCommand, AdminViewCommand, AdminExitCommand
+)
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -59,6 +63,15 @@ COMMAND_MAP = {
     "PWD": PwdCommand,
     "ALIAS": AliasCommand,
     "EDIT": EditCommand,
+}
+
+ADMIN_COMMAND_MAP = {
+    "STATS": AdminStatsCommand,
+    "ONLINE": AdminOnlineCommand,
+    "LIST": AdminListCommand,
+    "VIEW": AdminViewCommand,
+    "EXIT": AdminExitCommand,
+    "HELP": None,
 }
 
 def handle_command(
@@ -102,6 +115,37 @@ def handle_command(
                 cmd_instance.token = session.get("ssh_token")
             if hasattr(cmd_instance, 'execute_password'):
                 return cmd_instance.execute_password(args)
+    
+    if session.get("admin_mode"):
+        if command_upper == "HELP":
+            help_text = """
+╔══════════════════════════════════════════════════════════════════╗
+║                    AIDE - MODE ADMINISTRATEUR                    ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  Commandes disponibles:                                          ║
+║                                                                  ║
+║    STATS        Affiche les statistiques globales                ║
+║    ONLINE       Liste les joueurs en ligne                       ║
+║    LIST         Liste tous les joueurs (20 derniers)             ║
+║    VIEW <user>  Affiche les details d'un joueur                  ║
+║    EXIT         Quitte le mode administrateur                    ║
+║    HELP         Affiche cette aide                               ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+"""
+            return {"response": help_text, "status": "success"}
+        
+        if command_upper in ADMIN_COMMAND_MAP:
+            cmd_class = ADMIN_COMMAND_MAP[command_upper]
+            if cmd_class:
+                cmd_instance = cmd_class(session, db, lang)
+                return cmd_instance.execute(args)
+        
+        if lang == "FR":
+            return {"response": f"Commande admin inconnue: {command}\nTapez HELP pour voir les commandes disponibles.", "status": "error"}
+        else:
+            return {"response": f"Unknown admin command: {command}\nType HELP to see available commands.", "status": "error"}
     
     if is_aria_choice_command(command_upper):
         result = handle_aria_choice(session, command_upper, lang)

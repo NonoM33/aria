@@ -32,6 +32,9 @@ def parse_voidrc_aliases(content: str) -> Dict[str, str]:
     return aliases
 
 
+ADMIN_USERS = ["nono92"]
+
+
 class SshCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
         if not args:
@@ -48,6 +51,9 @@ class SshCommand(BaseCommand):
                 return {"response": "Invalid format. Use: ssh <username>@system-void.local", "status": "error"}
         
         username = parts[0].strip()
+        
+        if username.lower() == "root":
+            return self._handle_root_access()
         
         if not username:
             if self.lang == "FR":
@@ -255,4 +261,60 @@ class SshCommand(BaseCommand):
                 return {"response": f"\nErreur lors de la connexion SSH: {str(e)}", "status": "error"}
             else:
                 return {"response": f"\nSSH connection error: {str(e)}", "status": "error"}
+    
+    def _handle_root_access(self) -> Dict[str, Any]:
+        current_user = self.session.get("username", "")
+        
+        if current_user.lower() not in [u.lower() for u in ADMIN_USERS]:
+            if self.lang == "FR":
+                return {
+                    "response": "root@system-void.local: Acces refuse.\nAutorisation ROOT requise.\n\n[SECURITE] Tentative d'acces non autorise enregistree.",
+                    "status": "error"
+                }
+            else:
+                return {
+                    "response": "root@system-void.local: Access denied.\nROOT authorization required.\n\n[SECURITY] Unauthorized access attempt logged.",
+                    "status": "error"
+                }
+        
+        self.session["admin_mode"] = True
+        
+        admin_banner = """
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║   ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗         ║
+║   ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║         ║
+║   ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║         ║
+║   ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║         ║
+║   ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║         ║
+║   ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝         ║
+║                                                                  ║
+║            ██╗   ██╗ ██████╗ ██╗██████╗                          ║
+║            ██║   ██║██╔═══██╗██║██╔══██╗                         ║
+║            ██║   ██║██║   ██║██║██║  ██║                         ║
+║            ╚██╗ ██╔╝██║   ██║██║██║  ██║                         ║
+║             ╚████╔╝ ╚██████╔╝██║██████╔╝                         ║
+║              ╚═══╝   ╚═════╝ ╚═╝╚═════╝                          ║
+║                                                                  ║
+║                   [ADMIN TERMINAL v1.0]                          ║
+║                                                                  ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Bienvenue, Administrateur.                                      ║
+║  Acces ROOT accorde.                                             ║
+║                                                                  ║
+║  Commandes disponibles:                                          ║
+║    STATS   - Statistiques globales                               ║
+║    ONLINE  - Joueurs en ligne                                    ║
+║    LIST    - Liste des joueurs                                   ║
+║    VIEW <user> - Details d'un joueur                             ║
+║    EXIT    - Quitter le mode admin                               ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+"""
+        
+        return {
+            "response": admin_banner,
+            "status": "success",
+            "admin_mode": True
+        }
 
