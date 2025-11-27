@@ -18,6 +18,20 @@ import uuid
 router = APIRouter()
 global_state = GlobalState()
 
+def get_directory_contents(filesystem: dict, path: str) -> dict:
+    if path == "/":
+        return filesystem
+    parts = path.strip("/").split("/")
+    current = filesystem
+    for part in parts:
+        if isinstance(current, dict) and part in current:
+            current = current[part]
+        else:
+            return {}
+    if isinstance(current, dict):
+        return current
+    return {}
+
 class CommandRequest(BaseModel):
     command: str
     session_id: str
@@ -444,11 +458,13 @@ async def send_session_updates(connection_id: str, session_id: str, session: Dic
     adventure_data = get_adventure_data(lang)
     data = adventure_data.get(lang, {})
     chapter = data.get("chapters", {}).get(chapter_id, {})
-    files = list(chapter.get("files", {}).keys())
+    filesystem = chapter.get("filesystem", {})
+    current_path = session.get("current_path", "/")
     
     await manager.send_personal_message({
-        "type": "files_update",
-        "files": files
+        "type": "filesystem_update",
+        "filesystem": filesystem,
+        "current_path": current_path
     }, connection_id)
     
     await manager.send_personal_message({
@@ -474,11 +490,13 @@ async def send_files_update(connection_id: str, session_id: str, lang: str, db: 
     adventure_data = get_adventure_data(lang)
     data = adventure_data.get(lang, {})
     chapter = data.get("chapters", {}).get(chapter_id, {})
-    files = list(chapter.get("files", {}).keys())
+    filesystem = chapter.get("filesystem", {})
+    current_path = session.get("current_path", "/")
     
     await manager.send_personal_message({
-        "type": "files_update",
-        "files": files
+        "type": "filesystem_update",
+        "filesystem": filesystem,
+        "current_path": current_path
     }, connection_id)
 
 async def send_commands_update(connection_id: str, session_id: str, lang: str, db: Session):
