@@ -152,9 +152,10 @@ const Terminal = () => {
   }, [history, isTyping, isPasswordMode, showInput])
 
   useEffect(() => {
-    if (!isTyping) {
+    const timeout = setTimeout(() => {
       historyEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
+    }, isTyping ? 150 : 0)
+    return () => clearTimeout(timeout)
   }, [history, isTyping])
 
   const handleSubmit = (e) => {
