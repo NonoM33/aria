@@ -16,7 +16,10 @@ app.add_middleware(
 
 try:
     init_db()
-except:
+    from database import _migrate_installed_packages
+    _migrate_installed_packages()
+except Exception as e:
+    print(f"Database initialization error: {e}")
     pass
 
 app.include_router(router)

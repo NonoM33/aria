@@ -54,6 +54,11 @@ def save_player_progress(db: Session, player: Player):
     db.refresh(player)
 
 def player_to_session_dict(player: Player) -> Dict[str, Any]:
+    try:
+        installed_packages = player.installed_packages or []
+    except (AttributeError, KeyError):
+        installed_packages = []
+    
     return {
         "level": player.level,
         "chapter": player.chapter,
@@ -66,6 +71,6 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
         "language": player.language or "FR",
         "username": player.username,
         "player_id": player.id,
-        "installed_packages": player.installed_packages or []
+        "installed_packages": installed_packages
     }
 

@@ -60,14 +60,29 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
-    """Initialise la base de données"""
     Base.metadata.create_all(bind=engine)
+    _migrate_installed_packages()
+
+def _migrate_installed_packages():
+    try:
+        import sqlite3
+        db_path = DATABASE_URL.replace("sqlite:///", "")
+        if os.path.exists(db_path):
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            try:
+                cursor.execute("SELECT installed_packages FROM players LIMIT 1")
+            except sqlite3.OperationalError:
+                cursor.execute("ALTER TABLE players ADD COLUMN installed_packages TEXT DEFAULT '[]'")
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception:
+        pass
 
 def get_db():
-    """Obtient une session de base de données"""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-

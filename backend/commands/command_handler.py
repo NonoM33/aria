@@ -18,6 +18,7 @@ from commands.man_command import ManCommand
 from commands.ssh_command import SshCommand
 from commands.exploit_command import ExploitCommand
 from commands.create_user_command import CreateUserCommand
+from commands.pkg_command import PkgCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -40,6 +41,7 @@ COMMAND_MAP = {
     "SSH": SshCommand,
     "EXPLOIT": ExploitCommand,
     "CREATE_USER": CreateUserCommand,
+    "PKG": PkgCommand,
 }
 
 def handle_command(
@@ -47,13 +49,18 @@ def handle_command(
     args: str,
     session: Dict[str, Any],
     db: Optional[Session],
-    lang: str
+    lang: str,
+    token: Optional[str] = None
 ) -> Dict[str, Any]:
     command_upper = command.upper()
     
     if command_upper in COMMAND_MAP:
         cmd_class = COMMAND_MAP[command_upper]
         cmd_instance = cmd_class(session, db, lang)
+        if token and hasattr(cmd_instance, 'token'):
+            cmd_instance.token = token
+        elif session.get("ssh_token") and hasattr(cmd_instance, 'token'):
+            cmd_instance.token = session.get("ssh_token")
         return cmd_instance.execute(args)
     
     if command_upper == "DEV" and DEV_MODE:
