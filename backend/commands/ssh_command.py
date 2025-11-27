@@ -51,17 +51,20 @@ class SshCommand(BaseCommand):
                         "level": 1,
                         "current_path": "/"
                     })
+                    self.add_unlocked_command("SCAN")
+                    self.add_unlocked_command("DECODE")
+                    self.add_unlocked_command("ACCESS")
                     
                     if self.lang == "FR":
                         return {
-                            "response": f"Connexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu. Tapez LS pour explorer.",
+                            "response": f"Connexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS\n\nTapez LS pour explorer.",
                             "status": "success",
                             "token": new_token,
                             "username": result["username"]
                         }
                     else:
                         return {
-                            "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted. Type LS to explore.",
+                            "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted.\nNew commands: SCAN, DECODE, ACCESS\n\nType LS to explore.",
                             "status": "success",
                             "token": new_token,
                             "username": result["username"]
@@ -114,19 +117,22 @@ class SshCommand(BaseCommand):
                     "level": 1,
                     "current_path": "/"
                 })
+                self.add_unlocked_command("SCAN")
+                self.add_unlocked_command("DECODE")
+                self.add_unlocked_command("ACCESS")
                 if "ssh_pending_username" in self.session:
                     del self.session["ssh_pending_username"]
                 
                 if self.lang == "FR":
                     return {
-                        "response": f"\nConnexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu. Tapez LS pour explorer.",
+                        "response": f"\nConnexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS\n\nTapez LS pour explorer.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
                     }
                 else:
                     return {
-                        "response": f"\nSSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted. Type LS to explore.",
+                        "response": f"\nSSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted.\nNew commands: SCAN, DECODE, ACCESS\n\nType LS to explore.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
