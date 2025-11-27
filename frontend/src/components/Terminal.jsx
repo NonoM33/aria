@@ -31,7 +31,8 @@ const Terminal = () => {
     ariaMessage,
     clearAriaMessage,
     navigateAutocomplete,
-    hasAutocompleteOptions
+    hasAutocompleteOptions,
+    isAdminMode
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
@@ -368,9 +369,9 @@ const Terminal = () => {
   }
 
   return (
-    <div className={`terminal-container ${glitchActive ? 'terminal-glitch' : ''}`}>
+    <div className={`terminal-container ${glitchActive ? 'terminal-glitch' : ''} ${isAdminMode ? 'admin-mode' : ''}`}>
       <div className="scanlines"></div>
-      <LanguageMenu />
+      {!isAdminMode && <LanguageMenu />}
       {manPageCommand && (
         <ManPage 
           command={manPageCommand} 

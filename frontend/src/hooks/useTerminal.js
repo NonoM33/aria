@@ -677,7 +677,8 @@ export const useTerminal = () => {
     ariaMessage,
     clearAriaMessage: () => setAriaMessage(null),
     navigateAutocomplete,
-    hasAutocompleteOptions: autocompleteOptions.length > 0
+    hasAutocompleteOptions: autocompleteOptions.length > 0,
+    isAdminMode
   }
 }
 
