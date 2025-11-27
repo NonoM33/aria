@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
@@ -10,7 +10,10 @@ from adventures.adventure_data import get_adventure_data
 from adventures.global_state import GlobalState
 from man_pages import MAN_PAGES
 from api.dependencies import get_database, get_current_user
+from api.websocket_manager import manager
 from config import DEFAULT_LANGUAGE
+import json
+import uuid
 
 router = APIRouter()
 global_state = GlobalState()
@@ -77,7 +80,10 @@ async def handle_command_route(
         if db and (player or session.get("player_id")):
             try:
                 save_session_to_db(db, session, player)
+                db.commit()
             except Exception as e:
+                db.rollback()
+            finally:
                 pass
         
         return result
@@ -213,6 +219,230 @@ async def get_global_events(limit: int = 10, db: Session = Depends(get_database)
         }
     except:
         return {"events": []}
+
+@router.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = None):
+    connection_id = str(uuid.uuid4())
+    
+    if not session_id:
+        await websocket.close(code=1008, reason="Session ID required")
+        return
+    
+    await manager.connect(websocket, connection_id, session_id)
+    
+    from database import SessionLocal
+    db = SessionLocal()
+    lang = DEFAULT_LANGUAGE
+    token = None
+    username = None
+    
+    try:
+        session = get_session(session_id, lang, db, username, token)
+        
+        await manager.send_personal_message({
+            "type": "connected",
+            "message": "WebSocket connection established"
+        }, connection_id)
+        
+        while True:
+            data = await websocket.receive_json()
+            message_type = data.get("type")
+            
+            if message_type == "command":
+                command = data.get("command", "")
+                language = data.get("language", DEFAULT_LANGUAGE)
+                auth_token = data.get("token")
+                
+                lang = normalize_language(language)
+                token = auth_token
+                
+                if auth_token:
+                    from auth.session import verify_jwt_token
+                    payload = verify_jwt_token(auth_token)
+                    if payload:
+                        username = payload.get("username")
+                
+                session = get_session(session_id, lang, db, username, token)
+                session["language"] = lang
+                
+                command_parts = command.strip().split(" ", 1) if command.strip() else ["", ""]
+                cmd = command_parts[0].upper() if command_parts[0] else ""
+                args = command_parts[1] if len(command_parts) > 1 else ""
+                
+                adventure_data = get_adventure_data(lang)
+                data_resp = adventure_data.get(lang, {})
+                
+                if not cmd or cmd == "":
+                    if session.get("logged_in") and session.get("username"):
+                        if lang == "FR":
+                            welcome_msg = f"SYSTEM_VOID v2.0\n\nBienvenue de retour, {session['username']}!\nVous êtes connecté. Votre progression est sauvegardée.\n\nTapez HELP pour voir les commandes disponibles."
+                        else:
+                            welcome_msg = f"SYSTEM_VOID v2.0\n\nWelcome back, {session['username']}!\nYou are connected. Your progress is saved.\n\nType HELP to see available commands."
+                    else:
+                        system_messages = data_resp.get("system_messages", {})
+                        welcome_msg = system_messages.get("welcome", "")
+                        if not welcome_msg:
+                            if lang == "EN":
+                                welcome_msg = "SYSTEM_VOID v2.0 initialized.\nType HELP to start."
+                            else:
+                                welcome_msg = "SYSTEM_VOID v2.0 initialisé.\nTapez HELP pour commencer."
+                    
+                    await manager.send_personal_message({
+                        "type": "command_response",
+                        "response": welcome_msg,
+                        "status": "info"
+                    }, connection_id)
+                    continue
+                
+                player = None
+                if session.get("player_id") and db:
+                    try:
+                        from auth.player_service import get_player_by_id
+                        player = get_player_by_id(db, session["player_id"])
+                    except:
+                        pass
+                
+                try:
+                    result = handle_command(cmd, args, session, db, lang, token)
+                    
+                    if result.get("token"):
+                        session["ssh_token"] = result.get("token")
+                        await manager.send_personal_message({
+                            "type": "token_update",
+                            "token": result.get("token")
+                        }, connection_id)
+                    
+                    if result.get("username"):
+                        await manager.send_personal_message({
+                            "type": "username_update",
+                            "username": result.get("username")
+                        }, connection_id)
+                    
+                    if result.get("logout"):
+                        await manager.send_personal_message({
+                            "type": "logout",
+                            "username": None
+                        }, connection_id)
+                    
+                    if db and (player or session.get("player_id")):
+                        try:
+                            save_session_to_db(db, session, player)
+                            db.commit()
+                        except Exception as e:
+                            db.rollback()
+                    
+                    await manager.send_personal_message({
+                        "type": "command_response",
+                        "response": result.get("response", ""),
+                        "status": result.get("status", "info")
+                    }, connection_id)
+                    
+                    await send_session_updates(connection_id, session_id, session, lang, db)
+                    
+                except Exception as e:
+                    error_msg = str(e)
+                    if lang == "FR":
+                        await manager.send_personal_message({
+                            "type": "command_response",
+                            "response": f"Erreur lors de l'exécution de la commande: {error_msg}",
+                            "status": "error"
+                        }, connection_id)
+                    else:
+                        await manager.send_personal_message({
+                            "type": "command_response",
+                            "response": f"Error executing command: {error_msg}",
+                            "status": "error"
+                        }, connection_id)
+            
+            elif message_type == "subscribe":
+                subscriptions = data.get("subscriptions", [])
+                await manager.send_personal_message({
+                    "type": "subscribed",
+                    "subscriptions": subscriptions
+                }, connection_id)
+                
+                if "global_events" in subscriptions:
+                    await send_global_state_update(connection_id)
+                if "files" in subscriptions:
+                    await send_files_update(connection_id, session_id, lang, db)
+                if "commands" in subscriptions:
+                    await send_commands_update(connection_id, session_id, lang, db)
+                if "packages" in subscriptions:
+                    await send_packages_update(connection_id, session_id, lang, db)
+            
+            elif message_type == "ping":
+                await manager.send_personal_message({
+                    "type": "pong"
+                }, connection_id)
+    
+    except WebSocketDisconnect:
+        manager.disconnect(connection_id, session_id)
+    except Exception as e:
+        try:
+            manager.disconnect(connection_id, session_id)
+        except:
+            pass
+    finally:
+        try:
+            db.close()
+        except:
+            pass
+
+async def send_session_updates(connection_id: str, session_id: str, session: Dict[str, Any], lang: str, db: Session):
+    chapter_id = session.get("chapter", "chapter_1")
+    adventure_data = get_adventure_data(lang)
+    data = adventure_data.get(lang, {})
+    chapter = data.get("chapters", {}).get(chapter_id, {})
+    files = list(chapter.get("files", {}).keys())
+    
+    await manager.send_personal_message({
+        "type": "files_update",
+        "files": files
+    }, connection_id)
+    
+    await manager.send_personal_message({
+        "type": "commands_update",
+        "commands": session.get("unlocked_commands", [])
+    }, connection_id)
+    
+    await manager.send_personal_message({
+        "type": "packages_update",
+        "packages": session.get("installed_packages", [])
+    }, connection_id)
+
+async def send_global_state_update(connection_id: str):
+    global_state_data = global_state.get_state()
+    await manager.send_personal_message({
+        "type": "global_state_update",
+        "state": global_state_data
+    }, connection_id)
+
+async def send_files_update(connection_id: str, session_id: str, lang: str, db: Session):
+    session = get_session(session_id, lang, db, None, None)
+    chapter_id = session.get("chapter", "chapter_1")
+    adventure_data = get_adventure_data(lang)
+    data = adventure_data.get(lang, {})
+    chapter = data.get("chapters", {}).get(chapter_id, {})
+    files = list(chapter.get("files", {}).keys())
+    
+    await manager.send_personal_message({
+        "type": "files_update",
+        "files": files
+    }, connection_id)
+
+async def send_commands_update(connection_id: str, session_id: str, lang: str, db: Session):
+    session = get_session(session_id, lang, db, None, None)
+    await manager.send_personal_message({
+        "type": "commands_update",
+        "commands": session.get("unlocked_commands", [])
+    }, connection_id)
+
+async def send_packages_update(connection_id: str, session_id: str, lang: str, db: Session):
+    session = get_session(session_id, lang, db, None, None)
+    await manager.send_personal_message({
+        "type": "packages_update",
+        "packages": session.get("installed_packages", [])
+    }, connection_id)
 
 @router.get("/")
 async def root():
