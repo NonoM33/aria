@@ -18,6 +18,8 @@ if extra_origins:
         if origin and origin not in CORS_ORIGINS:
             CORS_ORIGINS.append(origin)
 
+CORS_ALLOW_ALL = os.getenv("CORS_ALLOW_ALL", "false").lower() == "true"
+
 ENCRYPTION_KEY = "VOID2024"
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "system-void-secret-key-change-in-production")

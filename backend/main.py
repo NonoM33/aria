@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from config import CORS_ORIGINS
+from config import CORS_ORIGINS, CORS_ALLOW_ALL
 from database import init_db
 from api.routes import router
 
@@ -8,12 +8,13 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=CORS_ORIGINS if not CORS_ALLOW_ALL else [],
+    allow_origin_regex=".*" if CORS_ALLOW_ALL else None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-print(f"CORS_ORIGINS: {CORS_ORIGINS}")
+print(f"CORS_ORIGINS: {CORS_ORIGINS}, allow_all={CORS_ALLOW_ALL}")
 
 try:
     init_db()
