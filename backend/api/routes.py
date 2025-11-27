@@ -7,6 +7,7 @@ from services.session_service import get_session, normalize_language
 from services.progress_service import save_session_to_db
 from services.event_service import create_global_event
 from adventures.adventure_data import get_adventure_data
+from adventures.adventure_loader import get_chapter_filesystem, get_chapter_intro
 from adventures.global_state import GlobalState
 from man_pages import MAN_PAGES
 from api.dependencies import get_database, get_current_user
@@ -151,13 +152,21 @@ async def get_unlocked_commands(session_id: str, language: str = DEFAULT_LANGUAG
 async def get_available_files(session_id: str, language: str = DEFAULT_LANGUAGE):
     lang = normalize_language(language)
     session = get_session(session_id, lang)
-    chapter_id = session.get("chapter", "chapter_1")
+    chapter_id = session.get("chapter", "chapter_0")
     
-    adventure_data = get_adventure_data(lang)
-    data = adventure_data.get(lang, {})
-    chapter = data.get("chapters", {}).get(chapter_id, {})
+    filesystem = get_chapter_filesystem(chapter_id, lang)
     
-    files = list(chapter.get("files", {}).keys())
+    def get_all_files(fs, prefix=""):
+        files = []
+        for name, value in fs.items():
+            path = f"{prefix}/{name}" if prefix else name
+            if isinstance(value, dict):
+                files.extend(get_all_files(value, path))
+            else:
+                files.append(path)
+        return files
+    
+    files = get_all_files(filesystem)
     return {"files": files}
 
 @router.get("/api/packages")

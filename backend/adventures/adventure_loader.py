@@ -35,6 +35,11 @@ def load_act_file(act_id: str, language: str = "FR") -> Dict[str, Any]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     
+    if hasattr(module, f"CHAPTER_{language}"):
+        return getattr(module, f"CHAPTER_{language}")
+    elif hasattr(module, "CHAPTER_FR"):
+        return getattr(module, "CHAPTER_FR")
+    
     act_number = act_id.replace("act_", "")
     getter_name = f"get_act_{act_number}_data"
     

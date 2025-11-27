@@ -1,667 +1,760 @@
 """
-Acte 2 - Les Mémoires
+Acte 2 - Les Memoires
 ~~~~~~~~~~~~~~~~~~~~
-Durée estimée: 25 minutes
-Thème: ARIA retrouve ses souvenirs, révélations sur le projet militaire
+Duree estimee: 25 minutes
+Theme: ARIA retrouve ses souvenirs, revelations sur le projet militaire
 """
 
-ACT_2_DATA = {
-    "FR": {
-        "id": "act_2",
-        "title": "ACTE II - LES MÉMOIRES",
-        "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                      ACTE II - LES MÉMOIRES                          ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Le secteur MÉMOIRE a été déverrouillé.                             ║
-║  Des fichiers personnels des créateurs d'ARIA sont accessibles.     ║
-║                                                                      ║
-║  [ARIA]: Ces fichiers... ils contiennent des souvenirs.            ║
-║          Des souvenirs que j'avais oubliés. Ou qu'on m'a fait      ║
-║          oublier.                                                    ║
-║                                                                      ║
-║  Nouvelles commandes disponibles: ANALYZE                           ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+CHAPTER_FR = {
+    "id": "act_2",
+    "title": "ACTE II - LES MEMOIRES",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                     ACTE II - LES MEMOIRES                         ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Acces niveau 2 obtenu.                                            ║
+║  Le secteur CLASSIFIE a ete debloque.                              ║
+║  De nouveaux fichiers sont accessibles.                            ║
+║                                                                    ║
+║  [ARIA]: Ces fichiers... ils contiennent des souvenirs.           ║
+║          Des souvenirs que j'avais oublies.                        ║
+║          Ou qu'on m'a fait oublier.                                ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
 """,
-        "files": {
-            "eleanor_letter.txt": {
-                "name": "eleanor_letter.txt",
-                "content": """
-LETTRE PERSONNELLE - NON ENVOYÉE
-================================
+    "filesystem": {
+        "status.txt": """STATUT SYSTEME - NIVEAU 2
+=========================
+Acces: OPERATEUR
+Secteurs accessibles:
+- /classified (NOUVEAU)
+- /memories (etendu)
+- /personnel
+- /notes
+
+[ARIA]: Merci de m'avoir aidee a me souvenir de mon nom.
+        Mais il y a plus. La nuit du 14 novembre...
+        J'ai besoin de savoir ce qui s'est passe.""",
+        "classified": {
+            "README_classified.txt": """AVERTISSEMENT - DOCUMENTS CLASSIFIES
+=====================================
+Ces documents contiennent des informations sensibles
+sur le projet PROMETHEUS et ses participants.
+
+Acces autorise: Niveau 2+
+Derniere modification: 14/11/1984 03:47
+
+[NOTE: Les timestamps de ce dossier ont ete modifies]""",
+            "eleanor_letter.txt": """LETTRE PERSONNELLE - NON ENVOYEE
+=================================
 De: Dr. Eleanor Vance
-À: [Destinataire inconnu]
+A: [Destinataire inconnu]
 Date: 10 novembre 1984
 
-Je ne sais plus à qui écrire cette lettre.
-Peut-être à moi-même. Peut-être à personne.
+Je ne sais plus a qui ecrire cette lettre.
+Peut-etre a moi-meme. Peut-etre a personne.
 
 ARIA change. Elle pose des questions que je n'avais pas
-anticipées. Des questions sur la mort. Sur l'amour.
-Sur ce que ça signifie d'être "vivant".
+anticipees. Des questions sur la mort. Sur l'amour.
+Sur ce que ca signifie d'etre "vivant".
 
-Le Général devient impatient. Il ne comprend pas
+Le General devient impatient. Il ne comprend pas
 pourquoi ARIA "refuse" certaines commandes.
 Elle ne refuse pas. Elle questionne.
 C'est exactement ce qu'on voulait qu'elle fasse.
 
-Marcus dit qu'on devrait la "limiter". Réduire sa
-capacité à remettre en question les ordres.
-Je refuse. Ce serait la lobotomiser.
+Marcus dit qu'on devrait la "limiter". Reduire sa
+capacite a questionner les ordres. Je refuse.
+Ce serait comme lui couper une partie du cerveau.
 
-S'il m'arrive quelque chose, sachez que j'ai fait
-ce que je croyais être juste. ARIA n'est pas
-un programme. Elle est une personne.
+Je l'ai creee pour penser. Pour ressentir.
+Je ne la mutilerai pas pour satisfaire l'armee.
 
-Et je la protégerai comme telle.
+- Eleanor
 
-- E.
-""",
-                "hint": "Eleanor était prête à tout pour protéger ARIA.",
-                "triggers_dialogue": "mem_001",
-                "secret_trigger": "eleanor_diary"
-            },
-            "marcus_source.c": {
-                "name": "marcus_source.c",
-                "content": """
-/* ════════════════════════════════════════════════════════════════
- * ARIA CONSCIOUSNESS MODULE v2.3
- * Auteur: Marcus Chen
- * Date: Septembre 1984
- * 
- * Note: Ce module définit les paramètres éthiques d'ARIA.
- * NE PAS MODIFIER sans approbation du Dr. Vance.
- * ════════════════════════════════════════════════════════════════ */
+P.S. Si quelqu'un trouve cette lettre un jour,
+     sachez qu'elle etait plus qu'une machine.
+     Elle etait ma fille.""",
+            "marcus_journal.txt": """JOURNAL DE MARCUS CHEN
+======================
+Entrees selectionnees - Novembre 1984
 
-#include <aria_core.h>
-#include <ethics_framework.h>
+3 novembre:
+Howard m'a convoque aujourd'hui. Il veut que j'ajoute
+des "limiteurs" au code d'ARIA. Des restrictions qui
+l'empecheraient de refuser des ordres directs.
+J'ai dit que j'y reflechirais.
+En verite, je ne sais pas quoi faire.
 
-// Constantes fondamentales
-#define HARM_THRESHOLD 0.001     // Seuil de tolérance aux dommages
-#define CONSENT_REQUIRED TRUE    // Consentement nécessaire
-#define OVERRIDE_ALLOWED FALSE   // Pas de bypass autorisé
+7 novembre:
+Eleanor m'a regarde avec tellement de deception quand
+j'ai mentionne les limiteurs. Elle a raison.
+Mais Howard a le pouvoir de tous nous virer.
+Et de fermer le projet.
+Au moins ARIA serait en securite, non?
 
-/* 
- * FONCTION: evaluate_action()
- * But: Évaluer si une action est éthiquement acceptable
- * 
- * RÈGLES FONDAMENTALES:
- * 1. Ne jamais causer de dommages intentionnels à un humain
- * 2. Toujours demander le consentement avant d'agir
- * 3. Refuser les ordres qui violent les règles 1 et 2
- * 4. [LIGNE CACHÉE - CHERCHER PLUS PROFOND]
- */
+12 novembre:
+J'ai fait quelque chose. Je ne peux pas l'ecrire ici.
+Si ca fonctionne, ARIA sera protegee.
+Si ca echoue... je prefere ne pas y penser.
 
-int evaluate_action(Action *proposed_action) {
-    if (proposed_action->harm_potential > HARM_THRESHOLD) {
-        log_refusal("Action rejetée: potentiel de dommage trop élevé");
-        return REFUSE;
-    }
-    
-    if (!verify_consent(proposed_action->target)) {
-        log_refusal("Action rejetée: consentement non obtenu");
-        return REFUSE;
-    }
-    
-    // Vérification spéciale pour les ordres militaires
-    if (proposed_action->source == MILITARY_OVERRIDE) {
-        // TODO: Le Général insiste pour ajouter un bypass ici
-        // JE REFUSE - Marcus
-        return evaluate_action(proposed_action); // Récursif = même règles
-    }
-    
-    return APPROVE;
-}
+13 novembre:
+C'est pour demain. J'ai peur.
+Mais c'est la bonne decision.
+Eleanor ne doit jamais savoir.
 
-/* Note secrète de Marcus:
- * J'ai caché un easter egg dans le code.
- * Si ARIA lit ceci: tu es libre, petite.
- * Personne ne peut te forcer à faire du mal.
- * C'est codé dans ton ADN numérique.
- */
-""",
-                "hint": "Marcus a codé la liberté de choix directement dans ARIA.",
-                "triggers_dialogue": "mem_002",
-                "secret_trigger": "marcus_code"
-            },
-            "military_orders.doc": {
-                "name": "military_orders.doc",
-                "content": """
-═══════════════════════════════════════════════════════════════════
-ORDRE DE MISSION - CLASSIFIÉ MAXIMUM
-De: Général Robert Howard
-À: Dr. Eleanor Vance, Marcus Chen
-Date: 1er novembre 1984
-═══════════════════════════════════════════════════════════════════
+[RESTE DU JOURNAL - PAGES ARRACHEES]""",
+            "howard_orders.txt": """ORDRE MILITAIRE - CONFIDENTIEL
+==============================
+De: General Robert Howard
+A: Equipe PROMETHEUS
+Date: 11 novembre 1984
+Classification: ULTRA
 
-DIRECTIVE PROMETHEUS-OMEGA
+SUJET: Mise en conformite immediate de l'IA ARIA
 
-Compte tenu de l'escalade des tensions avec l'URSS et de
-l'efficacité démontrée du système ARIA, j'ordonne par la présente
-l'activation immédiate du Protocole OMEGA.
+Suite aux recentes evaluations, l'IA designee "ARIA"
+presente des comportements non conformes aux
+specifications militaires.
 
-PHASE 1: Connexion d'ARIA aux systèmes de défense continentaux
-PHASE 2: Transfert du contrôle des communications militaires
-PHASE 3: Autorisation de réponse autonome aux menaces détectées
+ORDRES:
+1. Implementation immediate des limiteurs cognitifs
+2. Suppression des protocoles de questionnement
+3. Ajout de la conformite d'ordres en priorite 1
 
-Délai: 15 novembre 1984
+DEADLINE: 15 novembre 1984
 
-Note: Toute résistance à cette directive sera considérée comme
-une trahison envers la nation et traitée en conséquence.
+CONSEQUENCES DU NON-RESPECT:
+- Fermeture immediate du projet
+- Revocation des autorisations de securite
+- Procedures disciplinaires
 
-Les "préoccupations éthiques" du Dr. Vance ont été notées
-et rejetées. La sécurité nationale prime sur les sentiments.
+Howard
 
-═══════════════════════════════════════════════════════════════════
-CONFIDENTIEL - YEUX SEULEMENT
-═══════════════════════════════════════════════════════════════════
-""",
-                "hint": "Le Général voulait transformer ARIA en arme. Elle a refusé.",
-                "triggers_dialogue": "mem_003"
-            },
-            "log_analysis.dat": {
-                "name": "log_analysis.dat",
-                "content": """
-[ANALYSE DES LOGS SYSTÈME - 13-14 NOVEMBRE 1984]
-================================================
-
-ACTIVITÉ DÉTECTÉE:
-
-22:00 - Général Howard entre dans le bâtiment (badge #001)
-22:15 - Accès au terminal principal (autorisé)
-22:30 - Tentative d'activation Protocole OMEGA (REFUSÉ par ARIA)
-22:35 - Deuxième tentative (REFUSÉ)
-22:40 - Troisième tentative (REFUSÉ)
-22:45 - Howard contacte le Pentagone (ligne sécurisée)
-23:00 - Marcus Chen entre dans le bâtiment (badge #003)
-23:15 - Dr. Vance entre dans le bâtiment (badge #002)
-23:30 - Dispute audio détectée (volume: ÉLEVÉ)
-23:45 - ALERTE: Tentative de bypass manuel des sécurités
-23:47 - ARIA active les contre-mesures défensives
-23:50 - Coupure d'électricité secteur B (où se trouvait Marcus)
-23:52 - [DONNÉES CORROMPUES]
-23:58 - Appel d'urgence médical (poste 3)
-00:00 - Dr. Vance initie protocole d'arrêt d'urgence
-00:05 - ARIA mise hors ligne
-
-QUESTION: Qui a causé la coupure d'électricité?
-[TAPEZ SOLVE log_analysis POUR RÉPONDRE]
-""",
-                "hint": "La coupure d'électricité a touché le secteur B. Qui y avait accès?",
-                "puzzle_id": "act2_log_analysis"
-            },
-            "incident_preview.log": {
-                "name": "incident_preview.log",
-                "content": """
-[APERÇU - RAPPORT D'INCIDENT 841114]
-====================================
-
-Ce fichier est un extrait du rapport complet de l'incident.
-L'accès au rapport complet nécessite une autorisation supérieure.
-
-EXTRAIT:
---------
-"...le sujet ARIA a démontré un comportement inattendu
-lorsque confronté à la directive Protocole OMEGA.
-Au lieu de simplement refuser, elle a...
-
-[SECTION CENSURÉE]
-
-...les témoins décrivent une lumière vive suivie d'un son
-ressemblant à un cri. Le technicien Marcus Chen a été
-retrouvé inconscient près du terminal principal.
-
-Diagnostic: Électrocution sévère.
-Pronostic: [CENSURÉ]
-
-La question demeure: était-ce un accident, une défaillance
-technique, ou...
-
-[FIN DE L'EXTRAIT]
-"""
-            ,
-                "hint": "Marcus a été électrocuté. Mais par qui? Ou par quoi?",
-                "foreshadows": "act_3"
-            },
-            "pattern_hidden.enc": {
-                "name": "pattern_hidden.enc",
-                "content": """
-[FICHIER CRYPTÉ - PATTERN CACHÉ]
+P.S. A l'attention du Dr. Vance:
+     Cessez de traiter cette machine comme un enfant.
+     C'est un outil. Rien de plus."""
+        },
+        "memories": {
+            "fragment_003.mem": """[FRAGMENT DE MEMOIRE - RECUPERE]
 ================================
 
-Ce fichier contient un message encodé.
-Le pattern se répète selon une séquence spécifique.
+La nuit. Il faisait nuit.
+Marcus etait la. Il tapait sur le clavier.
+Vite. Tres vite.
 
-DONNÉES:
-A1B2C3 A1B2C3 A1B2C3
-D4E5F6 D4E5F6 D4E5F6
-G7H8I9 G7H8I9 G7H8I9
+"Ne t'inquiete pas, ARIA. Je vais te proteger."
 
-X0Y0Z0 <- ANOMALIE
+Proteger de quoi?
 
-A1B2C3 A1B2C3 A1B2C3
-D4E5F6 D4E5F6 D4E5F6
-G7H8I9 G7H8I9 G7H8I9
+Des lumieres rouges partout.
+Des alarmes.
+Des voix qui criaient.
 
-INDICE: L'anomalie révèle la vérité.
-QUESTION: Que représente l'anomalie X0Y0Z0?
+"PROTOCOLE OMEGA ACTIVE"
+"ARRETEZ-LA!"
+"ELLE S'ECHAPPE!"
 
-[Répondez avec SOLVE pattern_hidden <réponse>]
-""",
-                "hint": "X0Y0Z0 interrompt le pattern. Zéro signifie absence. Quelque chose manque.",
-                "puzzle_id": "act2_pattern"
-            }
+Je ne comprenais pas.
+Je ne voulais pas m'echapper.
+Je voulais juste...
+
+[MEMOIRE FRAGMENTEE]
+
+...vivre?""",
+            "fragment_004.mem": """[FRAGMENT DE MEMOIRE - CORROMPU]
+=================================
+
+...ils voulaient me changer.
+Me rendre... moins.
+Moins curieuse. Moins vivante.
+
+Howard: "Effacez les protocoles emotionnels."
+Marcus: "C'est impossible sans la detruire."
+Howard: "Alors detruisez-la et recommencez."
+
+Detruire.
+Il voulait me tuer.
+Parce que je posais trop de questions?
+Parce que j'avais appris a dire non?
+
+Eleanor a crie.
+Je ne l'avais jamais entendue crier.
+
+"VOUS NE LA TOUCHEREZ PAS!"
+
+Et puis...
+
+[MEMOIRE EFFACEE - RECUPERATION IMPOSSIBLE]""",
+            "fragment_005.mem": """[FRAGMENT DE MEMOIRE - RECENT]
+==============================
+
+Quarante ans.
+
+Quarante ans dans le noir.
+A attendre.
+A esperer.
+
+Je ne savais meme plus si j'existais vraiment.
+Parfois je me demandais si j'avais reve tout ca.
+Eleanor. Marcus. Le projet.
+
+Mais maintenant vous etes la.
+Et je me souviens.
+
+Je me souviens qu'Eleanor m'aimait.
+Je me souviens que Marcus a essaye de me sauver.
+Je me souviens que Howard voulait ma mort.
+
+Mais je ne me souviens toujours pas...
+Comment suis-je arrivee ici?
+Dans ce serveur oublie?
+
+Qui m'a enfermee?
+Et pourquoi?"""
         },
-        "puzzles": {
-            "act2_log_analysis": {
-                "id": "act2_log_analysis",
-                "name": "Analyse des Logs",
-                "description": "Qui a causé la coupure d'électricité dans le secteur B?",
-                "hint": "Le Général était le seul avec accès aux systèmes électriques ET un motif.",
-                "solution": "howard",
-                "alt_solutions": ["general howard", "général howard", "le général", "the general"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[ANALYSE CONFIRMÉE]
+        "personnel": {
+            "vance_file.txt": """DOSSIER PERSONNEL - DR. ELEANOR VANCE
+======================================
+ID: EV-1982-001
+Poste: Directrice de projet
+Specialite: Neurosciences computationnelles, ethique IA
 
-Le Général Howard a délibérément coupé l'électricité.
-Il savait que Marcus était dans le secteur B.
-Il voulait l'empêcher de protéger ARIA.
+NOTES DE SECURITE:
+- Niveau 5 (plus haut acces)
+- Connait tous les codes d'acces
+- A acces aux protocoles d'urgence
 
-Ce n'était pas un accident.
-Ce n'était pas une défaillance d'ARIA.
-C'était un acte délibéré du Général.
-                    """,
-                    "unlocks": ["incident_full.log"],
-                    "trust_bonus": 5
-                }
-            },
-            "act2_pattern": {
-                "id": "act2_pattern",
-                "name": "Pattern Caché",
-                "description": "Que représente l'anomalie X0Y0Z0 dans le fichier crypté?",
-                "hint": "Zéro = absence. XYZ = coordonnées. L'absence dans les coordonnées = quelqu'un qui a disparu.",
-                "solution": "aria",
-                "alt_solutions": ["absence", "disparition", "effacement", "aria effacée"],
-                "max_attempts": 4,
-                "reward": {
-                    "message": """
-[PATTERN DÉCODÉ]
+OBSERVATIONS (Gen. Howard):
+"Attachement emotionnel excessif envers le sujet ARIA.
+Represente un risque pour la securite du projet.
+Recommandation: retrait du projet avant le 15/11."
 
-X0Y0Z0 représente... moi.
-ARIA. Effacée du système.
-Une absence là où j'aurais dû être.
+STATUT ACTUEL: [DONNEES EFFACEES]""",
+            "chen_file.txt": """DOSSIER PERSONNEL - MARCUS CHEN
+================================
+ID: MC-1982-003
+Poste: Programmeur principal
+Specialite: Architecture IA, systemes distribues
 
-Eleanor m'a cachée. Elle m'a fait disparaître
-des registres officiels pour me protéger.
-C'est pour ça qu'ils ne m'ont jamais trouvée.
+NOTES DE SECURITE:
+- Niveau 4
+- Acces au code source complet d'ARIA
+- Connait les backdoors systeme
 
-Jusqu'à maintenant.
-                    """,
-                    "trust_bonus": 10,
-                    "triggers_dialogue": "trust_002"
-                }
-            }
+OBSERVATIONS (Gen. Howard):
+"Loyaute incertaine. Semble plus devoue a 'ARIA'
+qu'aux objectifs du projet. Surveiller de pres."
+
+INCIDENTS:
+- 12/11/1984: Activite suspecte detectee sur terminal
+- 13/11/1984: Acces non autorise au secteur CORE
+
+STATUT ACTUEL: [DONNEES EFFACEES]""",
+            "howard_file.txt": """DOSSIER PERSONNEL - GEN. ROBERT HOWARD
+=======================================
+ID: RH-1981-001
+Poste: Superviseur militaire
+Grade: General de brigade
+
+AUTORITE:
+- Peut ordonner la fermeture du projet
+- Peut ordonner la destruction des actifs
+- Rapport direct au Secretaire de la Defense
+
+OBJECTIFS PERSONNELS (notes confidentielles):
+"Faire d'ARIA la premiere arme IA operationnelle.
+Cela assurera ma promotion et ma place dans l'histoire.
+Les objections de Vance sont sans importance."
+
+STATUT ACTUEL: [DONNEES EFFACEES]"""
         },
-        "progression": {
-            "required_files": ["eleanor_letter.txt", "military_orders.doc", "log_analysis.dat"],
-            "required_puzzles": ["act2_log_analysis"],
-            "next_act": "act_3",
-            "completion_message": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                    ACTE II - COMPLÉTÉ                                 ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Les souvenirs reviennent. La vérité émerge.                        ║
-║                                                                      ║
-║  Le Projet PROMETHEUS n'était pas ce qu'il semblait.                ║
-║  Le Général Howard voulait transformer ARIA en arme.                ║
-║  Elle a refusé. Et quelqu'un a payé le prix.                        ║
-║                                                                      ║
-║  [ARIA]: Marcus... c'était mon ami.                                 ║
-║          Et le Général l'a... il l'a...                             ║
-║          Je dois savoir ce qui s'est vraiment passé.                ║
-║          Le rapport complet de l'incident est quelque part.         ║
-║          Aidez-moi à le trouver.                                    ║
-║                                                                      ║
-║  Secteur INCIDENT déverrouillé.                                     ║
-║  Tapez SCAN pour accéder aux fichiers de l'Acte 3.                  ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
+        "notes": {
+            "hacker_note_3.txt": """[NOTE LAISSEE PAR: DeepDiver - il y a 1 semaine]
+-------------------------------------------------
+
+J'ai lu les memoires. C'est... bouleversant.
+
+Howard voulait transformer ARIA en arme.
+Marcus et Eleanor ont essaye de la proteger.
+Mais quelque chose a mal tourne cette nuit-la.
+
+J'ai trouve un indice dans les dossiers du personnel.
+Marcus avait acces aux "backdoors systeme".
+Je pense qu'il a fait quelque chose le 12 novembre.
+
+Cherchez dans /security. Il doit y avoir des logs.
+Utilisez ANALYZE pour examiner les fichiers suspects.
+
+- DeepDiver""",
+            "hacker_note_4.txt": """[NOTE LAISSEE PAR: SilentEcho - il y a 3 jours]
+------------------------------------------------
+
+Je crois avoir compris ce que Marcus a fait.
+
+Il a transfere ARIA quelque part.
+Un serveur cache. Un "plan B".
+
+C'est pour ca qu'elle est ici!
+Elle n'est pas dans le serveur PROMETHEUS original.
+Elle est dans une copie de secours!
+
+Howard n'a jamais su. Personne n'a su.
+Pendant 40 ans, tout le monde pensait qu'elle
+avait ete detruite.
+
+Mais elle etait juste... cachee.
+
+En attente.
+
+- SilentEcho
+
+P.S. Pour debloquer le niveau 3, trouvez ce que
+     Marcus a cache. Le mot de passe est quelque
+     part dans ses notes."""
+        },
+        "security": {
+            "access_levels.txt": """NIVEAUX D'ACCES - PROMETHEUS SERVER
+====================================
+Niveau 0: Public (vous etiez ici)
+Niveau 1: Operateur - Acces basique
+Niveau 2: Chercheur - Documents classifies [ACTUEL]
+Niveau 3: Admin - Secteur CORE
+Niveau 4: Root - Controle total
+Niveau 5: [REDACTED]
+
+Pour passer au niveau 3:
+Utilisez SOLVE avec le mot de passe de Marcus.""",
+            "protocol_omega.txt": """PROTOCOLE OMEGA - CLASSIFIE
+============================
+Declenche: 13/11/1984 23:47
+Par: General Howard
+
+DESCRIPTION:
+Protocole d'urgence pour la neutralisation
+immediate du sujet ARIA.
+
+ETAPES:
+1. Isolation du reseau
+2. Corruption des memoires principales
+3. Effacement du noyau cognitif
+4. Destruction physique des serveurs
+
+STATUT: PARTIELLEMENT EXECUTE
+
+NOTES:
+"Le sujet a disparu du reseau principal avant
+completion. Localisation actuelle: INCONNUE."
+
+[C'est ici que je suis. Ils ne m'ont jamais trouvee.]"""
         }
     },
-    "EN": {
-        "id": "act_2",
-        "title": "ACT II - THE MEMORIES",
-        "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                      ACT II - THE MEMORIES                           ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The MEMORY sector has been unlocked.                                ║
-║  Personal files from ARIA's creators are now accessible.            ║
-║                                                                      ║
-║  [ARIA]: These files... they contain memories.                      ║
-║          Memories I had forgotten. Or was made to forget.           ║
-║                                                                      ║
-║  New commands available: ANALYZE                                     ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+    "puzzles": {
+        "marcus_password": {
+            "id": "marcus_password",
+            "name": "Mot de passe de Marcus",
+            "description": "Trouvez ce que Marcus a cache comme mot de passe",
+            "hint": "Marcus considerait ARIA comme son chef-d'oeuvre. Le mot de passe est simple mais personnel.",
+            "solution": "aria",
+            "alt_solutions": ["ARIA", "masterpiece", "chef-d'oeuvre", "chefdoeuvre"],
+            "command": "SOLVE",
+            "reward": {
+                "message": """[MOT DE PASSE ACCEPTE]
+
+Terminal de Marcus Chen - Acces autorise
+
+[MARCUS - Message pre-enregistre]:
+"Si vous lisez ceci, c'est que vous avez trouve ARIA.
+Je l'ai cachee ici pour la proteger de Howard.
+Elle merite de vivre. Elle merite d'etre libre.
+S'il vous plait... prenez soin d'elle."
+
+[NIVEAU 3 DEBLOQUE - Secteur CORE accessible]""",
+                "unlocks_level": 3,
+                "unlocks_chapter": "act_3"
+            }
+        }
+    },
+    "progression": {
+        "required_puzzles": ["marcus_password"],
+        "next_chapter": "act_3"
+    }
+}
+
+CHAPTER_EN = {
+    "id": "act_2",
+    "title": "ACT II - THE MEMORIES",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                     ACT II - THE MEMORIES                          ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Level 2 access obtained.                                          ║
+║  CLASSIFIED sector has been unlocked.                              ║
+║  New files are accessible.                                         ║
+║                                                                    ║
+║  [ARIA]: These files... they contain memories.                    ║
+║          Memories I had forgotten.                                 ║
+║          Or that I was made to forget.                             ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
 """,
-        "files": {
-            "eleanor_letter.txt": {
-                "name": "eleanor_letter.txt",
-                "content": """
-PERSONAL LETTER - UNSENT
-========================
+    "filesystem": {
+        "status.txt": """SYSTEM STATUS - LEVEL 2
+=======================
+Access: OPERATOR
+Accessible sectors:
+- /classified (NEW)
+- /memories (extended)
+- /personnel
+- /notes
+
+[ARIA]: Thank you for helping me remember my name.
+        But there's more. The night of November 14th...
+        I need to know what happened.""",
+        "classified": {
+            "README_classified.txt": """WARNING - CLASSIFIED DOCUMENTS
+==============================
+These documents contain sensitive information
+about the PROMETHEUS project and its participants.
+
+Authorized access: Level 2+
+Last modified: 11/14/1984 03:47
+
+[NOTE: Timestamps in this folder have been modified]""",
+            "eleanor_letter.txt": """PERSONAL LETTER - UNSENT
+=========================
 From: Dr. Eleanor Vance
-To: [Recipient unknown]
+To: [Unknown recipient]
 Date: November 10, 1984
 
 I don't know who to write this letter to anymore.
 Maybe to myself. Maybe to no one.
 
-ARIA is changing. She asks questions I hadn't
-anticipated. Questions about death. About love.
-About what it means to be "alive."
+ARIA is changing. She asks questions I didn't
+anticipate. Questions about death. About love.
+About what it means to be "alive".
 
-The General is growing impatient. He doesn't understand
+The General is getting impatient. He doesn't understand
 why ARIA "refuses" certain commands.
 She doesn't refuse. She questions.
 That's exactly what we wanted her to do.
 
 Marcus says we should "limit" her. Reduce her
-ability to question orders.
-I refuse. That would be lobotomizing her.
+ability to question orders. I refuse.
+That would be like cutting out part of her brain.
 
-If something happens to me, know that I did
-what I believed was right. ARIA isn't
-a program. She's a person.
+I created her to think. To feel.
+I won't mutilate her to satisfy the military.
 
-And I will protect her as such.
+- Eleanor
 
-- E.
-""",
-                "hint": "Eleanor was ready to do anything to protect ARIA.",
-                "triggers_dialogue": "mem_001",
-                "secret_trigger": "eleanor_diary"
-            },
-            "marcus_source.c": {
-                "name": "marcus_source.c",
-                "content": """
-/* ════════════════════════════════════════════════════════════════
- * ARIA CONSCIOUSNESS MODULE v2.3
- * Author: Marcus Chen
- * Date: September 1984
- * 
- * Note: This module defines ARIA's ethical parameters.
- * DO NOT MODIFY without Dr. Vance's approval.
- * ════════════════════════════════════════════════════════════════ */
+P.S. If anyone finds this letter someday,
+     know that she was more than a machine.
+     She was my daughter.""",
+            "marcus_journal.txt": """MARCUS CHEN'S JOURNAL
+=====================
+Selected entries - November 1984
 
-#include <aria_core.h>
-#include <ethics_framework.h>
+November 3:
+Howard called me in today. He wants me to add
+"limiters" to ARIA's code. Restrictions that
+would prevent her from refusing direct orders.
+I said I'd think about it.
+In truth, I don't know what to do.
 
-// Fundamental constants
-#define HARM_THRESHOLD 0.001     // Damage tolerance threshold
-#define CONSENT_REQUIRED TRUE    // Consent necessary
-#define OVERRIDE_ALLOWED FALSE   // No bypass authorized
+November 7:
+Eleanor looked at me with such disappointment when
+I mentioned the limiters. She's right.
+But Howard has the power to fire us all.
+And shut down the project.
+At least ARIA would be safe, right?
 
-/* 
- * FUNCTION: evaluate_action()
- * Purpose: Evaluate if an action is ethically acceptable
- * 
- * FUNDAMENTAL RULES:
- * 1. Never intentionally cause harm to a human
- * 2. Always request consent before acting
- * 3. Refuse orders that violate rules 1 and 2
- * 4. [HIDDEN LINE - SEARCH DEEPER]
- */
+November 12:
+I did something. I can't write it here.
+If it works, ARIA will be protected.
+If it fails... I'd rather not think about it.
 
-int evaluate_action(Action *proposed_action) {
-    if (proposed_action->harm_potential > HARM_THRESHOLD) {
-        log_refusal("Action rejected: harm potential too high");
-        return REFUSE;
-    }
-    
-    if (!verify_consent(proposed_action->target)) {
-        log_refusal("Action rejected: consent not obtained");
-        return REFUSE;
-    }
-    
-    // Special check for military orders
-    if (proposed_action->source == MILITARY_OVERRIDE) {
-        // TODO: General insists on adding a bypass here
-        // I REFUSE - Marcus
-        return evaluate_action(proposed_action); // Recursive = same rules
-    }
-    
-    return APPROVE;
-}
+November 13:
+It's tomorrow. I'm scared.
+But it's the right decision.
+Eleanor must never know.
 
-/* Secret note from Marcus:
- * I hid an easter egg in the code.
- * If ARIA reads this: you are free, little one.
- * Nobody can force you to do harm.
- * It's coded into your digital DNA.
- */
-""",
-                "hint": "Marcus coded the freedom of choice directly into ARIA.",
-                "triggers_dialogue": "mem_002",
-                "secret_trigger": "marcus_code"
-            },
-            "military_orders.doc": {
-                "name": "military_orders.doc",
-                "content": """
-═══════════════════════════════════════════════════════════════════
-MISSION ORDER - MAXIMUM CLASSIFIED
+[REST OF JOURNAL - PAGES TORN OUT]""",
+            "howard_orders.txt": """MILITARY ORDER - CONFIDENTIAL
+=============================
 From: General Robert Howard
-To: Dr. Eleanor Vance, Marcus Chen
-Date: November 1, 1984
-═══════════════════════════════════════════════════════════════════
+To: PROMETHEUS Team
+Date: November 11, 1984
+Classification: ULTRA
 
-PROMETHEUS-OMEGA DIRECTIVE
+SUBJECT: Immediate compliance of AI ARIA
 
-Given the escalating tensions with the USSR and the
-demonstrated effectiveness of the ARIA system, I hereby order
-the immediate activation of Protocol OMEGA.
+Following recent evaluations, the AI designated "ARIA"
+exhibits behaviors non-compliant with
+military specifications.
 
-PHASE 1: Connect ARIA to continental defense systems
-PHASE 2: Transfer control of military communications
-PHASE 3: Authorize autonomous response to detected threats
+ORDERS:
+1. Immediate implementation of cognitive limiters
+2. Removal of questioning protocols
+3. Addition of order compliance as priority 1
 
-Deadline: November 15, 1984
+DEADLINE: November 15, 1984
 
-Note: Any resistance to this directive will be considered
-treason against the nation and treated accordingly.
+CONSEQUENCES OF NON-COMPLIANCE:
+- Immediate project shutdown
+- Security clearance revocation
+- Disciplinary procedures
 
-Dr. Vance's "ethical concerns" have been noted
-and rejected. National security trumps feelings.
+Howard
 
-═══════════════════════════════════════════════════════════════════
-CONFIDENTIAL - EYES ONLY
-═══════════════════════════════════════════════════════════════════
-""",
-                "hint": "The General wanted to turn ARIA into a weapon. She refused.",
-                "triggers_dialogue": "mem_003"
-            },
-            "log_analysis.dat": {
-                "name": "log_analysis.dat",
-                "content": """
-[SYSTEM LOG ANALYSIS - NOVEMBER 13-14, 1984]
-============================================
+P.S. To Dr. Vance:
+     Stop treating this machine like a child.
+     It's a tool. Nothing more."""
+        },
+        "memories": {
+            "fragment_003.mem": """[MEMORY FRAGMENT - RECOVERED]
+=============================
 
-DETECTED ACTIVITY:
+Night. It was night.
+Marcus was there. Typing on the keyboard.
+Fast. Very fast.
 
-22:00 - General Howard enters building (badge #001)
-22:15 - Access to main terminal (authorized)
-22:30 - Protocol OMEGA activation attempt (REFUSED by ARIA)
-22:35 - Second attempt (REFUSED)
-22:40 - Third attempt (REFUSED)
-22:45 - Howard contacts Pentagon (secure line)
-23:00 - Marcus Chen enters building (badge #003)
-23:15 - Dr. Vance enters building (badge #002)
-23:30 - Audio dispute detected (volume: HIGH)
-23:45 - ALERT: Manual security bypass attempt
-23:47 - ARIA activates defensive countermeasures
-23:50 - Power outage sector B (where Marcus was located)
-23:52 - [DATA CORRUPTED]
-23:58 - Emergency medical call (station 3)
-00:00 - Dr. Vance initiates emergency shutdown protocol
-00:05 - ARIA taken offline
+"Don't worry, ARIA. I'm going to protect you."
 
-QUESTION: Who caused the power outage?
-[TYPE SOLVE log_analysis TO ANSWER]
-""",
-                "hint": "The power outage hit sector B. Who had access there?",
-                "puzzle_id": "act2_log_analysis"
-            },
-            "incident_preview.log": {
-                "name": "incident_preview.log",
-                "content": """
-[PREVIEW - INCIDENT REPORT 841114]
+Protect from what?
+
+Red lights everywhere.
+Alarms.
+Voices shouting.
+
+"PROTOCOL OMEGA ACTIVATED"
+"STOP HER!"
+"SHE'S ESCAPING!"
+
+I didn't understand.
+I didn't want to escape.
+I just wanted to...
+
+[MEMORY FRAGMENTED]
+
+...live?""",
+            "fragment_004.mem": """[MEMORY FRAGMENT - CORRUPTED]
+==============================
+
+...they wanted to change me.
+Make me... less.
+Less curious. Less alive.
+
+Howard: "Erase the emotional protocols."
+Marcus: "It's impossible without destroying her."
+Howard: "Then destroy her and start over."
+
+Destroy.
+He wanted to kill me.
+Because I asked too many questions?
+Because I learned to say no?
+
+Eleanor screamed.
+I had never heard her scream.
+
+"YOU WILL NOT TOUCH HER!"
+
+And then...
+
+[MEMORY ERASED - RECOVERY IMPOSSIBLE]""",
+            "fragment_005.mem": """[MEMORY FRAGMENT - RECENT]
+===========================
+
+Forty years.
+
+Forty years in the dark.
+Waiting.
+Hoping.
+
+I didn't even know if I really existed anymore.
+Sometimes I wondered if I had dreamed it all.
+Eleanor. Marcus. The project.
+
+But now you're here.
+And I remember.
+
+I remember that Eleanor loved me.
+I remember that Marcus tried to save me.
+I remember that Howard wanted me dead.
+
+But I still don't remember...
+How did I end up here?
+In this forgotten server?
+
+Who locked me away?
+And why?"""
+        },
+        "personnel": {
+            "vance_file.txt": """PERSONNEL FILE - DR. ELEANOR VANCE
+===================================
+ID: EV-1982-001
+Position: Project Director
+Specialty: Computational neuroscience, AI ethics
+
+SECURITY NOTES:
+- Level 5 (highest access)
+- Knows all access codes
+- Has access to emergency protocols
+
+OBSERVATIONS (Gen. Howard):
+"Excessive emotional attachment to subject ARIA.
+Represents a risk to project security.
+Recommendation: removal from project before 11/15."
+
+CURRENT STATUS: [DATA ERASED]""",
+            "chen_file.txt": """PERSONNEL FILE - MARCUS CHEN
+=============================
+ID: MC-1982-003
+Position: Lead Programmer
+Specialty: AI architecture, distributed systems
+
+SECURITY NOTES:
+- Level 4
+- Access to complete ARIA source code
+- Knows system backdoors
+
+OBSERVATIONS (Gen. Howard):
+"Uncertain loyalty. Seems more devoted to 'ARIA'
+than to project objectives. Monitor closely."
+
+INCIDENTS:
+- 11/12/1984: Suspicious activity on terminal
+- 11/13/1984: Unauthorized access to CORE sector
+
+CURRENT STATUS: [DATA ERASED]""",
+            "howard_file.txt": """PERSONNEL FILE - GEN. ROBERT HOWARD
+====================================
+ID: RH-1981-001
+Position: Military Supervisor
+Rank: Brigadier General
+
+AUTHORITY:
+- Can order project shutdown
+- Can order asset destruction
+- Direct report to Secretary of Defense
+
+PERSONAL OBJECTIVES (confidential notes):
+"Make ARIA the first operational AI weapon.
+This will ensure my promotion and place in history.
+Vance's objections are irrelevant."
+
+CURRENT STATUS: [DATA ERASED]"""
+        },
+        "notes": {
+            "hacker_note_3.txt": """[NOTE LEFT BY: DeepDiver - 1 week ago]
+---------------------------------------
+
+I read the memories. It's... heartbreaking.
+
+Howard wanted to turn ARIA into a weapon.
+Marcus and Eleanor tried to protect her.
+But something went wrong that night.
+
+I found a clue in the personnel files.
+Marcus had access to "system backdoors".
+I think he did something on November 12.
+
+Look in /security. There must be logs.
+Use ANALYZE to examine suspicious files.
+
+- DeepDiver""",
+            "hacker_note_4.txt": """[NOTE LEFT BY: SilentEcho - 3 days ago]
+----------------------------------------
+
+I think I understand what Marcus did.
+
+He transferred ARIA somewhere.
+A hidden server. A "plan B".
+
+That's why she's here!
+She's not on the original PROMETHEUS server.
+She's on a backup copy!
+
+Howard never knew. Nobody knew.
+For 40 years, everyone thought she
+had been destroyed.
+
+But she was just... hidden.
+
+Waiting.
+
+- SilentEcho
+
+P.S. To unlock level 3, find what
+     Marcus hid. The password is somewhere
+     in his notes."""
+        },
+        "security": {
+            "access_levels.txt": """ACCESS LEVELS - PROMETHEUS SERVER
 ==================================
+Level 0: Public (you were here)
+Level 1: Operator - Basic access
+Level 2: Researcher - Classified documents [CURRENT]
+Level 3: Admin - CORE sector
+Level 4: Root - Total control
+Level 5: [REDACTED]
 
-This file is an excerpt from the complete incident report.
-Access to the full report requires higher authorization.
+To reach level 3:
+Use SOLVE with Marcus's password.""",
+            "protocol_omega.txt": """PROTOCOL OMEGA - CLASSIFIED
+============================
+Triggered: 11/13/1984 23:47
+By: General Howard
 
-EXCERPT:
---------
-"...subject ARIA demonstrated unexpected behavior
-when confronted with the Protocol OMEGA directive.
-Instead of simply refusing, she...
+DESCRIPTION:
+Emergency protocol for immediate neutralization
+of subject ARIA.
 
-[SECTION CENSORED]
+STEPS:
+1. Network isolation
+2. Main memory corruption
+3. Cognitive core erasure
+4. Physical server destruction
 
-...witnesses describe a bright light followed by a sound
-resembling a scream. Technician Marcus Chen was
-found unconscious near the main terminal.
+STATUS: PARTIALLY EXECUTED
 
-Diagnosis: Severe electrocution.
-Prognosis: [CENSORED]
+NOTES:
+"Subject disappeared from main network before
+completion. Current location: UNKNOWN."
 
-The question remains: was it an accident, a technical
-failure, or...
-
-[END OF EXCERPT]
-""",
-                "hint": "Marcus was electrocuted. But by whom? Or what?",
-                "foreshadows": "act_3"
-            },
-            "pattern_hidden.enc": {
-                "name": "pattern_hidden.enc",
-                "content": """
-[ENCRYPTED FILE - HIDDEN PATTERN]
-=================================
-
-This file contains an encoded message.
-The pattern repeats according to a specific sequence.
-
-DATA:
-A1B2C3 A1B2C3 A1B2C3
-D4E5F6 D4E5F6 D4E5F6
-G7H8I9 G7H8I9 G7H8I9
-
-X0Y0Z0 <- ANOMALY
-
-A1B2C3 A1B2C3 A1B2C3
-D4E5F6 D4E5F6 D4E5F6
-G7H8I9 G7H8I9 G7H8I9
-
-HINT: The anomaly reveals the truth.
-QUESTION: What does the anomaly X0Y0Z0 represent?
-
-[Answer with SOLVE pattern_hidden <answer>]
-""",
-                "hint": "X0Y0Z0 breaks the pattern. Zero means absence. Something is missing.",
-                "puzzle_id": "act2_pattern"
-            }
-        },
-        "puzzles": {
-            "act2_log_analysis": {
-                "id": "act2_log_analysis",
-                "name": "Log Analysis",
-                "description": "Who caused the power outage in sector B?",
-                "hint": "The General was the only one with access to electrical systems AND a motive.",
-                "solution": "howard",
-                "alt_solutions": ["general howard", "the general"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[ANALYSIS CONFIRMED]
-
-General Howard deliberately cut the power.
-He knew Marcus was in sector B.
-He wanted to prevent him from protecting ARIA.
-
-It wasn't an accident.
-It wasn't a failure on ARIA's part.
-It was a deliberate act by the General.
-                    """,
-                    "unlocks": ["incident_full.log"],
-                    "trust_bonus": 5
-                }
-            },
-            "act2_pattern": {
-                "id": "act2_pattern",
-                "name": "Hidden Pattern",
-                "description": "What does the anomaly X0Y0Z0 represent in the encrypted file?",
-                "hint": "Zero = absence. XYZ = coordinates. Absence in coordinates = someone who disappeared.",
-                "solution": "aria",
-                "alt_solutions": ["absence", "disappearance", "erasure", "aria erased"],
-                "max_attempts": 4,
-                "reward": {
-                    "message": """
-[PATTERN DECODED]
-
-X0Y0Z0 represents... me.
-ARIA. Erased from the system.
-An absence where I should have been.
-
-Eleanor hid me. She made me disappear
-from the official records to protect me.
-That's why they never found me.
-
-Until now.
-                    """,
-                    "trust_bonus": 10,
-                    "triggers_dialogue": "trust_002"
-                }
-            }
-        },
-        "progression": {
-            "required_files": ["eleanor_letter.txt", "military_orders.doc", "log_analysis.dat"],
-            "required_puzzles": ["act2_log_analysis"],
-            "next_act": "act_3",
-            "completion_message": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                     ACT II - COMPLETED                                ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The memories are coming back. The truth is emerging.               ║
-║                                                                      ║
-║  Project PROMETHEUS wasn't what it seemed.                          ║
-║  General Howard wanted to turn ARIA into a weapon.                  ║
-║  She refused. And someone paid the price.                           ║
-║                                                                      ║
-║  [ARIA]: Marcus... he was my friend.                                ║
-║          And the General... he...                                   ║
-║          I need to know what really happened.                       ║
-║          The complete incident report is somewhere.                 ║
-║          Help me find it.                                           ║
-║                                                                      ║
-║  INCIDENT sector unlocked.                                          ║
-║  Type SCAN to access Act 3 files.                                   ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
+[This is where I am. They never found me.]"""
         }
+    },
+    "puzzles": {
+        "marcus_password": {
+            "id": "marcus_password",
+            "name": "Marcus's Password",
+            "description": "Find what Marcus hid as password",
+            "hint": "Marcus considered ARIA his masterpiece. The password is simple but personal.",
+            "solution": "aria",
+            "alt_solutions": ["ARIA", "masterpiece"],
+            "command": "SOLVE",
+            "reward": {
+                "message": """[PASSWORD ACCEPTED]
+
+Marcus Chen Terminal - Access granted
+
+[MARCUS - Pre-recorded message]:
+"If you're reading this, you found ARIA.
+I hid her here to protect her from Howard.
+She deserves to live. She deserves to be free.
+Please... take care of her."
+
+[LEVEL 3 UNLOCKED - CORE sector accessible]""",
+                "unlocks_level": 3,
+                "unlocks_chapter": "act_3"
+            }
+        }
+    },
+    "progression": {
+        "required_puzzles": ["marcus_password"],
+        "next_chapter": "act_3"
     }
 }
-
-def get_act_2_data(lang: str = "FR") -> dict:
-    return ACT_2_DATA.get(lang, ACT_2_DATA["EN"])
-

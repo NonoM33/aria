@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
-from adventures.adventure_data import get_adventure_data
+from adventures.adventure_loader import get_chapter_filesystem
 
 class AccessCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
