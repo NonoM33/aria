@@ -12,6 +12,7 @@ const AriaFloatingPanel = ({
   const [currentFrame, setCurrentFrame] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [hasGlitch, setHasGlitch] = useState(false)
 
   const getAriaArt = useCallback(() => {
     if (isTyping) {
@@ -44,12 +45,19 @@ const AriaFloatingPanel = ({
   useEffect(() => {
     if (!message || !visible) {
       setDisplayedText('')
+      setHasGlitch(false)
       return
     }
 
     const cleanMessage = message.replace(/\[ARIA\]\n?/g, '').trim()
     setIsTyping(true)
     setDisplayedText('')
+    
+    setTimeout(() => {
+      setHasGlitch(true)
+      setTimeout(() => setHasGlitch(false), 200)
+    }, 100)
+    
     let index = 0
     const charsPerTick = 3
 
@@ -57,9 +65,19 @@ const AriaFloatingPanel = ({
       if (index < cleanMessage.length) {
         index = Math.min(index + charsPerTick, cleanMessage.length)
         setDisplayedText(cleanMessage.substring(0, index))
+        
+        if (index > 10 && index % 25 === 0 && Math.random() < 0.25) {
+          setHasGlitch(true)
+          setTimeout(() => setHasGlitch(false), 150)
+        }
       } else {
         clearInterval(typingInterval)
         setIsTyping(false)
+        
+        setTimeout(() => {
+          setHasGlitch(true)
+          setTimeout(() => setHasGlitch(false), 150)
+        }, 100)
         
         if (choices.length === 0) {
           const autoCloseTimer = setTimeout(() => {
@@ -92,7 +110,7 @@ const AriaFloatingPanel = ({
 
   return (
     <div className="aria-notification-container">
-      <div className="aria-notification">
+      <div className={`aria-notification ${hasGlitch ? 'aria-glitch-active' : ''}`}>
         <div className="aria-notification-header">
           <span className="aria-notification-status">● ARIA</span>
           <button className="aria-notification-close" onClick={onClose}>×</button>
