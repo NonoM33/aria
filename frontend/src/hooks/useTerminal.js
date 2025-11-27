@@ -70,6 +70,7 @@ export const useTerminal = () => {
   const [isPasswordMode, setIsPasswordMode] = useState(false)
   const [passwordUsername, setPasswordUsername] = useState(null)
   const [currentPath, setCurrentPath] = useState('/')
+  const currentPathRef = useRef('/')
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -116,6 +117,7 @@ export const useTerminal = () => {
       
       if (data.current_path) {
         setCurrentPath(data.current_path)
+        currentPathRef.current = data.current_path
       }
       
       if (systemResponse.includes("Vous n'êtes pas connecté") || 
@@ -213,18 +215,13 @@ export const useTerminal = () => {
       if (data.dirs) {
         setAvailableDirs(data.dirs)
       }
-      if (data.current_path) {
-        setCurrentPath(data.current_path)
-      }
     } else if (data.type === 'filesystem_update') {
       if (data.filesystem) {
         setFilesystem(data.filesystem)
-        const { dirs, files } = getDirsAndFiles(getPathContents(data.filesystem, data.current_path || '/', ''))
+        const pathToUse = data.current_path || currentPathRef.current || '/'
+        const { dirs, files } = getDirsAndFiles(getPathContents(data.filesystem, pathToUse, ''))
         setAvailableDirs(dirs)
         setAvailableFiles(files)
-      }
-      if (data.current_path) {
-        setCurrentPath(data.current_path)
       }
     } else if (data.type === 'commands_update') {
       if (data.commands) {
