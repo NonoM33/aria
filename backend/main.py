@@ -13,6 +13,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+print(f"CORS_ORIGINS: {CORS_ORIGINS}")
 
 try:
     init_db()
