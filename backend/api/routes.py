@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 from commands.command_handler import handle_command
-from services.session_service import get_session, normalize_language
+from services.session_service import get_session, normalize_language, sessions
 from services.progress_service import save_session_to_db
 from services.event_service import create_global_event
 from adventures.adventure_data import get_adventure_data
@@ -288,7 +288,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                     if payload:
                         username = payload.get("username")
                 
+                existing_current_path = sessions.get(session_id, {}).get("current_path")
                 session = get_session(session_id, lang, db, username, token)
+                if existing_current_path and existing_current_path != "/":
+                    session["current_path"] = existing_current_path
                 session["language"] = lang
                 
                 if password and session.get("ssh_pending_username"):
