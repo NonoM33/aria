@@ -381,6 +381,15 @@ const Terminal = () => {
         />
       )}
       <div className="terminal-content">
+        {username && (
+          <AriaDisplay 
+            state={ariaState}
+            emotion={ariaEmotion}
+            isSpeaking={ariaSpeaking}
+            isMinimized={ariaMinimized}
+            onMinimize={() => setAriaMinimized(!ariaMinimized)}
+          />
+        )}
         <div className="terminal-history">
           {history.map((entry, index) => (
             <div key={index} className={`terminal-entry terminal-entry-${entry.type}`}>
@@ -393,8 +402,8 @@ const Terminal = () => {
                 </div>
               )}
               {entry.type === 'system' && (
-                <div className="terminal-line">
-                  <span className="terminal-text">{entry.content}</span>
+                <div className={`terminal-line ${isAriaMessage(entry.content) ? 'aria-dialogue' : ''}`}>
+                  <span className={`terminal-text ${isAriaMessage(entry.content) ? 'aria-message' : ''}`}>{entry.content}</span>
                 </div>
               )}
             </div>
