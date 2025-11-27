@@ -63,7 +63,7 @@ def get_session(
             "level": 0,
             "chapter": "chapter_0",
             "logged_in": False,
-            "unlocked_commands": ["HELP", "STATUS", "SCAN", "LS", "EXPLOIT", "CREATE_USER", "SSH", "EXIT"],
+            "unlocked_commands": ["HELP", "STATUS", "LOGIN", "SCAN", "LS", "EXPLOIT", "CREATE_USER", "SSH", "EXIT"],
             "accessed_files": [],
             "solved_puzzles": [],
             "collected_items": [],
