@@ -2,7 +2,7 @@ CHAPTER_FR = {
     "title": "Le Décodage",
     "intro": "Accès niveau 1 obtenu.\n\nNouvelles commandes disponibles: SCAN, DECODE, ACCESS\n\nVous devez maintenant scanner le système pour trouver les fichiers corrompus.",
     "files": {
-        "corrupted_data.b64": "VGhlIG5leHQgc3RlcCBpcyB0byBkZWNvZGUgdGhlIGZpbGUgY29kZWQgaW4gYmFzZTY0LgpUaGUgYW5zd2VyIGlzOiBQUk9UT0NPTF9YWVo=",
+        "corrupted_data.b64": "TGUgcHJvY2hhaW4gw6l0YXBlIGVzdCBkZSBkw6ljb2RlciBsZSBmaWNoaWVyIGNvZMOpIGVuIGJhc2U2NC4KTGUgbm9tIGR1IHByb3RvY29sZSBlc3Q6IFBST1RPQ09MX1hZWg==",
         "protocol_xyz.txt": """PROTOCOL XYZ
 ==============
 

@@ -1,15 +1,38 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 import base64
 import os
 from adventures.adventure_data import get_adventure_data
 from adventures.global_state import GlobalState
 from man_pages import MAN_PAGES
 
+# Imports optionnels pour la base de données
+DB_AVAILABLE = False
+try:
+    import sqlalchemy
+    from database import init_db, get_db, Player, GlobalEvent, PlayerEvent
+    from auth import create_player, authenticate_player, get_player_by_username, save_player_progress, get_player_by_id, player_to_session_dict
+    DB_AVAILABLE = True
+except (ImportError, Exception):
+    DB_AVAILABLE = False
+    def init_db():
+        pass
+    def get_db():
+        yield None
+    def player_to_session_dict(player):
+        return {}
+
 DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
 global_state = GlobalState()
+
+# Initialiser la base de données au démarrage (si disponible)
+if DB_AVAILABLE:
+    try:
+        init_db()
+    except:
+        DB_AVAILABLE = False
 
 app = FastAPI()
 
@@ -25,11 +48,27 @@ sessions: Dict[str, Dict] = {}
 
 ENCRYPTION_KEY = "VOID2024"
 
-def get_session(session_id: str, language: str = "FR") -> Dict:
-    lang_upper = language.upper().strip() if language else "FR"
-    if lang_upper not in ["FR", "EN"]:
-        lang_upper = "FR"
+def get_session(session_id: str, language: str = "FR", db: Any = None, username: str = None) -> Dict:
+    # Normaliser la langue : par défaut FR, valider FR ou EN
+    lang_upper = "FR"  # Par défaut FR
+    if language:
+        lang_upper = language.upper().strip()
+        if lang_upper not in ["FR", "EN"]:
+            lang_upper = "FR"
     
+    # Si on a un username, charger depuis la DB
+    if username and db and DB_AVAILABLE:
+        try:
+            from auth import get_player_by_username
+            player = get_player_by_username(db, username)
+            if player:
+                session_dict = player_to_session_dict(player)
+                session_dict["language"] = lang_upper  # S'assurer que la langue est bien définie
+                return session_dict
+        except:
+            pass
+    
+    # Sinon, utiliser les sessions temporaires
     is_new_session = session_id not in sessions
     
     if is_new_session:
@@ -42,10 +81,13 @@ def get_session(session_id: str, language: str = "FR") -> Dict:
             "solved_puzzles": [],
             "collected_items": [],
             "flags": [],
-            "language": lang_upper
+            "language": lang_upper,
+            "username": None,
+            "player_id": None
         }
         global_state.add_player()
     
+    # Toujours mettre à jour la langue dans la session
     sessions[session_id]["language"] = lang_upper
     return sessions[session_id]
 
@@ -75,18 +117,29 @@ class CommandRequest(BaseModel):
     command: str
     session_id: str
     language: Optional[str] = "FR"
+    username: Optional[str] = None
 
 @app.post("/api/command")
 async def handle_command(request: CommandRequest):
+    db = None
+    if DB_AVAILABLE:
+        try:
+            db = next(get_db())
+        except:
+            db = None
     command_parts = request.command.strip().split(" ", 1)
     command = command_parts[0].upper() if request.command.strip() else ""
     args = command_parts[1] if len(command_parts) > 1 else ""
     
-    requested_lang = (request.language or "FR").upper().strip()
-    if requested_lang not in ["FR", "EN"]:
-        requested_lang = "FR"
+    # Normaliser la langue : par défaut FR
+    requested_lang = "FR"  # Par défaut FR
+    if request.language:
+        requested_lang = request.language.upper().strip()
+        if requested_lang not in ["FR", "EN"]:
+            requested_lang = "FR"
     
-    session = get_session(request.session_id, requested_lang)
+    # Charger depuis la DB si username fourni
+    session = get_session(request.session_id, requested_lang, db, request.username)
     session["language"] = requested_lang
     lang = requested_lang
     
@@ -97,6 +150,14 @@ async def handle_command(request: CommandRequest):
     chapter_id = session.get("chapter", "chapter_1")
     chapter = data["chapters"].get(chapter_id, {})
     
+    # Si on a un player_id, charger le joueur depuis la DB
+    player = None
+    if session.get("player_id") and db and DB_AVAILABLE:
+        try:
+            player = get_player_by_id(db, session["player_id"])
+        except:
+            pass
+    
     if not command or command == "":
         system_messages = data.get("system_messages", {})
         welcome_msg = system_messages.get("welcome", "")
@@ -105,7 +166,83 @@ async def handle_command(request: CommandRequest):
                 welcome_msg = "SYSTEM_VOID v2.0 initialized.\nType HELP to start."
             else:
                 welcome_msg = "SYSTEM_VOID v2.0 initialisé.\nTapez HELP pour commencer."
+        
+        # Si le joueur est connecté, ajouter un message personnalisé
+        if session.get("username"):
+            if lang == "FR":
+                welcome_msg += f"\n\nBienvenue de retour, {session['username']}!"
+            else:
+                welcome_msg += f"\n\nWelcome back, {session['username']}!"
+        
         return {"response": welcome_msg, "status": "info"}
+    
+    # Si on a un player_id, charger le joueur depuis la DB
+    player = None
+    if session.get("player_id") and db and DB_AVAILABLE:
+        try:
+            player = get_player_by_id(db, session["player_id"])
+        except:
+            pass
+    
+    # Sauvegarder la progression à la fin de chaque commande si on a un joueur
+    def finalize_response(response_data):
+        """Helper pour sauvegarder et retourner la réponse"""
+        if DB_AVAILABLE and (player or session.get("player_id")):
+            try:
+                save_session_to_db(db, session, player)
+            except:
+                pass  # Ignorer les erreurs de sauvegarde
+        return response_data
+    
+    def save_session_to_db(db: Any, session: Dict, player: Any = None):
+        """Sauvegarde la session dans la base de données"""
+        if not DB_AVAILABLE or not db:
+            return
+        
+        # Si on a un player_id, charger le joueur
+        if not player and session.get("player_id"):
+            try:
+                player = get_player_by_id(db, session["player_id"])
+            except:
+                pass
+        
+        if player:
+            # Mettre à jour la progression
+            player.level = session.get("level", 0)
+            player.chapter = session.get("chapter", "chapter_1")
+            player.logged_in = session.get("logged_in", False)
+            player.unlocked_commands = session.get("unlocked_commands", [])
+            player.accessed_files = session.get("accessed_files", [])
+            player.solved_puzzles = session.get("solved_puzzles", [])
+            player.collected_items = session.get("collected_items", [])
+            player.flags = session.get("flags", [])
+            player.language = session.get("language", "FR")
+            player.total_commands = (player.total_commands or 0) + 1
+            
+            try:
+                save_player_progress(db, player)
+            except:
+                pass
+    
+    def create_global_event(db: Any, event_type: str, event_data: dict, triggered_by: str = None, impact_level: int = 1):
+        """Crée un événement global qui impacte tous les joueurs"""
+        if not DB_AVAILABLE or not db:
+            return
+        
+        try:
+            event = GlobalEvent(
+                event_type=event_type,
+                event_data=event_data,
+                triggered_by=triggered_by,
+                impact_level=impact_level
+            )
+            db.add(event)
+            db.commit()
+            
+            # Mettre à jour le global_state
+            global_state._add_event(event_type, event_data)
+        except:
+            pass
     
     if command == "HELP":
         # Construire la liste des commandes disponibles sans duplication
@@ -133,7 +270,7 @@ async def handle_command(request: CommandRequest):
         else:
             help_msg += "\n\nType STATUS to see system status."
             help_msg += f"\n[GLOBAL] World integrity: {global_state._state['global_integrity']}%"
-        return {"response": help_msg, "status": "success"}
+        return finalize_response({"response": help_msg, "status": "success"})
     
     elif command == "STATUS":
         integrity = 34 + (session["level"] * 15)
@@ -279,6 +416,9 @@ async def handle_command(request: CommandRequest):
             if "NETWORK" not in session["unlocked_commands"]:
                 session["unlocked_commands"].extend(["ACTIVATE", "NETWORK", "ANALYZE", "BYPASS"])
             
+            # Sauvegarder la progression
+            save_session_to_db(db, session, player)
+            
             new_chapter = data["chapters"].get("chapter_3", {})
             intro = new_chapter.get("intro", "")
             
@@ -287,12 +427,12 @@ async def handle_command(request: CommandRequest):
             else:
                 intro += "\n\nLevel 2 unlocked! New commands: NETWORK, ANALYZE, BYPASS"
             
-            return {"response": intro, "status": "success"}
+            return finalize_response({"response": intro, "status": "success"})
         else:
             if lang == "FR":
-                return {"response": "Protocole invalide.", "status": "error"}
+                return {"response": "Protocole invalide.\n\nIndice: Le nom du protocole se trouve dans le fichier corrupted_data.b64 décodé.\nIl commence par PROTOCOL_ et se termine par _XYZ.", "status": "error"}
             else:
-                return {"response": "Invalid protocol.", "status": "error"}
+                return {"response": "Invalid protocol.\n\nHint: The protocol name is in the decoded corrupted_data.b64 file.\nIt starts with PROTOCOL_ and ends with _XYZ.", "status": "error"}
     
     elif command == "NETWORK" and session["level"] >= 2:
         if lang == "FR":
@@ -411,6 +551,9 @@ Password is the reverse of "VOID"."""
             new_chapter = data["chapters"].get("chapter_5", {})
             intro = new_chapter.get("intro", "")
             
+            # Sauvegarder la progression
+            save_session_to_db(db, session, player)
+            
             if lang == "FR":
                 return {"response": f"Serveur GAMMA connecté!\n\n{intro}", "status": "success"}
             else:
@@ -431,6 +574,19 @@ Password is the reverse of "VOID"."""
         if args.strip() == "55":
             session["level"] = 5
             session["flags"].append("system_restored")
+            
+            # Sauvegarder la progression
+            save_session_to_db(db, session, player)
+            
+            # Créer un événement global
+            if session.get("username"):
+                create_global_event(
+                    db, 
+                    "SYSTEM_RESTORED", 
+                    {"level": 5, "restored_by": session.get("username")},
+                    triggered_by=session.get("username"),
+                    impact_level=8
+                )
             
             if lang == "FR":
                 return {"response": "Code de restauration correct!\n\nSystème restauré à 100%.\n\nÉtape finale: résolvez l'énigme finale avec SOLVE.", "status": "success"}
@@ -626,6 +782,15 @@ async def get_man_page(command: str, language: str = "FR"):
                 "language": lang
             }
 
+@app.get("/api/unlocked-commands")
+async def get_unlocked_commands(session_id: str, language: str = "FR"):
+    requested_lang = (language or "FR").upper().strip()
+    if requested_lang not in ["FR", "EN"]:
+        requested_lang = "FR"
+    
+    session = get_session(session_id, requested_lang)
+    return {"commands": session.get("unlocked_commands", [])}
+
 @app.get("/api/files")
 async def get_available_files(session_id: str, language: str = "FR"):
     requested_lang = (language or "FR").upper().strip()
@@ -672,6 +837,30 @@ async def get_global_status(session_id: str = None):
         "world_state": global_state_data["world_state"],
         "last_update": global_state_data["last_update"]
     }
+
+@app.get("/api/global-events")
+async def get_global_events(limit: int = 10):
+    """Récupère les événements globaux récents"""
+    if not DB_AVAILABLE:
+        return {"events": []}
+    
+    try:
+        db = next(get_db())
+        events = db.query(GlobalEvent).order_by(GlobalEvent.created_at.desc()).limit(limit).all()
+        return {
+            "events": [
+                {
+                    "type": event.event_type,
+                    "data": event.event_data,
+                    "triggered_by": event.triggered_by,
+                    "impact_level": event.impact_level,
+                    "created_at": event.created_at.isoformat() if event.created_at else None
+                }
+                for event in events
+            ]
+        }
+    except:
+        return {"events": []}
 
 @app.get("/")
 async def root():

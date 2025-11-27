@@ -200,6 +200,7 @@ body {
 }
 
 .man-page-overlay {
+  outline: none;
   position: fixed;
   top: 0;
   left: 0;

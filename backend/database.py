@@ -1,0 +1,75 @@
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, JSON, DateTime, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+from datetime import datetime
+import json
+import os
+
+Base = declarative_base()
+
+class Player(Base):
+    __tablename__ = "players"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login = Column(DateTime, default=datetime.utcnow)
+    
+    # Progression du joueur
+    level = Column(Integer, default=0)
+    chapter = Column(String, default="chapter_1")
+    logged_in = Column(Boolean, default=False)
+    unlocked_commands = Column(JSON, default=list)
+    accessed_files = Column(JSON, default=list)
+    solved_puzzles = Column(JSON, default=list)
+    collected_items = Column(JSON, default=list)
+    flags = Column(JSON, default=list)
+    language = Column(String, default="FR")
+    
+    # Statistiques
+    total_commands = Column(Integer, default=0)
+    total_playtime = Column(Integer, default=0)  # en secondes
+    achievements = Column(JSON, default=list)
+
+class GlobalEvent(Base):
+    __tablename__ = "global_events"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    event_type = Column(String, nullable=False)
+    event_data = Column(JSON, default=dict)
+    triggered_by = Column(String)  # username du joueur qui a déclenché
+    created_at = Column(DateTime, default=datetime.utcnow)
+    impact_level = Column(Integer, default=1)  # 1-10, impact sur tous les joueurs
+
+class PlayerEvent(Base):
+    __tablename__ = "player_events"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    player_id = Column(Integer, nullable=False)
+    event_type = Column(String, nullable=False)
+    event_data = Column(JSON, default=dict)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# Base de données SQLite
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./system_void.db")
+
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def init_db():
+    """Initialise la base de données"""
+    Base.metadata.create_all(bind=engine)
+
+def get_db():
+    """Obtient une session de base de données"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+

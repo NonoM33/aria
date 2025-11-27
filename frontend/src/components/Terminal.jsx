@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useTerminal } from '../hooks/useTerminal'
 import { useLanguage } from '../contexts/LanguageContext'
 import LanguageMenu from './LanguageMenu'
@@ -22,15 +22,38 @@ const Terminal = () => {
   const [welcomeShown, setWelcomeShown] = useState(false)
   const [manPageCommand, setManPageCommand] = useState(null)
 
+  const welcomeSentRef = useRef(false)
+  const languageRef = useRef(language)
+  const sendCommandRef = useRef(sendCommand)
+
+  // Mettre à jour la ref de sendCommand
   useEffect(() => {
-    if (!welcomeShown && history.length === 0) {
-      setTimeout(() => {
-        const currentLang = language || localStorage.getItem('system_void_language') || 'FR'
-        sendCommand('')
+    sendCommandRef.current = sendCommand
+  }, [sendCommand])
+
+  // Envoyer le welcome une seule fois au démarrage
+  useEffect(() => {
+    if (!welcomeSentRef.current && history.length === 0) {
+      welcomeSentRef.current = true
+      languageRef.current = language
+      const timer = setTimeout(() => {
+        sendCommandRef.current('')
         setWelcomeShown(true)
       }, 500)
+      return () => clearTimeout(timer)
     }
-  }, [welcomeShown, history.length, sendCommand, language])
+  }, [history.length]) // Seulement dépendre de history.length
+
+  // Quand la langue change après l'initialisation, réafficher le welcome
+  useEffect(() => {
+    if (welcomeSentRef.current && languageRef.current !== language && history.length > 0) {
+      languageRef.current = language
+      const timer = setTimeout(() => {
+        sendCommandRef.current('')
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [language, history.length]) // Dépendre de language et history.length
 
   useEffect(() => {
     if (inputRef.current && !isTyping) {
@@ -60,6 +83,10 @@ const Terminal = () => {
   }
 
   const handleKeyDown = (e) => {
+    // Ne pas traiter les touches si la modal MAN est ouverte
+    if (manPageCommand) {
+      return
+    }
     if (isTyping) return
 
     if (e.key === 'Enter' && !e.shiftKey) {

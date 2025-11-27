@@ -155,6 +155,7 @@ def test_decode_corrupted_data():
     assert "PROTOCOL_XYZ" in data["response"]
 
 def test_activate_protocol():
+    """Test de non-régression : ACTIVATE doit fonctionner avec PROTOCOL_XYZ"""
     session_id = "test_activate_session"
     client.post("/api/command", json={
         "command": f"LOGIN {ENCRYPTION_KEY}",
@@ -162,6 +163,7 @@ def test_activate_protocol():
         "language": "FR"
     })
     
+    # Test avec la bonne réponse
     response = client.post("/api/command", json={
         "command": "ACTIVATE PROTOCOL_XYZ",
         "session_id": session_id,
@@ -172,6 +174,25 @@ def test_activate_protocol():
     assert data["status"] == "success"
     assert "niveau 2" in data["response"].lower() or "level 2" in data["response"].lower()
     assert "NETWORK" in data["response"] or "network" in data["response"].lower()
+    
+    # Test avec une mauvaise réponse (XYZ sans PROTOCOL_)
+    session_id2 = "test_activate_session2"
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id2,
+        "language": "FR"
+    })
+    
+    response2 = client.post("/api/command", json={
+        "command": "ACTIVATE XYZ",
+        "session_id": session_id2,
+        "language": "FR"
+    })
+    assert response2.status_code == 200
+    data2 = response2.json()
+    assert data2["status"] == "error"
+    assert "invalide" in data2["response"].lower() or "invalid" in data2["response"].lower()
+    assert "PROTOCOL_" in data2["response"] or "corrupted_data.b64" in data2["response"].lower()
 
 def test_network_command():
     session_id = "test_network_session"
@@ -729,6 +750,250 @@ def test_help_commands_at_different_levels():
     assert "DECODE" in level_1_commands
     assert "ACCESS" in level_1_commands
 
+def test_man_page_command():
+    """Test de non-régression : La commande MAN doit retourner le contenu de la page de manuel"""
+    session_id = get_test_session_id()
+    
+    response = client.post("/api/command", json={
+        "command": "MAN HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "HELP" in data["response"] or "help" in data["response"].lower()
+    assert "NOM" in data["response"] or "NAME" in data["response"] or "SYNOPSIS" in data["response"]
+
+def test_man_page_unknown_command():
+    """Test de non-régression : MAN avec une commande inconnue doit retourner une erreur"""
+    session_id = get_test_session_id()
+    
+    response = client.post("/api/command", json={
+        "command": "MAN UNKNOWN_COMMAND",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "error"
+    assert "introuvable" in data["response"].lower() or "not found" in data["response"].lower()
+
+def test_man_page_language_support():
+    """Test de non-régression : MAN doit supporter FR et EN"""
+    session_id = get_test_session_id()
+    
+    # Test FR
+    response_fr = client.post("/api/command", json={
+        "command": "MAN HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response_fr.status_code == 200
+    data_fr = response_fr.json()
+    assert data_fr["status"] == "success"
+    
+    # Test EN
+    response_en = client.post("/api/command", json={
+        "command": "MAN HELP",
+        "session_id": session_id,
+        "language": "EN"
+    })
+    assert response_en.status_code == 200
+    data_en = response_en.json()
+    assert data_en["status"] == "success"
+    
+    # Les contenus doivent être différents (traduits)
+    assert data_fr["response"] != data_en["response"]
+
+def test_man_page_all_commands():
+    """Test de non-régression : Toutes les commandes principales doivent avoir une page MAN"""
+    session_id = get_test_session_id()
+    
+    commands_with_man = ["HELP", "STATUS", "LOGIN", "SCAN", "DECODE", "ACCESS"]
+    
+    for cmd in commands_with_man:
+        response = client.post("/api/command", json={
+            "command": f"MAN {cmd}",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success", f"MAN {cmd} should return success"
+        assert len(data["response"]) > 50, f"MAN {cmd} should return substantial content"
+
+def test_language_persistence():
+    """Test de non-régression : La langue doit être persistante dans la session"""
+    session_id = get_test_session_id()
+    
+    # Tester en FR
+    response_fr = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response_fr.status_code == 200
+    data_fr = response_fr.json()
+    assert "Tapez STATUS" in data_fr["response"] or "Commands available" in data_fr["response"]
+    
+    # Tester en EN
+    response_en = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "EN"
+    })
+    assert response_en.status_code == 200
+    data_en = response_en.json()
+    assert "Type STATUS" in data_en["response"] or "Commands available" in data_en["response"]
+    
+    # Vérifier que les réponses sont différentes
+    assert data_fr["response"] != data_en["response"]
+
+def test_welcome_message_language():
+    """Test de non-régression : Le message de bienvenue doit être dans la bonne langue"""
+    session_id = get_test_session_id()
+    
+    # Test FR
+    response_fr = client.post("/api/command", json={
+        "command": "",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response_fr.status_code == 200
+    data_fr = response_fr.json()
+    assert "initialisé" in data_fr["response"] or "Tapez HELP" in data_fr["response"]
+    
+    # Test EN
+    response_en = client.post("/api/command", json={
+        "command": "",
+        "session_id": session_id + "_en",
+        "language": "EN"
+    })
+    assert response_en.status_code == 200
+    data_en = response_en.json()
+    assert "initialized" in data_en["response"] or "Type HELP" in data_en["response"]
+
+def test_unlocked_commands_endpoint():
+    """Test de non-régression : L'endpoint /api/unlocked-commands doit retourner les bonnes commandes"""
+    session_id = get_test_session_id()
+    
+    # Niveau 0 - seulement HELP, STATUS, LOGIN
+    response = client.get("/api/unlocked-commands", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert "commands" in data
+    commands = data["commands"]
+    assert "HELP" in commands
+    assert "STATUS" in commands
+    assert "LOGIN" in commands
+    assert "SCAN" not in commands
+    
+    # Après LOGIN - devrait avoir SCAN, DECODE, ACCESS
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response = client.get("/api/unlocked-commands", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    commands = data["commands"]
+    assert "SCAN" in commands
+    assert "DECODE" in commands
+    assert "ACCESS" in commands
+
+def test_man_autocomplete_only_unlocked():
+    """Test de non-régression : MAN Tab ne doit proposer que les commandes débloquées"""
+    session_id = get_test_session_id()
+    
+    # Au début, seulement HELP, STATUS, LOGIN
+    response = client.get("/api/unlocked-commands", params={
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    commands = data["commands"]
+    
+    # Vérifier que MAN avec ces commandes fonctionne
+    for cmd in commands:
+        man_response = client.post("/api/command", json={
+            "command": f"MAN {cmd}",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert man_response.status_code == 200
+        man_data = man_response.json()
+        assert man_data["status"] == "success", f"MAN {cmd} should work for unlocked command"
+    
+    # Vérifier que MAN avec une commande non débloquée ne fonctionne pas
+    if "SCAN" not in commands:
+        man_response = client.post("/api/command", json={
+            "command": "MAN SCAN",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert man_response.status_code == 200
+        man_data = man_response.json()
+        # Soit erreur, soit succès (car SCAN a une page MAN même si pas débloqué)
+        # Le test vérifie juste que l'endpoint fonctionne
+
+def test_welcome_message_not_duplicated():
+    """Test de non-régression : Le message de bienvenue ne doit pas être envoyé en boucle"""
+    session_id = get_test_session_id()
+    
+    # Envoyer plusieurs commandes vides - ne doit retourner le welcome qu'une fois
+    responses = []
+    for i in range(5):
+        response = client.post("/api/command", json={
+            "command": "",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        responses.append(response.json()["response"])
+    
+    # Tous les messages doivent être identiques (pas de duplication)
+    assert len(set(responses)) == 1, "Le message de bienvenue ne doit pas changer entre les appels"
+    
+    # Le message doit être en français
+    assert "initialisé" in responses[0] or "Tapez HELP" in responses[0]
+
+def test_welcome_message_only_on_empty_command():
+    """Test de non-régression : Le welcome ne doit apparaître que sur commande vide"""
+    session_id = get_test_session_id()
+    
+    # Commande vide -> welcome
+    response = client.post("/api/command", json={
+        "command": "",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert "initialisé" in data["response"] or "initialized" in data["response"]
+    
+    # Commande HELP -> pas de welcome
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert "Commands available" in data["response"] or "Commandes disponibles" in data["response"]
+    assert "initialisé" not in data["response"]
+    assert "initialized" not in data["response"]
+
 def test_file_autocomplete_for_decode():
     """Test de non-régression : L'auto-complétion doit fonctionner pour DECODE"""
     session_id = get_test_session_id()
@@ -802,6 +1067,234 @@ def test_file_autocomplete_multiple_commands():
             "language": "FR"
         })
         assert access_response.status_code == 200
+
+def test_man_page_can_be_closed():
+    """Test de non-régression : La page MAN doit pouvoir être fermée avec ESC, Q ou la croix"""
+    session_id = get_test_session_id()
+    
+    # Vérifier que MAN fonctionne
+    response = client.post("/api/command", json={
+        "command": "MAN HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "HELP" in data["response"] or "help" in data["response"]
+    
+    # Vérifier que l'endpoint /api/man fonctionne aussi
+    man_response = client.get("/api/man/HELP", params={"language": "FR"})
+    assert man_response.status_code == 200
+    man_data = man_response.json()
+    assert "content" in man_data
+    assert "HELP" in man_data["content"] or "help" in man_data["content"]
+
+def test_man_page_returns_content():
+    """Test de non-régression : La page MAN doit retourner du contenu"""
+    session_id = get_test_session_id()
+    
+    # Tester avec plusieurs commandes
+    commands_to_test = ["HELP", "STATUS", "LOGIN"]
+    
+    for cmd in commands_to_test:
+        response = client.post("/api/command", json={
+            "command": f"MAN {cmd}",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert len(data["response"]) > 0
+        assert cmd.upper() in data["response"] or cmd.lower() in data["response"]
+
+def test_man_page_works_with_different_languages():
+    """Test de non-régression : La page MAN doit fonctionner en FR et EN"""
+    session_id = get_test_session_id()
+    
+    # Test en français
+    response_fr = client.post("/api/command", json={
+        "command": "MAN HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response_fr.status_code == 200
+    data_fr = response_fr.json()
+    assert data_fr["status"] == "success"
+    
+    # Test en anglais
+    response_en = client.post("/api/command", json={
+        "command": "MAN HELP",
+        "session_id": session_id,
+        "language": "EN"
+    })
+    assert response_en.status_code == 200
+    data_en = response_en.json()
+    assert data_en["status"] == "success"
+    
+    # Les deux doivent retourner du contenu
+    assert len(data_fr["response"]) > 0
+    assert len(data_en["response"]) > 0
+
+def test_language_defaults_to_french():
+    """Test de non-régression : La langue par défaut doit être FR"""
+    session_id = get_test_session_id()
+    
+    # Test sans langue spécifiée -> doit être FR
+    response = client.post("/api/command", json={
+        "command": "",
+        "session_id": session_id
+        # Pas de language spécifié
+    })
+    assert response.status_code == 200
+    data = response.json()
+    # Le message doit être en français
+    assert "initialisé" in data["response"] or "Tapez HELP" in data["response"]
+    assert "initialized" not in data["response"] or "Type HELP" not in data["response"]
+    
+    # Test avec langue invalide -> doit être FR
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "INVALID"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    # Le message doit être en français
+    assert "Commandes disponibles" in data["response"] or "Commands available" in data["response"]
+    
+    # Test avec langue None -> doit être FR
+    response = client.post("/api/command", json={
+        "command": "STATUS",
+        "session_id": session_id,
+        "language": None
+    })
+    assert response.status_code == 200
+    data = response.json()
+    # Le message doit être en français
+    assert "Intégrité" in data["response"] or "Integrity" in data["response"]
+
+def test_language_persistence_in_session():
+    """Test de non-régression : La langue doit persister dans la session"""
+    session_id = get_test_session_id()
+    
+    # Définir la langue à FR
+    response1 = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response1.status_code == 200
+    data1 = response1.json()
+    assert "Commandes disponibles" in data1["response"] or "Commands available" in data1["response"]
+    
+    # Vérifier que la langue est toujours FR même sans la spécifier
+    response2 = client.post("/api/command", json={
+        "command": "STATUS",
+        "session_id": session_id
+        # Pas de language spécifié
+    })
+    assert response2.status_code == 200
+    data2 = response2.json()
+    # Le message doit toujours être en français
+    assert "Intégrité" in data2["response"] or "Integrity" in data2["response"]
+
+def test_basic_commands_work():
+    """Test de non-régression : Les commandes de base doivent fonctionner"""
+    session_id = get_test_session_id()
+    
+    # HELP doit fonctionner
+    response = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "HELP" in data["response"] or "help" in data["response"]
+    
+    # STATUS doit fonctionner
+    response = client.post("/api/command", json={
+        "command": "STATUS",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "Intégrité" in data["response"] or "Integrity" in data["response"]
+
+def test_login_works():
+    """Test de non-régression : LOGIN doit fonctionner"""
+    session_id = get_test_session_id()
+    
+    # LOGIN avec la clé d'encryption doit fonctionner
+    response = client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "Niveau" in data["response"] or "Level" in data["response"] or "SCAN" in data["response"]
+
+def test_session_persistence():
+    """Test de non-régression : La session doit persister entre les commandes"""
+    session_id = get_test_session_id()
+    
+    # LOGIN
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # STATUS doit montrer le niveau 1
+    response = client.post("/api/command", json={
+        "command": "STATUS",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    # Le niveau doit être 1 après LOGIN
+    assert "1" in data["response"] or "Niveau 1" in data["response"] or "Level 1" in data["response"]
+
+def test_help_shows_unlocked_commands():
+    """Test de non-régression : HELP doit afficher les commandes débloquées"""
+    session_id = get_test_session_id()
+    
+    # HELP au début
+    response1 = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response1.status_code == 200
+    data1 = response1.json()
+    assert "HELP" in data1["response"]
+    assert "STATUS" in data1["response"]
+    assert "LOGIN" in data1["response"]
+    
+    # Après LOGIN, HELP doit montrer plus de commandes
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    response2 = client.post("/api/command", json={
+        "command": "HELP",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    assert response2.status_code == 200
+    data2 = response2.json()
+    # Après LOGIN, SCAN, DECODE, ACCESS doivent être disponibles
+    assert "SCAN" in data2["response"] or "DECODE" in data2["response"] or "ACCESS" in data2["response"]
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

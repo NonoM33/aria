@@ -20,6 +20,7 @@ export const useTerminal = () => {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [autocompleteOptions, setAutocompleteOptions] = useState([])
   const [availableFiles, setAvailableFiles] = useState([])
+  const [unlockedCommands, setUnlockedCommands] = useState(['HELP', 'STATUS', 'LOGIN'])
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -46,15 +47,40 @@ export const useTerminal = () => {
         })
         if (response.data && response.data.files) {
           setAvailableFiles(response.data.files)
-          console.log('Files loaded:', response.data.files)
         }
       } catch (error) {
-        console.error('Error loading files:', error)
+        // Silently fail
+      }
+    }
+    
+    const fetchCommands = async () => {
+      try {
+        let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
+        currentLanguage = currentLanguage.toUpperCase()
+        if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
+          currentLanguage = 'FR'
+        }
+        
+        const response = await axios.get(`${API_URL}/api/unlocked-commands`, {
+          params: {
+            session_id: sessionIdRef.current,
+            language: currentLanguage
+          }
+        })
+        if (response.data && response.data.commands) {
+          setUnlockedCommands(response.data.commands)
+        }
+      } catch (error) {
+        // Silently fail
       }
     }
     
     fetchFiles()
-    const interval = setInterval(fetchFiles, 5000)
+    fetchCommands()
+    const interval = setInterval(() => {
+      fetchFiles()
+      fetchCommands()
+    }, 5000)
     return () => clearInterval(interval)
   }, [language])
 
@@ -109,24 +135,24 @@ export const useTerminal = () => {
     if (command === 'MAN') {
       if (arg) {
         const upperArg = arg.toUpperCase()
-        return AVAILABLE_COMMANDS.filter(cmd => 
+        return unlockedCommands.filter(cmd => 
           cmd.startsWith(upperArg) && cmd !== upperArg
         )
       } else {
-        return AVAILABLE_COMMANDS
+        return unlockedCommands
       }
     }
     
     // Auto-complétion pour les commandes simples
     if (command && !arg) {
       const upper = command.toUpperCase()
-      return AVAILABLE_COMMANDS.filter(cmd => 
+      return unlockedCommands.filter(cmd => 
         cmd.startsWith(upper) && cmd !== upper
       )
     }
     
     return []
-  }, [availableFiles])
+  }, [availableFiles, unlockedCommands])
 
   const sendCommand = useCallback(async (command) => {
     if (isTyping) return
@@ -149,19 +175,57 @@ export const useTerminal = () => {
     setAutocompleteOptions([])
 
     try {
-      let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
-      currentLanguage = currentLanguage.toUpperCase()
+      // Toujours utiliser la langue du contexte, avec fallback
+      let currentLanguage = language
+      if (!currentLanguage) {
+        currentLanguage = localStorage.getItem('system_void_language') || 'FR'
+      }
+      currentLanguage = currentLanguage.toUpperCase().trim()
       if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
         currentLanguage = 'FR'
       }
       
+      // S'assurer que la langue est bien stockée dans localStorage
+      localStorage.setItem('system_void_language', currentLanguage)
+      
+      // Récupérer le username depuis localStorage si présent
+      const username = localStorage.getItem('system_void_username')
+      
       const response = await axios.post(`${API_URL}/api/command`, {
         command: userCommand,
         session_id: sessionIdRef.current,
-        language: currentLanguage
+        language: currentLanguage,
+        username: username || null
       })
 
-      const systemResponse = response.data.response || 'No response from system.'
+          const systemResponse = response.data.response || 'No response from system.'
+          
+          // Si la réponse contient un username (après REGISTER ou LOGIN), le sauvegarder
+          if (response.data.username) {
+            localStorage.setItem('system_void_username', response.data.username)
+          }
+          
+          // Si la réponse contient une session (après LOGIN), mettre à jour le localStorage
+          if (response.data.session) {
+            localStorage.setItem('system_void_username', response.data.session.username)
+          }
+          
+          // Mettre à jour les commandes débloquées après chaque commande
+      setTimeout(async () => {
+        try {
+          const commandsResponse = await axios.get(`${API_URL}/api/unlocked-commands`, {
+            params: {
+              session_id: sessionIdRef.current,
+              language: currentLanguage
+            }
+          })
+          if (commandsResponse.data && commandsResponse.data.commands) {
+            setUnlockedCommands(commandsResponse.data.commands)
+          }
+        } catch (error) {
+          // Silently fail
+        }
+      }, 100)
       
       // Mettre à jour les fichiers disponibles après SCAN ou LOGIN
       if (userCommand.toUpperCase().startsWith('SCAN') || userCommand.toUpperCase().startsWith('LOGIN')) {
@@ -175,10 +239,9 @@ export const useTerminal = () => {
             })
             if (fileResponse.data && fileResponse.data.files) {
               setAvailableFiles(fileResponse.data.files)
-              console.log('Files updated after command:', fileResponse.data.files)
             }
           } catch (error) {
-            console.error('Error updating files:', error)
+            // Silently fail
           }
         }, 100)
       }
@@ -267,7 +330,6 @@ export const useTerminal = () => {
     }
     
     const options = getAutocompleteOptions(trimmed)
-    console.log('Tab pressed, input:', trimmed, 'options:', options, 'availableFiles:', availableFiles)
     
     if (options.length === 0) {
       return false

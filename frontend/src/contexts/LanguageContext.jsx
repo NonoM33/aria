@@ -13,14 +13,18 @@ export const useLanguage = () => {
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
     const stored = localStorage.getItem('system_void_language')
-    if (stored && (stored === 'FR' || stored === 'EN')) {
-      return stored
+    if (stored) {
+      const upper = stored.toUpperCase().trim()
+      if (upper === 'FR' || upper === 'EN') {
+        return upper
+      }
     }
     return 'FR'
   })
 
   useEffect(() => {
-    localStorage.setItem('system_void_language', language)
+    const upperLang = language.toUpperCase().trim()
+    localStorage.setItem('system_void_language', upperLang)
   }, [language])
 
   const toggleLanguage = () => {
