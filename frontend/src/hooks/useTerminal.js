@@ -359,6 +359,7 @@ export const useTerminal = () => {
         setHistory(prev => [...prev, {
           type: 'system',
           content: 'ERROR: WebSocket not connected. Please wait...',
+          path: currentPathRef.current || '/',
           timestamp: new Date().toISOString()
         }])
         return
@@ -420,6 +421,7 @@ export const useTerminal = () => {
       setHistory(prev => [...prev, {
         type: 'system',
         content: 'ERROR: WebSocket not connected. Please wait...',
+        path: currentPathRef.current || '/',
         timestamp: new Date().toISOString()
       }])
       return
@@ -432,6 +434,7 @@ export const useTerminal = () => {
       setHistory(prev => [...prev, {
         type: 'system',
         content: 'ERROR: Failed to send command. WebSocket may be disconnected.',
+        path: currentPathRef.current || '/',
         timestamp: new Date().toISOString()
       }])
     }
