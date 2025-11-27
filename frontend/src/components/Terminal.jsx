@@ -173,6 +173,38 @@ const Terminal = () => {
   }, [history, isTyping, isPasswordMode, showInput])
 
   useEffect(() => {
+    const handleWindowFocus = () => {
+      if (inputRef.current && showInput && !isTyping && !manPageCommand && !fileViewerData) {
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus()
+          }
+        }, 50)
+      }
+    }
+
+    const handleClick = (e) => {
+      if (inputRef.current && showInput && !isTyping && !manPageCommand && !fileViewerData) {
+        const isClickInsideTerminal = e.target.closest('.terminal-container')
+        const isClickOnInput = e.target === inputRef.current
+        const isClickOnAutocomplete = e.target.closest('.autocomplete-menu')
+        
+        if (isClickInsideTerminal && !isClickOnAutocomplete && !isClickOnInput) {
+          inputRef.current.focus()
+        }
+      }
+    }
+
+    window.addEventListener('focus', handleWindowFocus)
+    document.addEventListener('click', handleClick)
+    
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus)
+      document.removeEventListener('click', handleClick)
+    }
+  }, [showInput, isTyping, manPageCommand, fileViewerData])
+
+  useEffect(() => {
     if (terminalContentRef.current) {
       requestAnimationFrame(() => {
         if (terminalContentRef.current) {
@@ -422,7 +454,7 @@ const Terminal = () => {
               {entry.type === 'user' && (
                 <div className="terminal-line">
                   <span className="prompt">
-                    {username ? `${username}@system-void:${entry.path || currentPath}$ ` : `guest:${entry.path || currentPath}$ `}
+                    {entry.username ? `${entry.username}@system-void:${entry.path || '/'}$ ` : `guest:${entry.path || '/'}$ `}
                   </span>
                   <span className="terminal-text">{entry.content}</span>
                 </div>

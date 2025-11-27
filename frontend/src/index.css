@@ -1512,6 +1512,152 @@ body {
   opacity: 0.7;
 }
 
+/* ==========================================
+   ARIA NOTIFICATION (Less Intrusive)
+   ========================================== */
+
+.aria-notification-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 500px;
+  animation: aria-notification-slide-in 0.3s ease-out;
+}
+
+@keyframes aria-notification-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.aria-notification {
+  background: rgba(0, 17, 17, 0.95);
+  border: 2px solid #00FFFF;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), 0 4px 20px rgba(0, 0, 0, 0.8);
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  overflow: hidden;
+  position: relative;
+}
+
+.aria-notification::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 255, 255, 0.02) 50%
+  );
+  background-size: 100% 3px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.aria-notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 34, 34, 0.8);
+  border-bottom: 1px solid #00FFFF;
+  position: relative;
+  z-index: 2;
+}
+
+.aria-notification-status {
+  color: #00FFFF;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.aria-notification-close {
+  background: transparent;
+  border: 1px solid #00FFFF;
+  color: #00FFFF;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.aria-notification-close:hover {
+  background: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.aria-notification-content {
+  padding: 12px 15px;
+  position: relative;
+  z-index: 2;
+}
+
+.aria-notification-message {
+  color: #00FFFF;
+  font-size: 13px;
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+}
+
+.aria-notification-prefix {
+  color: #00FFFF;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.aria-notification-text {
+  flex: 1;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.aria-notification-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.aria-notification-choice-btn {
+  background: transparent;
+  border: 1px solid #00FFFF;
+  color: #00FFFF;
+  padding: 8px 12px;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.aria-notification-choice-btn:hover {
+  background: rgba(0, 255, 255, 0.15);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  transform: translateX(5px);
+}
+
+.aria-notification-choice-btn:active {
+  background: rgba(0, 255, 255, 0.25);
+}
+
 /* ========================================
    ADMIN MODE - FALLOUT TERMINAL STYLE
    ======================================== */

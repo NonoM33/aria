@@ -293,7 +293,22 @@ ARIA comprendra.
     },
     "progression": {
         "required_puzzles": ["final_choice"],
-        "next_chapter": "act_5"
+        "next_chapter": "act_5",
+        "branches": {
+            "truth_path": "act_4_5_reveal",
+            "choice_liberation": "act_5",
+            "choice_protection": "act_5",
+            "choice_fin": "act_5"
+        },
+        "secret_branch": {
+            "target": "act_4_5_reveal",
+            "requirements": {
+                "min_trust": 80,
+                "required_secrets": ["timestamp_anomaly", "eleanor_secret", "marcus_secret", 
+                                   "aria_true_nature", "final_secret"],
+                "required_flags": ["truth_seeker_final"]
+            }
+        }
     }
 }
 

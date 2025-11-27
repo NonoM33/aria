@@ -294,7 +294,18 @@ Controle total du systeme.
     },
     "progression": {
         "required_puzzles": ["aria_wish"],
-        "next_chapter": "act_4"
+        "next_chapter": "act_3_5",
+        "branches": {
+            "trust_high": "act_3_light",
+            "trust_low": "act_3_dark"
+        }
+    },
+    "secrets": {
+        "marcus_secret": {
+            "id": "marcus_secret",
+            "description": "Marcus savait quelque chose que meme ARIA ne sait pas",
+            "clue_for_reveal": True
+        }
     }
 }
 

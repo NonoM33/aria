@@ -60,11 +60,18 @@ const AriaFloatingPanel = ({
       } else {
         clearInterval(typingInterval)
         setIsTyping(false)
+        
+        if (choices.length === 0) {
+          const autoCloseTimer = setTimeout(() => {
+            onClose && onClose()
+          }, 5000)
+          return () => clearTimeout(autoCloseTimer)
+        }
       }
     }, 20)
 
     return () => clearInterval(typingInterval)
-  }, [message, visible])
+  }, [message, visible, choices.length, onClose])
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape' || e.key === 'q' || e.key === 'Q') {
@@ -84,43 +91,33 @@ const AriaFloatingPanel = ({
   }
 
   return (
-    <div className="aria-modal-overlay" onClick={onClose}>
-      <div className="aria-modal-container" onClick={(e) => e.stopPropagation()}>
-        <div className="aria-modal-header">
-          <span className="aria-modal-status">● ARIA - EN LIGNE</span>
-          <button className="aria-modal-close" onClick={onClose}>×</button>
+    <div className="aria-notification-container">
+      <div className="aria-notification">
+        <div className="aria-notification-header">
+          <span className="aria-notification-status">● ARIA</span>
+          <button className="aria-notification-close" onClick={onClose}>×</button>
         </div>
         
-        <div className="aria-modal-body">
-          <div className="aria-modal-ascii-container">
-            <pre className="aria-modal-ascii">{getAriaArt()}</pre>
-            <div className="aria-modal-scanlines"></div>
+        <div className="aria-notification-content">
+          <div className="aria-notification-message">
+            <span className="aria-notification-prefix">[ARIA]</span>
+            <span className="aria-notification-text">{displayedText}</span>
+            {isTyping && <span className="aria-typing-cursor">▊</span>}
           </div>
-          
-          <div className="aria-modal-dialogue">
-            <div className="aria-modal-message">
-              <p>{displayedText}</p>
-              {isTyping && <span className="aria-typing-cursor">▊</span>}
-            </div>
 
-            {choices.length > 0 && !isTyping && (
-              <div className="aria-modal-choices">
-                {choices.map((choice, idx) => (
-                  <button
-                    key={idx}
-                    className="aria-modal-choice-btn"
-                    onClick={() => onChoice && onChoice(choice.id)}
-                  >
-                    &gt; {choice.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="aria-modal-footer">
-          Appuyez sur Q ou ESC pour fermer
+          {choices.length > 0 && !isTyping && (
+            <div className="aria-notification-choices">
+              {choices.map((choice, idx) => (
+                <button
+                  key={idx}
+                  className="aria-notification-choice-btn"
+                  onClick={() => onChoice && onChoice(choice.id)}
+                >
+                  &gt; {choice.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

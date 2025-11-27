@@ -69,8 +69,10 @@ export const useTerminal = () => {
   const [installedPackages, setInstalledPackages] = useState([])
   const [isPasswordMode, setIsPasswordMode] = useState(false)
   const [passwordUsername, setPasswordUsername] = useState(null)
-  const [currentPath, setCurrentPath] = useState('/')
-  const currentPathRef = useRef('/')
+  const [currentPath, setCurrentPath] = useState(() => {
+    return localStorage.getItem('system_void_path') || '/'
+  })
+  const currentPathRef = useRef(localStorage.getItem('system_void_path') || '/')
   const [ariaChoices, setAriaChoices] = useState([])
   const [ariaMessage, setAriaMessage] = useState(null)
   const [isAdminMode, setIsAdminMode] = useState(false)
@@ -84,11 +86,13 @@ export const useTerminal = () => {
     localStorage.setItem('session_id', sessionIdRef.current)
   }
 
-  const addToHistory = useCallback((type, content, path = null) => {
+  const addToHistory = useCallback((type, content, path = null, entryUsername = undefined) => {
+    const storedUsername = localStorage.getItem('system_void_username') || null
     setHistory(prev => [...prev, {
       type,
       content,
       path: path || currentPathRef.current || '/',
+      username: entryUsername !== undefined ? entryUsername : storedUsername,
       timestamp: new Date().toISOString()
     }])
   }, [])
@@ -123,6 +127,7 @@ export const useTerminal = () => {
       if (data.current_path) {
         setCurrentPath(data.current_path)
         currentPathRef.current = data.current_path
+        localStorage.setItem('system_void_path', data.current_path)
       }
       
       if (data.admin_mode) {
@@ -142,6 +147,9 @@ export const useTerminal = () => {
           systemResponse.includes("Identifiants invalides")) {
         localStorage.removeItem('system_void_username')
         localStorage.removeItem('system_void_token')
+        localStorage.setItem('system_void_path', '/')
+        setCurrentPath('/')
+        currentPathRef.current = '/'
         window.dispatchEvent(new Event('localStorageChange'))
       }
       
@@ -150,13 +158,6 @@ export const useTerminal = () => {
         setPasswordUsername(data.username || null)
         setInput('')
         setIsTyping(false)
-        
-      setHistory(prev => [...prev, {
-        type: 'system',
-        content: systemResponse,
-        path: currentPathRef.current || '/',
-        timestamp: new Date().toISOString()
-      }])
         
         window.dispatchEvent(new CustomEvent('passwordPrompt', { detail: { username: data.username } }))
         
@@ -183,16 +184,21 @@ export const useTerminal = () => {
         return
       }
 
+      const currentUsername = localStorage.getItem('system_void_username') || null
       setHistory(prev => [...prev, {
         type: 'system',
         content: '',
         path: currentPathRef.current || '/',
+        username: currentUsername,
         timestamp: new Date().toISOString()
       }])
       
       if (data.logout || data.username === null) {
         localStorage.removeItem('system_void_username')
         localStorage.removeItem('system_void_token')
+        localStorage.setItem('system_void_path', '/')
+        setCurrentPath('/')
+        currentPathRef.current = '/'
         window.dispatchEvent(new Event('localStorageChange'))
       }
       
@@ -378,17 +384,18 @@ export const useTerminal = () => {
       setPasswordUsername(null)
       
       if (!isConnected) {
-        setHistory(prev => [...prev, {
-          type: 'system',
-          content: 'ERROR: WebSocket not connected. Please wait...',
-          path: currentPathRef.current || '/',
-          timestamp: new Date().toISOString()
-        }])
-        return
-      }
+      setHistory(prev => [...prev, {
+        type: 'system',
+        content: 'ERROR: WebSocket not connected. Please wait...',
+        path: currentPathRef.current || '/',
+        username: localStorage.getItem('system_void_username') || null,
+        timestamp: new Date().toISOString()
+      }])
+      return
+    }
 
-      const token = localStorage.getItem('system_void_token')
-      wsSendCommand('', token, password)
+    const token = localStorage.getItem('system_void_token')
+    wsSendCommand('', token, password)
       return
     }
     
@@ -444,6 +451,7 @@ export const useTerminal = () => {
         type: 'system',
         content: 'ERROR: WebSocket not connected. Please wait...',
         path: currentPathRef.current || '/',
+        username: localStorage.getItem('system_void_username') || null,
         timestamp: new Date().toISOString()
       }])
       return
@@ -457,6 +465,7 @@ export const useTerminal = () => {
         type: 'system',
         content: 'ERROR: Failed to send command. WebSocket may be disconnected.',
         path: currentPathRef.current || '/',
+        username: localStorage.getItem('system_void_username') || null,
         timestamp: new Date().toISOString()
       }])
     }

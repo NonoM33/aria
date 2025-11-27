@@ -7,9 +7,9 @@ class AccessCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
         if not args:
             if self.lang == "FR":
-                return {"response": "Usage: CAT <nom_fichier>\nExemple: CAT readme.txt", "status": "info"}
+                return {"response": "Usage: ACCESS <nom_fichier>\nExemple: ACCESS readme.txt", "status": "info"}
             else:
-                return {"response": "Usage: CAT <filename>\nExample: CAT readme.txt", "status": "info"}
+                return {"response": "Usage: ACCESS <filename>\nExample: ACCESS readme.txt", "status": "info"}
         
         chapter_id = self.session.get("chapter", "chapter_0")
         filesystem = get_chapter_filesystem(chapter_id, self.lang)

@@ -378,7 +378,18 @@ S'il vous plait... prenez soin d'elle."
     },
     "progression": {
         "required_puzzles": ["marcus_password"],
-        "next_chapter": "act_3"
+        "next_chapter": "act_2_5",
+        "branches": {
+            "trust_high": "act_2_trust",
+            "trust_low": "act_2_doubt"
+        }
+    },
+    "secrets": {
+        "eleanor_secret": {
+            "id": "eleanor_secret",
+            "description": "Eleanor ecrivait 'elle est ma fille' mais aussi 'je ne veux pas disparaitre'",
+            "clue_for_reveal": True
+        }
     }
 }
 
