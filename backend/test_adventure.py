@@ -1296,6 +1296,74 @@ def test_help_shows_unlocked_commands():
     # Après LOGIN, SCAN, DECODE, ACCESS doivent être disponibles
     assert "SCAN" in data2["response"] or "DECODE" in data2["response"] or "ACCESS" in data2["response"]
 
+def test_all_commands_have_man_pages():
+    """Test de non-régression : Toutes les commandes doivent avoir une page MAN"""
+    from man_pages import MAN_PAGES
+    
+    # Liste de toutes les commandes qui devraient avoir une page MAN
+    expected_commands = [
+        "HELP", "STATUS", "LOGIN", "SCAN", "DECODE", "ACCESS",
+        "ACTIVATE", "NETWORK", "ANALYZE", "BYPASS",
+        "CONNECT", "RESTORE", "SOLVE",
+        "NVIM", "MAN", "SPLIT", "PORTSCAN", "BRUTEFORCE", "JOBS"
+    ]
+    
+    # Vérifier en FR
+    for cmd in expected_commands:
+        assert cmd in MAN_PAGES["FR"], f"La commande {cmd} n'a pas de page MAN en FR"
+        assert len(MAN_PAGES["FR"][cmd]) > 50, f"La page MAN de {cmd} en FR est trop courte"
+        assert cmd.upper() in MAN_PAGES["FR"][cmd] or cmd.lower() in MAN_PAGES["FR"][cmd].lower(), f"La page MAN de {cmd} en FR ne contient pas le nom de la commande"
+    
+    # Vérifier en EN
+    for cmd in expected_commands:
+        assert cmd in MAN_PAGES["EN"], f"La commande {cmd} n'a pas de page MAN en EN"
+        assert len(MAN_PAGES["EN"][cmd]) > 50, f"La page MAN de {cmd} en EN est trop courte"
+        assert cmd.upper() in MAN_PAGES["EN"][cmd] or cmd.lower() in MAN_PAGES["EN"][cmd].lower(), f"La page MAN de {cmd} en EN ne contient pas le nom de la commande"
+
+def test_man_pages_for_unlocked_commands():
+    """Test de non-régression : Les commandes débloquées doivent avoir des pages MAN accessibles"""
+    session_id = get_test_session_id()
+    
+    # LOGIN pour débloquer niveau 1
+    client.post("/api/command", json={
+        "command": f"LOGIN {ENCRYPTION_KEY}",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # Vérifier que les commandes niveau 1 ont des pages MAN
+    level_1_commands = ["SCAN", "DECODE", "ACCESS", "ACTIVATE"]
+    for cmd in level_1_commands:
+        response = client.post("/api/command", json={
+            "command": f"MAN {cmd}",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success", f"MAN {cmd} devrait fonctionner au niveau 1"
+        assert len(data["response"]) > 50, f"La page MAN de {cmd} est trop courte"
+    
+    # ACTIVATE pour débloquer niveau 2
+    client.post("/api/command", json={
+        "command": "ACTIVATE PROTOCOL_XYZ",
+        "session_id": session_id,
+        "language": "FR"
+    })
+    
+    # Vérifier que les commandes niveau 2 ont des pages MAN
+    level_2_commands = ["NETWORK", "ANALYZE", "BYPASS"]
+    for cmd in level_2_commands:
+        response = client.post("/api/command", json={
+            "command": f"MAN {cmd}",
+            "session_id": session_id,
+            "language": "FR"
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success", f"MAN {cmd} devrait fonctionner au niveau 2"
+        assert len(data["response"]) > 50, f"La page MAN de {cmd} est trop courte"
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 
