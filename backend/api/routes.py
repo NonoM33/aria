@@ -267,6 +267,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
             "message": "WebSocket connection established"
         }, connection_id)
         
+        await send_session_updates(connection_id, session_id, session, lang, db)
+        
         while True:
             data = await websocket.receive_json()
             message_type = data.get("type")
@@ -463,17 +465,16 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
             pass
 
 async def send_session_updates(connection_id: str, session_id: str, session: Dict[str, Any], lang: str, db: Session):
-    chapter_id = session.get("chapter", "chapter_1")
-    adventure_data = get_adventure_data(lang)
-    data = adventure_data.get(lang, {})
-    chapter = data.get("chapters", {}).get(chapter_id, {})
-    filesystem = chapter.get("filesystem", {})
+    chapter_id = session.get("chapter", "chapter_0")
+    filesystem = get_chapter_filesystem(chapter_id, lang)
     current_path = session.get("current_path", "/")
     
     await manager.send_personal_message({
         "type": "filesystem_update",
         "filesystem": filesystem,
-        "current_path": current_path
+        "current_path": current_path,
+        "chapter": chapter_id,
+        "level": session.get("level", 0)
     }, connection_id)
     
     await manager.send_personal_message({
@@ -495,17 +496,15 @@ async def send_global_state_update(connection_id: str):
 
 async def send_files_update(connection_id: str, session_id: str, lang: str, db: Session):
     session = get_session(session_id, lang, db, None, None)
-    chapter_id = session.get("chapter", "chapter_1")
-    adventure_data = get_adventure_data(lang)
-    data = adventure_data.get(lang, {})
-    chapter = data.get("chapters", {}).get(chapter_id, {})
-    filesystem = chapter.get("filesystem", {})
+    chapter_id = session.get("chapter", "chapter_0")
+    filesystem = get_chapter_filesystem(chapter_id, lang)
     current_path = session.get("current_path", "/")
     
     await manager.send_personal_message({
         "type": "filesystem_update",
         "filesystem": filesystem,
-        "current_path": current_path
+        "current_path": current_path,
+        "chapter": chapter_id
     }, connection_id)
 
 async def send_commands_update(connection_id: str, session_id: str, lang: str, db: Session):

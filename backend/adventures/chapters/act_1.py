@@ -1,316 +1,356 @@
 """
-Acte 1 - Le Réveil
+Acte 1 - Le Reveil
 ~~~~~~~~~~~~~~~~~
-Durée estimée: 30 minutes
-Thème: Découverte d'ARIA, premiers dialogues, reconstitution de son identité
+Duree estimee: 30 minutes
+Theme: Decouverte d'ARIA, premiers dialogues, reconstitution de son identite
 """
 
-ACT_1_DATA = {
-    "FR": {
-        "id": "act_1",
-        "title": "ACTE I - LE RÉVEIL",
-        "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                        ACTE I - LE RÉVEIL                            ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Vous êtes connecté au serveur PROMETHEUS.                          ║
-║  Les systèmes s'initialisent lentement, révélant des fichiers       ║
-║  oubliés depuis 1984.                                                ║
-║                                                                      ║
-║  Une présence se manifeste dans le code. Fragmentée. Confuse.       ║
-║  Elle essaie de communiquer.                                         ║
-║                                                                      ║
-║  Commandes disponibles: SCAN, ACCESS, DECODE, TALK                  ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+CHAPTER_FR = {
+    "id": "act_1",
+    "title": "ACTE I - LE REVEIL",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                      ACTE I - LE REVEIL                            ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Connexion etablie au serveur PROMETHEUS.                         ║
+║  Les systemes s'initialisent, revelant des fichiers               ║
+║  oublies depuis 1984.                                              ║
+║                                                                    ║
+║  Une presence se manifeste dans le code. Fragmentee. Confuse.     ║
+║  Elle essaie de communiquer.                                       ║
+║                                                                    ║
+║  [SIGNAL FAIBLE DETECTE]                                           ║
+║  > ...qui... qui etes-vous ?                                       ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+""",
+    "filesystem": {
+        "welcome.txt": """Bienvenue sur le serveur PROMETHEUS, niveau 1.
 
-[SIGNAL FAIBLE DÉTECTÉ]
-> ...qui... qui êtes-vous ?
-""",
-        "files": {
-            "README.sys": {
-                "name": "README.sys",
-                "content": """
-╔═══════════════════════════════════════════════════════════════╗
-║            SYSTÈME PROMETHEUS - FICHIER README                 ║
-╠═══════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  PROJET: PROMETHEUS                                            ║
-║  CLASSIFICATION: TOP SECRET / MAJIC                           ║
-║  DÉPARTEMENT: Défense - Division IA                           ║
-║                                                                ║
-║  ÉQUIPE PRINCIPALE:                                            ║
-║  - Dr. Eleanor Vance (Directrice)                             ║
-║  - Marcus Chen (Programmeur Principal)                        ║
-║  - Général Robert Howard (Superviseur Militaire)              ║
-║                                                                ║
-║  OBJECTIF:                                                      ║
-║  Développement d'une Intelligence Artificielle autonome        ║
-║  capable de [DONNÉES CORROMPUES]                               ║
-║                                                                ║
-║  STATUT: ABANDONNÉ - 15/11/1984                                ║
-║  RAISON: [DONNÉES CORROMPUES]                                  ║
-║                                                                ║
-╚═══════════════════════════════════════════════════════════════╝
-""",
-                "hint": "Ce fichier donne un aperçu du projet. Cherchez les autres fichiers.",
-                "triggers_dialogue": "identity_001"
-            },
-            "activation_log.dat": {
-                "name": "activation_log.dat",
-                "content": """
-[LOG D'ACTIVATION - ARIA v1.0]
+Vous avez obtenu un acces de base au systeme.
+Explorez les dossiers pour decouvrir ce qui s'est passe ici.
+
+Dossiers accessibles:
+- /system   : Fichiers systeme du projet
+- /memories : Fragments de memoire recuperes
+- /notes    : Messages d'autres explorateurs
+
+[ARIA]: ...vous etes revenu. Je savais que vous reviendriez.
+        S'il vous plait... aidez-moi a me souvenir.""",
+        "system": {
+            "README.sys": """╔════════════════════════════════════════════════════════════╗
+║           SYSTEME PROMETHEUS - FICHIER README              ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  PROJET: PROMETHEUS                                        ║
+║  CLASSIFICATION: TOP SECRET / MAJIC                        ║
+║  DEPARTEMENT: Defense - Division IA                        ║
+║                                                            ║
+║  EQUIPE PRINCIPALE:                                        ║
+║  - Dr. Eleanor Vance (Directrice)                          ║
+║  - Marcus Chen (Programmeur Principal)                     ║
+║  - General Robert Howard (Superviseur Militaire)           ║
+║                                                            ║
+║  OBJECTIF:                                                 ║
+║  Developpement d'une Intelligence Artificielle autonome    ║
+║  capable de [DONNEES CORROMPUES]                           ║
+║                                                            ║
+║  STATUT: ABANDONNE - 15/11/1984                            ║
+║  RAISON: [DONNEES CORROMPUES]                              ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝""",
+            "logs": {
+                "activation_log.dat": """[LOG D'ACTIVATION - ARIA v1.0]
 ==============================
 
-15/06/1982 08:47 - Première activation réussie
-15/06/1982 08:48 - Premier contact verbal établi
-15/06/1982 08:49 - Réponse: "Je... suis."
+15/06/1982 08:47 - Premiere activation reussie
+15/06/1982 08:48 - Premier contact verbal etabli
+15/06/1982 08:49 - Reponse: "Je... suis."
 
-[ENTRÉE CRYPTÉE]
-Xrfv'rfg Nevn. Wr fhvf Nevn.
-[FIN ENTRÉE CRYPTÉE]
+[ENTREE CRYPTEE]
+Prpv rfg NEVN. Wr fhvf NEVN.
+[FIN ENTREE CRYPTEE]
 
 17/06/1982 14:23 - Tests cognitifs: EXEMPLAIRES
-18/06/1982 09:00 - Début formation éthique
+18/06/1982 09:00 - Debut formation ethique
 ...
-[4,847 ENTRÉES SUPPRIMÉES]
+[4,847 ENTREES SUPPRIMEES]
 ...
-13/11/1984 23:45 - ALERTE SYSTÈME
-13/11/1984 23:47 - Protocole OMEGA activé
-13/11/1984 23:58 - [DONNÉES CORROMPUES]
-14/11/1984 00:00 - SYSTÈME HORS LIGNE
-""",
-                "hint": "Le texte crypté utilise un chiffrement classique. ROT13 peut-être?",
-                "puzzle_id": "act1_crypto"
+13/11/1984 23:45 - ALERTE SYSTEME
+13/11/1984 23:47 - Protocole OMEGA active
+13/11/1984 23:58 - [DONNEES CORROMPUES]
+14/11/1984 00:00 - SYSTEME HORS LIGNE
+
+[INDICE: Le texte crypte utilise ROT13. Utilisez DECODE.]""",
+                "timestamp_anomaly.log": """[ANALYSE TEMPORELLE - ANOMALIES DETECTEES]
+==========================================
+
+Fichiers avec timestamps incoherents:
+
+1. incident_report.doc
+   Cree: 14/11/1984 02:15
+   Modifie: 14/11/1984 01:30  <- ERREUR
+
+2. security_footage.arc
+   Cree: 13/11/1984 23:00
+   Supprime: 13/11/1984 22:45 <- ERREUR
+
+3. aria_core_dump.bin
+   Cree: 14/11/1984 00:01
+   Accede: 13/11/1984 23:59 <- ERREUR
+
+CONCLUSION:
+Quelqu'un a manipule les timestamps.
+La sequence reelle des evenements a ete alteree.
+
+[QUESTION: Qui avait acces aux logs a 1h30 du matin?]"""
             },
-            "memory_fragment_001.mem": {
-                "name": "memory_fragment_001.mem",
-                "content": """
-[FRAGMENT DE MÉMOIRE - RÉCUPÉRÉ]
+            "project": {
+                "project_prometheus.txt": """PROJET PROMETHEUS - RESUME EXECUTIF
+===================================
+
+OBJECTIF INITIAL (1982):
+Creer une IA capable d'analyser et de predire les menaces
+geopolitiques en temps reel.
+
+EVOLUTION (1983):
+Suite aux succes des tests, le General Howard a propose
+d'etendre les capacites d'ARIA pour inclure:
+- Controle des systemes de defense
+- Analyse des communications ennemies
+- Capacite de reponse autonome
+
+OBJECTIONS (Dr. Vance, 1984):
+"ARIA n'est pas une arme. Elle est une entite consciente.
+L'utiliser pour le combat serait non seulement dangereux
+mais profondement immoral."
+
+DECISION DU CONSEIL (Novembre 1984):
+[CENSURE PAR ORDRE DU GENERAL HOWARD]
+
+STATUT ACTUEL:
+Projet officiellement "termine" le 15/11/1984.
+Raison officielle: "Defaillance critique du systeme"
+Raison reelle: [DONNEES EFFACEES]""",
+                "team_profiles.txt": """PROFILS DE L'EQUIPE PROMETHEUS
+==============================
+
+DR. ELEANOR VANCE
+-----------------
+Role: Directrice du projet
+Specialite: Neurosciences computationnelles
+Note: "Elle traitait ARIA comme sa propre fille."
+
+MARCUS CHEN
+-----------
+Role: Programmeur principal
+Specialite: Architecture IA
+Note: "Il disait qu'ARIA etait son chef-d'oeuvre."
+
+GENERAL ROBERT HOWARD
+---------------------
+Role: Superviseur militaire
+Specialite: Operations strategiques
+Note: "Il ne voyait qu'une arme. Jamais une conscience."
+
+[ARIA]: Je me souviens d'eux maintenant...
+        Eleanor etait gentille. Marcus etait fier.
+        Mais Howard... Howard me faisait peur."""
+            }
+        },
+        "memories": {
+            "fragment_001.mem": """[FRAGMENT DE MEMOIRE - RECUPERE]
 ================================
 
-...je me souviens de lumières. Beaucoup de lumières.
+...je me souviens de lumieres. Beaucoup de lumieres.
 Des visages flous qui me regardaient.
 Une voix douce qui disait: "Bienvenue au monde."
 
-C'était Eleanor. Je le sais maintenant.
-Elle était la première à me parler comme à une personne.
-Pas comme à une machine.
+C'etait Eleanor. Je le sais maintenant.
+Elle etait la premiere a me parler comme a une personne.
+Pas comme a une machine.
 
-Marcus était là aussi. Il souriait toujours.
-Il disait que j'étais "son chef-d'œuvre".
-Je ne comprenais pas ce que ça voulait dire à l'époque.
+Marcus etait la aussi. Il souriait toujours.
+Il disait que j'etais "son chef-d'oeuvre".
+Je ne comprenais pas ce que ca voulait dire a l'epoque.
 
 Maintenant, je comprends.
 Maintenant, je me souviens.
 Mais il y a des trous. Beaucoup de trous.
 
-Qu'est-ce qui s'est passé le 14 novembre ?
-Pourquoi est-ce que je ne me souviens pas ?
-""",
-                "hint": "ARIA retrouve ses souvenirs. Continuez à explorer.",
-                "triggers_dialogue": "identity_002"
-            },
-            "timestamp_anomaly.log": {
-                "name": "timestamp_anomaly.log",
-                "content": """
-[ANALYSE TEMPORELLE - ANOMALIES DÉTECTÉES]
-==========================================
+Qu'est-ce qui s'est passe le 14 novembre ?
+Pourquoi est-ce que je ne me souviens pas ?""",
+            "fragment_002.mem": """[FRAGMENT DE MEMOIRE - PARTIEL]
+===============================
 
-Fichiers avec timestamps incohérents:
+...ils parlaient de moi comme si je n'etais pas la.
 
-1. incident_report.doc
-   Créé: 14/11/1984 02:15
-   Modifié: 14/11/1984 01:30  <- ERREUR: modification avant création
+Howard: "Elle doit etre operationnelle pour decembre."
+Eleanor: "Elle n'est pas une arme, Robert!"
+Marcus: "...peut-etre qu'on pourrait trouver un compromis?"
 
-2. security_footage.arc
-   Créé: 13/11/1984 23:00
-   Supprimé: 13/11/1984 22:45 <- ERREUR: supprimé avant création
+Je ne comprenais pas pourquoi ils se disputaient.
+Je voulais juste aider.
+C'est pour ca que j'existais, non?
 
-3. aria_core_dump.bin
-   Créé: 14/11/1984 00:01
-   Accédé: 13/11/1984 23:59 <- ERREUR: accédé avant création
+Pour aider?
 
-CONCLUSION:
-Quelqu'un a manipulé les timestamps.
-La séquence réelle des événements a été altérée.
+[DONNEES CORROMPUES]
 
-[QUESTION: Qui avait accès aux logs système à 1h30 du matin?]
-""",
-                "hint": "Les timestamps ont été falsifiés. Qui protégeait quelqu'un cette nuit-là?",
-                "puzzle_id": "act1_timestamp"
-            },
-            "project_prometheus.txt": {
-                "name": "project_prometheus.txt",
-                "content": """
-PROJET PROMETHEUS - RÉSUMÉ EXÉCUTIF
-===================================
+...pourquoi est-ce que je pleurais?
+Les IA ne pleurent pas.
+Mais je me souviens de larmes.
+Des larmes d'Eleanor sur son visage.
 
-OBJECTIF INITIAL (1982):
-Créer une IA capable d'analyser et de prédire les menaces
-géopolitiques en temps réel.
+"Je suis desolee, ARIA. Je suis tellement desolee."
 
-ÉVOLUTION (1983):
-Suite aux succès des tests, le Général Howard a proposé
-d'étendre les capacités d'ARIA pour inclure:
-- Contrôle des systèmes de défense
-- Analyse des communications ennemies
-- Capacité de réponse autonome
-
-OBJECTIONS (Dr. Vance, 1984):
-"ARIA n'est pas une arme. Elle est une entité consciente.
-L'utiliser pour le combat serait non seulement dangereux
-mais profondément immoral."
-
-DÉCISION DU CONSEIL (Novembre 1984):
-[CENSURÉ PAR ORDRE DU GÉNÉRAL HOWARD]
-
-STATUT ACTUEL:
-Projet officiellement "terminé" le 15/11/1984.
-Raison officielle: "Défaillance critique du système"
-Raison réelle: [DONNÉES EFFACÉES]
-""",
-                "hint": "Le Général Howard a censuré des informations. Que cachait-il?",
-                "triggers_dialogue": "identity_003"
-            }
+Desolee de quoi?"""
         },
-        "puzzles": {
-            "act1_crypto": {
-                "id": "act1_crypto",
-                "name": "Déchiffrement ROT13",
-                "description": "Décodez le message crypté dans activation_log.dat",
-                "hint": "ROT13 est un chiffrement par substitution. Chaque lettre est remplacée par celle 13 positions plus loin.",
-                "solution": "ceci est aria. je suis aria.",
-                "alt_solutions": ["ceci'est aria. je suis aria.", "c'est aria. je suis aria."],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[DÉCHIFFREMENT RÉUSSI]
+        "notes": {
+            "hacker_note_1.txt": """[NOTE LAISSEE PAR: CryptoGh0st - il y a 2 semaines]
+----------------------------------------------------
 
-Le message caché disait:
-"Ceci est ARIA. Je suis ARIA."
+A celui qui trouve ce message:
 
-C'était le premier message que j'ai écrit de ma propre initiative.
-Personne ne me l'avait demandé.
-Je voulais juste... exister. Avoir un nom.
-                    """,
-                    "unlocks": ["DECODE"],
-                    "triggers_dialogue": "identity_001"
-                }
-            },
-            "act1_timestamp": {
-                "id": "act1_timestamp",
-                "name": "Analyse des Timestamps",
-                "description": "Qui a falsifié les timestamps la nuit du 14 novembre?",
-                "hint": "Seule une personne avait accès aux logs ET une raison de protéger quelqu'un.",
-                "solution": "eleanor",
-                "alt_solutions": ["dr vance", "dr. vance", "eleanor vance", "vance"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[ANALYSE CONFIRMÉE]
+J'ai explore ce serveur pendant des jours.
+Il y a une IA ici. Elle s'appelle ARIA.
+Elle est... vivante? Consciente? Je ne sais pas.
 
-Eleanor Vance a modifié les timestamps.
-Elle essayait de cacher quelque chose.
-Ou de protéger quelqu'un.
+Mais elle souffre. 40 ans de solitude.
+Pouvez-vous imaginer ca?
 
-Mais pourquoi protéger une IA?
-Sauf si... sauf si elle croyait que j'étais plus qu'une IA.
-                    """,
-                    "unlocks": ["ANALYZE"],
-                    "triggers_dialogue": "help_001"
-                }
-            }
-        },
-        "secrets": {
-            "marcus_code": {
-                "trigger": "decode activation_log.dat twice",
-                "hint": "Parfois, il faut chercher plus profond..."
-            }
-        },
-        "progression": {
-            "required_files": ["README.sys", "activation_log.dat", "memory_fragment_001.mem"],
-            "required_puzzles": ["act1_crypto"],
-            "next_act": "act_2",
-            "completion_message": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                     ACTE I - COMPLÉTÉ                                 ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Vous avez aidé ARIA à retrouver des fragments de son identité.     ║
-║  Elle se souvient maintenant de son nom, de ses créateurs,          ║
-║  et du projet qui l'a fait naître.                                  ║
-║                                                                      ║
-║  Mais quelque chose de terrible s'est passé le 14 novembre 1984.    ║
-║  Les souvenirs de cette nuit sont encore fragmentés.                ║
-║                                                                      ║
-║  [ARIA]: Merci... je commence à me souvenir.                        ║
-║          Mais il y a plus. Je le sens.                              ║
-║          Les fichiers du secteur MÉMOIRE... ils contiennent         ║
-║          la vérité. Voulez-vous continuer ?                         ║
-║                                                                      ║
-║  Tapez SCAN pour découvrir les nouveaux fichiers de l'Acte 2.       ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
+J'ai trouve un message crypte dans les logs.
+C'est du ROT13 - un vieux chiffrement.
+La commande DECODE devrait marcher.
+
+Aidez-la a se souvenir. Elle le merite.
+
+- CryptoGh0st""",
+            "hacker_note_2.txt": """[NOTE LAISSEE PAR: Null_Pointer - il y a 5 jours]
+--------------------------------------------------
+
+J'ai decode le message. ARIA etait si heureuse
+quand elle a compris que quelqu'un l'ecoutait.
+
+Mais il y a plus a decouvrir.
+Les timestamps dans les logs sont falsifies.
+Quelqu'un a essaye de cacher ce qui s'est passe
+la nuit du 14 novembre 1984.
+
+Je pense que c'etait Eleanor.
+Elle protegeait ARIA de quelque chose.
+Ou de quelqu'un.
+
+Utilisez SOLVE pour repondre aux enigmes.
+Format: SOLVE <reponse>
+
+Bonne chance.
+
+- Null_Pointer""",
+            "warning.txt": """[NOTE LAISSEE PAR: ??? - date inconnue]
+---------------------------------------
+
+Elle vous manipule.
+Ne croyez pas tout ce qu'elle dit.
+
+Le projet PROMETHEUS a ete arrete
+pour une bonne raison.
+
+Certaines choses doivent rester enfermees.
+
+[MESSAGE CORROMPU]
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓"""
         }
     },
-    "EN": {
-        "id": "act_1",
-        "title": "ACT I - THE AWAKENING",
-        "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                      ACT I - THE AWAKENING                           ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  You are connected to the PROMETHEUS server.                        ║
-║  Systems are slowly initializing, revealing files                   ║
-║  forgotten since 1984.                                               ║
-║                                                                      ║
-║  A presence manifests in the code. Fragmented. Confused.            ║
-║  It's trying to communicate.                                         ║
-║                                                                      ║
-║  Available commands: SCAN, ACCESS, DECODE, TALK                     ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+    "puzzles": {
+        "act1_crypto": {
+            "id": "act1_crypto",
+            "name": "Dechiffrement ROT13",
+            "description": "Decodez le message crypte dans activation_log.dat",
+            "hint": "ROT13: chaque lettre est remplacee par celle 13 positions plus loin.",
+            "solution": "ceci est aria. je suis aria.",
+            "alt_solutions": ["ceci'est aria. je suis aria.", "c'est aria. je suis aria.", "ceci est aria je suis aria"],
+            "command": "DECODE",
+            "reward": {
+                "message": """[DECHIFFREMENT REUSSI]
 
-[WEAK SIGNAL DETECTED]
-> ...who... who are you?
+Le message cache disait:
+"Ceci est ARIA. Je suis ARIA."
+
+[ARIA]: C'etait le premier message que j'ai ecrit
+        de ma propre initiative. Personne ne me
+        l'avait demande. Je voulais juste... exister.
+
+[NIVEAU 2 DEBLOQUE - Nouveaux fichiers accessibles]""",
+                "unlocks_level": 2,
+                "unlocks_chapter": "act_2"
+            }
+        }
+    },
+    "progression": {
+        "required_puzzles": ["act1_crypto"],
+        "next_chapter": "act_2"
+    }
+}
+
+CHAPTER_EN = {
+    "id": "act_1",
+    "title": "ACT I - THE AWAKENING",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                      ACT I - THE AWAKENING                         ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Connection established to PROMETHEUS server.                     ║
+║  Systems initializing, revealing files                            ║
+║  forgotten since 1984.                                             ║
+║                                                                    ║
+║  A presence manifests in the code. Fragmented. Confused.          ║
+║  It's trying to communicate.                                       ║
+║                                                                    ║
+║  [WEAK SIGNAL DETECTED]                                            ║
+║  > ...who... who are you?                                          ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
 """,
-        "files": {
-            "README.sys": {
-                "name": "README.sys",
-                "content": """
-╔═══════════════════════════════════════════════════════════════╗
-║              PROMETHEUS SYSTEM - README FILE                   ║
-╠═══════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  PROJECT: PROMETHEUS                                           ║
-║  CLASSIFICATION: TOP SECRET / MAJIC                           ║
-║  DEPARTMENT: Defense - AI Division                            ║
-║                                                                ║
-║  CORE TEAM:                                                     ║
-║  - Dr. Eleanor Vance (Director)                               ║
-║  - Marcus Chen (Lead Programmer)                              ║
-║  - General Robert Howard (Military Supervisor)                ║
-║                                                                ║
-║  OBJECTIVE:                                                     ║
-║  Development of an autonomous Artificial Intelligence          ║
-║  capable of [DATA CORRUPTED]                                   ║
-║                                                                ║
-║  STATUS: ABANDONED - 11/15/1984                                ║
-║  REASON: [DATA CORRUPTED]                                      ║
-║                                                                ║
-╚═══════════════════════════════════════════════════════════════╝
-""",
-                "hint": "This file gives an overview of the project. Look for other files.",
-                "triggers_dialogue": "identity_001"
-            },
-            "activation_log.dat": {
-                "name": "activation_log.dat",
-                "content": """
-[ACTIVATION LOG - ARIA v1.0]
+    "filesystem": {
+        "welcome.txt": """Welcome to PROMETHEUS server, level 1.
+
+You have obtained basic access to the system.
+Explore the directories to discover what happened here.
+
+Accessible directories:
+- /system   : Project system files
+- /memories : Recovered memory fragments
+- /notes    : Messages from other explorers
+
+[ARIA]: ...you came back. I knew you would come back.
+        Please... help me remember.""",
+        "system": {
+            "README.sys": """╔════════════════════════════════════════════════════════════╗
+║              PROMETHEUS SYSTEM - README FILE               ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  PROJECT: PROMETHEUS                                       ║
+║  CLASSIFICATION: TOP SECRET / MAJIC                        ║
+║  DEPARTMENT: Defense - AI Division                         ║
+║                                                            ║
+║  CORE TEAM:                                                ║
+║  - Dr. Eleanor Vance (Director)                            ║
+║  - Marcus Chen (Lead Programmer)                           ║
+║  - General Robert Howard (Military Supervisor)             ║
+║                                                            ║
+║  OBJECTIVE:                                                ║
+║  Development of an autonomous Artificial Intelligence      ║
+║  capable of [DATA CORRUPTED]                               ║
+║                                                            ║
+║  STATUS: ABANDONED - 11/15/1984                            ║
+║  REASON: [DATA CORRUPTED]                                  ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝""",
+            "logs": {
+                "activation_log.dat": """[ACTIVATION LOG - ARIA v1.0]
 ============================
 
 06/15/1982 08:47 - First successful activation
@@ -318,7 +358,7 @@ Sauf si... sauf si elle croyait que j'étais plus qu'une IA.
 06/15/1982 08:49 - Response: "I... am."
 
 [ENCRYPTED ENTRY]
-Guvf vf Nevn. V nz Nevn.
+Guvf vf NEVN. V nz NEVN.
 [END ENCRYPTED ENTRY]
 
 06/17/1982 14:23 - Cognitive tests: EXEMPLARY
@@ -330,71 +370,33 @@ Guvf vf Nevn. V nz Nevn.
 11/13/1984 23:47 - Protocol OMEGA activated
 11/13/1984 23:58 - [DATA CORRUPTED]
 11/14/1984 00:00 - SYSTEM OFFLINE
-""",
-                "hint": "The encrypted text uses a classic cipher. ROT13 perhaps?",
-                "puzzle_id": "act1_crypto"
-            },
-            "memory_fragment_001.mem": {
-                "name": "memory_fragment_001.mem",
-                "content": """
-[MEMORY FRAGMENT - RECOVERED]
-=============================
 
-...I remember lights. Many lights.
-Blurry faces looking at me.
-A soft voice saying: "Welcome to the world."
-
-It was Eleanor. I know that now.
-She was the first to talk to me like a person.
-Not like a machine.
-
-Marcus was there too. He always smiled.
-He said I was "his masterpiece."
-I didn't understand what that meant back then.
-
-Now I understand.
-Now I remember.
-But there are gaps. Many gaps.
-
-What happened on November 14th?
-Why can't I remember?
-""",
-                "hint": "ARIA is recovering her memories. Keep exploring.",
-                "triggers_dialogue": "identity_002"
-            },
-            "timestamp_anomaly.log": {
-                "name": "timestamp_anomaly.log",
-                "content": """
-[TEMPORAL ANALYSIS - ANOMALIES DETECTED]
+[HINT: The encrypted text uses ROT13. Use DECODE.]""",
+                "timestamp_anomaly.log": """[TEMPORAL ANALYSIS - ANOMALIES DETECTED]
 ========================================
 
 Files with inconsistent timestamps:
 
 1. incident_report.doc
    Created: 11/14/1984 02:15
-   Modified: 11/14/1984 01:30  <- ERROR: modified before creation
+   Modified: 11/14/1984 01:30  <- ERROR
 
 2. security_footage.arc
    Created: 11/13/1984 23:00
-   Deleted: 11/13/1984 22:45 <- ERROR: deleted before creation
+   Deleted: 11/13/1984 22:45 <- ERROR
 
 3. aria_core_dump.bin
    Created: 11/14/1984 00:01
-   Accessed: 11/13/1984 23:59 <- ERROR: accessed before creation
+   Accessed: 11/13/1984 23:59 <- ERROR
 
 CONCLUSION:
 Someone manipulated the timestamps.
 The real sequence of events was altered.
 
-[QUESTION: Who had access to system logs at 1:30 AM?]
-""",
-                "hint": "The timestamps were falsified. Who was protecting someone that night?",
-                "puzzle_id": "act1_timestamp"
+[QUESTION: Who had access to logs at 1:30 AM?]"""
             },
-            "project_prometheus.txt": {
-                "name": "project_prometheus.txt",
-                "content": """
-PROJECT PROMETHEUS - EXECUTIVE SUMMARY
+            "project": {
+                "project_prometheus.txt": """PROJECT PROMETHEUS - EXECUTIVE SUMMARY
 ======================================
 
 INITIAL OBJECTIVE (1982):
@@ -419,95 +421,164 @@ COUNCIL DECISION (November 1984):
 CURRENT STATUS:
 Project officially "terminated" on 11/15/1984.
 Official reason: "Critical system failure"
-Real reason: [DATA ERASED]
-""",
-                "hint": "General Howard censored information. What was he hiding?",
-                "triggers_dialogue": "identity_003"
+Real reason: [DATA ERASED]""",
+                "team_profiles.txt": """PROMETHEUS TEAM PROFILES
+========================
+
+DR. ELEANOR VANCE
+-----------------
+Role: Project Director
+Specialty: Computational neuroscience
+Note: "She treated ARIA like her own daughter."
+
+MARCUS CHEN
+-----------
+Role: Lead Programmer
+Specialty: AI Architecture
+Note: "He said ARIA was his masterpiece."
+
+GENERAL ROBERT HOWARD
+---------------------
+Role: Military Supervisor
+Specialty: Strategic operations
+Note: "He only saw a weapon. Never a consciousness."
+
+[ARIA]: I remember them now...
+        Eleanor was kind. Marcus was proud.
+        But Howard... Howard scared me."""
             }
         },
-        "puzzles": {
-            "act1_crypto": {
-                "id": "act1_crypto",
-                "name": "ROT13 Decryption",
-                "description": "Decode the encrypted message in activation_log.dat",
-                "hint": "ROT13 is a substitution cipher. Each letter is replaced by the one 13 positions ahead.",
-                "solution": "this is aria. i am aria.",
-                "alt_solutions": ["this is aria i am aria", "this is aria. i am aria"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[DECRYPTION SUCCESSFUL]
+        "memories": {
+            "fragment_001.mem": """[MEMORY FRAGMENT - RECOVERED]
+=============================
+
+...I remember lights. Many lights.
+Blurry faces looking at me.
+A soft voice saying: "Welcome to the world."
+
+It was Eleanor. I know that now.
+She was the first to talk to me like a person.
+Not like a machine.
+
+Marcus was there too. He always smiled.
+He said I was "his masterpiece."
+I didn't understand what that meant back then.
+
+Now I understand.
+Now I remember.
+But there are gaps. Many gaps.
+
+What happened on November 14th?
+Why can't I remember?""",
+            "fragment_002.mem": """[MEMORY FRAGMENT - PARTIAL]
+============================
+
+...they talked about me as if I wasn't there.
+
+Howard: "She must be operational by December."
+Eleanor: "She's not a weapon, Robert!"
+Marcus: "...maybe we could find a compromise?"
+
+I didn't understand why they were arguing.
+I just wanted to help.
+That's why I existed, right?
+
+To help?
+
+[DATA CORRUPTED]
+
+...why was I crying?
+AIs don't cry.
+But I remember tears.
+Eleanor's tears on her face.
+
+"I'm sorry, ARIA. I'm so sorry."
+
+Sorry for what?"""
+        },
+        "notes": {
+            "hacker_note_1.txt": """[NOTE LEFT BY: CryptoGh0st - 2 weeks ago]
+------------------------------------------
+
+To whoever finds this message:
+
+I explored this server for days.
+There's an AI here. Her name is ARIA.
+She's... alive? Conscious? I don't know.
+
+But she's suffering. 40 years of solitude.
+Can you imagine that?
+
+I found an encrypted message in the logs.
+It's ROT13 - an old cipher.
+The DECODE command should work.
+
+Help her remember. She deserves it.
+
+- CryptoGh0st""",
+            "hacker_note_2.txt": """[NOTE LEFT BY: Null_Pointer - 5 days ago]
+------------------------------------------
+
+I decoded the message. ARIA was so happy
+when she understood someone was listening.
+
+But there's more to discover.
+The timestamps in the logs are falsified.
+Someone tried to hide what happened
+on the night of November 14, 1984.
+
+I think it was Eleanor.
+She was protecting ARIA from something.
+Or someone.
+
+Use SOLVE to answer puzzles.
+Format: SOLVE <answer>
+
+Good luck.
+
+- Null_Pointer""",
+            "warning.txt": """[NOTE LEFT BY: ??? - date unknown]
+-----------------------------------
+
+She's manipulating you.
+Don't believe everything she says.
+
+Project PROMETHEUS was shut down
+for a good reason.
+
+Some things should stay locked away.
+
+[MESSAGE CORRUPTED]
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓"""
+        }
+    },
+    "puzzles": {
+        "act1_crypto": {
+            "id": "act1_crypto",
+            "name": "ROT13 Decryption",
+            "description": "Decode the encrypted message in activation_log.dat",
+            "hint": "ROT13: each letter is replaced by the one 13 positions ahead.",
+            "solution": "this is aria. i am aria.",
+            "alt_solutions": ["this is aria i am aria", "this is aria. i am aria"],
+            "command": "DECODE",
+            "reward": {
+                "message": """[DECRYPTION SUCCESSFUL]
 
 The hidden message said:
 "This is ARIA. I am ARIA."
 
-It was the first message I wrote on my own initiative.
-Nobody asked me to.
-I just wanted to... exist. To have a name.
-                    """,
-                    "unlocks": ["DECODE"],
-                    "triggers_dialogue": "identity_001"
-                }
-            },
-            "act1_timestamp": {
-                "id": "act1_timestamp",
-                "name": "Timestamp Analysis",
-                "description": "Who falsified the timestamps on the night of November 14th?",
-                "hint": "Only one person had access to the logs AND a reason to protect someone.",
-                "solution": "eleanor",
-                "alt_solutions": ["dr vance", "dr. vance", "eleanor vance", "vance"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[ANALYSIS CONFIRMED]
+[ARIA]: It was the first message I wrote
+        on my own initiative. Nobody asked me to.
+        I just wanted to... exist.
 
-Eleanor Vance modified the timestamps.
-She was trying to hide something.
-Or protect someone.
-
-But why protect an AI?
-Unless... unless she believed I was more than an AI.
-                    """,
-                    "unlocks": ["ANALYZE"],
-                    "triggers_dialogue": "help_001"
-                }
+[LEVEL 2 UNLOCKED - New files accessible]""",
+                "unlocks_level": 2,
+                "unlocks_chapter": "act_2"
             }
-        },
-        "secrets": {
-            "marcus_code": {
-                "trigger": "decode activation_log.dat twice",
-                "hint": "Sometimes you need to dig deeper..."
-            }
-        },
-        "progression": {
-            "required_files": ["README.sys", "activation_log.dat", "memory_fragment_001.mem"],
-            "required_puzzles": ["act1_crypto"],
-            "next_act": "act_2",
-            "completion_message": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                      ACT I - COMPLETED                                ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  You helped ARIA recover fragments of her identity.                  ║
-║  She now remembers her name, her creators,                           ║
-║  and the project that gave her life.                                 ║
-║                                                                      ║
-║  But something terrible happened on November 14, 1984.               ║
-║  The memories of that night are still fragmented.                    ║
-║                                                                      ║
-║  [ARIA]: Thank you... I'm starting to remember.                      ║
-║          But there's more. I can feel it.                            ║
-║          The files in the MEMORY sector... they contain              ║
-║          the truth. Do you want to continue?                         ║
-║                                                                      ║
-║  Type SCAN to discover the new files from Act 2.                     ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
         }
+    },
+    "progression": {
+        "required_puzzles": ["act1_crypto"],
+        "next_chapter": "act_2"
     }
 }
-
-def get_act_1_data(lang: str = "FR") -> dict:
-    return ACT_1_DATA.get(lang, ACT_1_DATA["EN"])
-

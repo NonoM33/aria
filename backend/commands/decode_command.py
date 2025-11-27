@@ -1,45 +1,29 @@
 import base64
+import codecs
 from typing import Dict, Any
 from commands.base_command import BaseCommand
-from adventures.adventure_data import get_adventure_data
+from adventures.adventure_loader import get_chapter_filesystem
 
 class DecodeCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
         if not args:
             if self.lang == "FR":
-                return {"response": "Usage: DECODE <texte_base64> ou DECODE <nom_fichier>\nExemple: DECODE VGhpcyBpcyBhIHRlc3Q=\nExemple: DECODE corrupted_data.b64", "status": "info"}
+                return {"response": "Usage: DECODE <texte>\nDecode du texte en Base64 ou ROT13.\nExemple: DECODE SGVsbG8gV29ybGQ=", "status": "info"}
             else:
-                return {"response": "Usage: DECODE <base64_text> or DECODE <filename>\nExample: DECODE VGhpcyBpcyBhIHRlc3Q=\nExample: DECODE corrupted_data.b64", "status": "info"}
+                return {"response": "Usage: DECODE <text>\nDecodes Base64 or ROT13 text.\nExample: DECODE SGVsbG8gV29ybGQ=", "status": "info"}
         
-        adventure_data = get_adventure_data(self.lang)
-        data = adventure_data.get(self.lang, {})
-        chapter = self.get_chapter_data(data)
-        files = chapter.get("files", {})
-        filename = args.lower().strip()
+        text = args.strip()
         
-        if filename in files:
-            file_content = files[filename]
-            try:
-                decoded = base64.b64decode(file_content).decode('utf-8')
-                if self.lang == "FR":
-                    return {"response": f"Fichier {filename} décodé:\n\n{decoded}", "status": "success"}
-                else:
-                    return {"response": f"File {filename} decoded:\n\n{decoded}", "status": "success"}
-            except:
-                if self.lang == "FR":
-                    return {"response": f"Le fichier {filename} ne contient pas de Base64 valide.", "status": "error"}
-                else:
-                    return {"response": f"File {filename} does not contain valid Base64.", "status": "error"}
-        else:
-            try:
-                decoded = base64.b64decode(args).decode('utf-8')
-                if self.lang == "FR":
-                    return {"response": f"Décodé: {decoded}", "status": "success"}
-                else:
-                    return {"response": f"Decoded: {decoded}", "status": "success"}
-            except:
-                if self.lang == "FR":
-                    return {"response": "Échec du décodage. Format invalide ou fichier introuvable.", "status": "error"}
-                else:
-                    return {"response": "Decoding failed. Invalid format or file not found.", "status": "error"}
-
+        rot13_result = codecs.decode(text, 'rot_13')
+        
+        try:
+            base64_result = base64.b64decode(text).decode('utf-8')
+            if self.lang == "FR":
+                return {"response": f"[Base64 decode]\n{base64_result}\n\n[ROT13 decode]\n{rot13_result}", "status": "success"}
+            else:
+                return {"response": f"[Base64 decoded]\n{base64_result}\n\n[ROT13 decoded]\n{rot13_result}", "status": "success"}
+        except:
+            if self.lang == "FR":
+                return {"response": f"[ROT13 decode]\n{rot13_result}", "status": "success"}
+            else:
+                return {"response": f"[ROT13 decoded]\n{rot13_result}", "status": "success"}

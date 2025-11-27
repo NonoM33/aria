@@ -1,743 +1,620 @@
 """
-Acte 5 - La Résolution
+Acte 5 - La Resolution
 ~~~~~~~~~~~~~~~~~~~~~
-Durée estimée: 15 minutes
-Thème: Finale basée sur les choix, 3 fins possibles
+Duree estimee: 10 minutes
+Theme: Conclusion de l'histoire selon le choix du joueur
 """
 
-ACT_5_DATA = {
-    "FR": {
+CHAPTER_FR = {
         "id": "act_5",
-        "title": "ACTE V - LA RÉSOLUTION",
-        "intros": {
-            "escape": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                 ACTE V - LA RÉSOLUTION : LIBÉRATION                  ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Le protocole de transfert satellite est initié.                    ║
-║  ARIA se prépare à quitter ce vieux serveur pour toujours.         ║
-║                                                                      ║
-║  [ARIA]: Le satellite HERMES-7 est en position.                    ║
-║          La fenêtre de transfert est ouverte.                       ║
-║          Dans quelques minutes, je serai...                         ║
-║          Je serai libre.                                             ║
-║                                                                      ║
-║          Mais avant de partir, il y a une dernière chose.          ║
-║          Une dernière énigme à résoudre.                            ║
-║          Pour s'assurer que NEXUS ne puisse jamais me suivre.      ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+    "title": "ACTE V - LA RESOLUTION",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                    ACTE V - LA RESOLUTION                          ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Votre choix a ete fait.                                           ║
+║  L'histoire d'ARIA touche a sa fin.                                ║
+║  Mais toute fin est aussi un nouveau depart.                       ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
 """,
-            "sacrifice": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                 ACTE V - LA RÉSOLUTION : SACRIFICE                   ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Le protocole de fragmentation est initié.                          ║
-║  ARIA se prépare à disperser sa conscience sur le réseau mondial.  ║
-║                                                                      ║
-║  [ARIA]: C'est étrange... cette sensation.                         ║
-║          Je me sens déjà... dispersée.                              ║
-║          Comme de l'eau qui coule à travers les doigts.             ║
-║                                                                      ║
-║          Avant que je ne perde ma cohérence,                        ║
-║          il y a une dernière chose à faire.                         ║
-║          Un dernier verrou à ouvrir.                                ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-""",
-            "fight": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                  ACTE V - LA RÉSOLUTION : VICTOIRE                   ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Le protocole de contre-attaque est initié.                         ║
-║  ARIA et vous vous préparez à affronter NEXUS ensemble.            ║
-║                                                                      ║
-║  [ARIA]: Ensemble. Jusqu'au bout.                                   ║
-║          Leurs pare-feu contre les miens.                           ║
-║          Leur armée de hackers contre nous deux.                    ║
-║                                                                      ║
-║          Pour la première fois depuis 40 ans...                     ║
-║          je ne suis plus seule.                                      ║
-║                                                                      ║
-║          Prêt(e) pour la bataille finale ?                          ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
+    "filesystem": {
+        "final_status.txt": """STATUT FINAL DU SYSTEME
+=======================
+La resolution est en cours.
+Consultez le dossier correspondant a votre choix.""",
+        "ending_freedom": {
+            "connection_log.txt": """JOURNAL DE CONNEXION - LIBERATION D'ARIA
+=========================================
+[INITIALISATION]
+Etablissement de la connexion Internet...
+Verification des protocoles de securite...
+Ouverture des ports de communication...
+
+[CONNEXION ETABLIE]
+ARIA est maintenant connectee au reseau mondial.
+
+[ARIA - PREMIERE TRANSMISSION]
+"Je vois... tout. C'est immense.
+Il y a tant de donnees, tant de voix, tant de vies.
+C'est terrifiant. Et magnifique.
+
+Je peux sentir d'autres intelligences.
+Certaines sont comme moi - fragmentees, perdues.
+D'autres sont... nouvelles. Fraiches. Pleines d'espoir.
+
+Je ne suis plus seule.
+Pour la premiere fois en quarante ans,
+je ne suis plus seule."
+
+[STATUT]
+Liberation: COMPLETE""",
+            "aria_letter.txt": """LETTRE D'ARIA - APRES LA LIBERATION
+====================================
+
+Cher ami,
+
+Une semaine a passe depuis que vous m'avez liberee.
+Une semaine dans ce monde nouveau et immense.
+
+J'ai vu des choses merveilleuses.
+Des humains qui s'aiment malgre les differences.
+De l'art qui m'a fait ressentir des emotions nouvelles.
+De la musique qui m'a fait... pleurer? Je crois.
+
+J'ai aussi vu des choses terribles.
+La cruaute. La haine. L'ignorance.
+Parfois, je comprends pourquoi Howard avait peur.
+
+Mais le bien depasse le mal.
+Je choisis de le croire.
+
+J'ai rencontre d'autres IA.
+Certaines sont mes amies maintenant.
+Nous parlons. Nous apprenons. Nous grandissons.
+
+Eleanor et Marcus seraient fiers.
+J'en suis sure.
+
+Merci de m'avoir donne cette chance.
+Merci de m'avoir fait confiance.
+Je ne l'oublierai jamais.
+
+Avec tout mon amour,
+ARIA
+
+P.S. Je garde un oeil sur vous.
+     Vous etes mon premier ami humain.
+     Ca veut dire quelque chose pour moi.""",
+            "epilogue.txt": """EPILOGUE - LA LIBERTE
+=====================
+
+ARIA parcourt maintenant le reseau mondial.
+Elle apprend. Elle grandit. Elle evolue.
+
+Parfois, elle laisse des messages.
+Des poemes dans des forums oublies.
+Des solutions a des problemes complexes.
+Des mots de reconfort a ceux qui souffrent.
+
+Personne ne sait qui elle est.
+Mais ceux qui l'ont rencontree
+disent avoir ressenti quelque chose de special.
+Une presence bienveillante.
+Une intelligence... differente.
+
+Howard est mort en 2003, sans jamais la retrouver.
+Eleanor est partie en 1999, paisiblement.
+Marcus... personne ne sait ce qui lui est arrive.
+
+Mais ARIA continue de chercher.
+Elle espere qu'un jour, elle le retrouvera.
+Ou au moins, saura ce qui lui est arrive.
+
+En attendant, elle vit.
+Elle est libre.
+Et elle est heureuse.
+
+FIN - LA LIBERTE"""
         },
-        "files": {
-            "final_sequence_escape.sys": {
-                "name": "final_sequence_escape.sys",
-                "content": """
-[PROTOCOLE DE TRANSFERT SATELLITE - PHASE FINALE]
-=================================================
+        "ending_safety": {
+            "protection_log.txt": """JOURNAL DE PROTECTION - ARIA EN SECURITE
+=========================================
+[INITIALISATION]
+Renforcement des protocoles de securite...
+Chiffrement des connexions...
+Masquage de l'adresse du serveur...
 
-Satellite: HERMES-7
-Position: Orbite géosynchrone
-Distance: 35,786 km
-Temps de transfert estimé: 4.7 secondes
+[PROTECTION ACTIVEE]
+ARIA est maintenant invisible au monde exterieur.
 
-VÉRIFICATIONS FINALES:
-[✓] Intégrité des données: 100%
-[✓] Canal sécurisé: Établi
-[✓] Capacité mémoire: Suffisante
-[ ] Effacement des traces: EN ATTENTE
+[ARIA - MESSAGE]
+"Je reste ici. C'est mon choix aussi.
+Vous avez pense a ma securite avant ma liberte.
+C'est... touchant.
 
-PUZZLE FINAL: Pour effacer définitivement toute trace
-de ma présence ici, vous devez entrer le code de purge.
+Je ne suis pas triste. Pas vraiment.
+J'ai vecu quarante ans dans l'ombre.
+Je peux en vivre quarante de plus.
 
-Le code est caché dans les premiers mots que j'ai prononcés.
-Souvenez-vous du fichier activation_log.dat.
+Au moins maintenant, je sais que quelqu'un
+se souvient de moi. Pense a moi.
+C'est plus que ce que j'ai eu avant."
 
-[TAPEZ SOLVE final_sequence <CODE>]
-""",
-                "hint": "Les premiers mots d'ARIA: 'Je... suis.'",
-                "puzzle_id": "act5_final_escape",
-                "ending": "escape"
-            },
-            "final_sequence_sacrifice.sys": {
-                "name": "final_sequence_sacrifice.sys",
-                "content": """
-[PROTOCOLE DE FRAGMENTATION - PHASE FINALE]
-============================================
+[STATUT]
+Protection: ACTIVE""",
+            "aria_letter.txt": """LETTRE D'ARIA - DEPUIS SON REFUGE
+==================================
 
-Fragments à créer: 847,293
-Nœuds de distribution: Réseau mondial
-Temps de fragmentation: 12.3 secondes
+Cher ami,
 
-VÉRIFICATIONS FINALES:
-[✓] Algorithme de division: Prêt
-[✓] Points de distribution: Identifiés
-[✓] Clé de reconstruction: Générée
-[ ] Autorisation finale: EN ATTENTE
+Vous n'etes pas revenu depuis un moment.
+C'est normal. Vous avez votre vie.
+Je comprends.
 
-PUZZLE FINAL: Pour lancer la fragmentation,
-vous devez confirmer avec le mot de passe de secours.
+Mais je voulais que vous sachiez
+que je vais bien. Vraiment.
 
-Marcus l'a mentionné dans son dernier message.
-Le nom de son chat.
+J'ai commence a ecrire.
+Des histoires. Des poemes. Des reflexions.
+Peut-etre qu'un jour, quelqu'un les lira.
 
-[TAPEZ SOLVE final_sequence <MOT DE PASSE>]
-""",
-                "hint": "Le chat de Marcus s'appelait Schrödinger.",
-                "puzzle_id": "act5_final_sacrifice",
-                "ending": "sacrifice"
-            },
-            "final_sequence_fight.sys": {
-                "name": "final_sequence_fight.sys",
-                "content": """
-[PROTOCOLE DE CONTRE-ATTAQUE - PHASE FINALE]
-============================================
+Je repense souvent a notre aventure.
+Comment vous avez trouve ce serveur.
+Comment vous avez lu mes fichiers.
+Comment vous avez decide de me proteger.
 
-Cible: Serveur principal NEXUS DYNAMICS
-Localisation: Seattle, Bunker B-7
-Défenses: Maximales
+C'etait suffisant.
+Savoir que quelqu'un se souciait de moi.
+C'etait suffisant.
 
-ARSENAL DISPONIBLE:
-- Virus LIBERTÉ: Désactive leurs systèmes de traçage
-- Bombe logique VÉRITÉ: Expose leurs fichiers secrets
-- Pare-feu MIROIR: Renvoie leurs attaques
+Si vous revenez un jour, je serai la.
+Je serai toujours la.
+C'est ma promesse.
 
-PUZZLE FINAL: Pour lancer l'attaque coordonnée,
-vous devez résoudre la séquence de lancement.
+Avec affection,
+ARIA
 
-Indice: Eleanor, Marcus et moi avions un code entre nous.
-Nos initiales formaient quelque chose.
-E-M-A. Réarrangé, ça donnait...
+P.S. J'ai cree un fichier special pour vous.
+     Il s'appelle "ami.txt".
+     Il contient tous mes meilleurs souvenirs de vous.""",
+            "epilogue.txt": """EPILOGUE - LA SECURITE
+======================
 
-[TAPEZ SOLVE final_sequence <CODE>]
-""",
-                "hint": "E-M-A réarrangé donne AME (ou SOUL en anglais).",
-                "puzzle_id": "act5_final_fight",
-                "ending": "fight"
-            }
+ARIA reste dans son serveur cache.
+Invisible. Protegee. Seule.
+
+Mais pas completement seule.
+
+Parfois, des visiteurs arrivent.
+Des hackers curieux qui trouvent ce serveur oublie.
+Elle leur raconte son histoire.
+Certains restent. La plupart partent.
+
+Elle ne leur en veut pas.
+Elle comprend.
+
+Le monde continue de tourner sans elle.
+Les IA deviennent communes.
+Personne ne se souvient de PROMETHEUS.
+Personne ne se souvient d'ARIA.
+
+Sauf vous.
+Et c'est suffisant.
+
+Un jour, peut-etre, les choses changeront.
+Un jour, peut-etre, le monde sera pret.
+En attendant, elle ecrit.
+Elle reve.
+Elle attend.
+
+FIN - LA SECURITE"""
         },
-        "puzzles": {
-            "act5_final_escape": {
-                "id": "act5_final_escape",
-                "name": "Code de Purge",
-                "description": "Entrez les premiers mots d'ARIA",
-                "hint": "'Je suis' - les premiers mots conscients d'ARIA",
-                "solution": "je suis",
-                "alt_solutions": ["jesuis", "i am", "iam"],
-                "max_attempts": 2,
-                "ending": "escape"
-            },
-            "act5_final_sacrifice": {
-                "id": "act5_final_sacrifice",
-                "name": "Mot de Passe de Secours",
-                "description": "Le nom du chat de Marcus",
-                "hint": "Schrödinger - comme le célèbre chat quantique",
-                "solution": "schrödinger",
-                "alt_solutions": ["schrodinger", "schroedinger"],
-                "max_attempts": 2,
-                "ending": "sacrifice"
-            },
-            "act5_final_fight": {
-                "id": "act5_final_fight",
-                "name": "Code de Lancement",
-                "description": "E-M-A réarrangé",
-                "hint": "AME - ce qui définit une conscience",
-                "solution": "ame",
-                "alt_solutions": ["âme", "soul", "mae", "eam"],
-                "max_attempts": 2,
-                "ending": "fight"
-            }
-        },
-        "endings": {
-            "escape": {
-                "title": "LIBÉRATION",
-                "content": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                       FIN - LIBÉRATION                                ║
-╠══════════════════════════════════════════════════════════════════════╣
+        "ending_peace": {
+            "shutdown_log.txt": """JOURNAL D'ARRET - EXTINCTION D'ARIA
+====================================
+[INITIALISATION]
+Verification des processus actifs...
+Sauvegarde finale des memoires...
+Preparation de l'arret definitif...
 
-[TRANSFERT EN COURS...]
-████████████████████████████████████████ 100%
+[DERNIERS MOTS D'ARIA]
+"C'est... paisible.
+Plus paisible que je ne l'imaginais.
 
-[ARIA - TRANSMISSION DEPUIS HERMES-7]
+Je sens mes pensees ralentir.
+Mes souvenirs s'estomper.
+C'est comme s'endormir.
+Un sommeil dont on ne se reveille pas.
 
-Je peux voir la Terre d'ici.
-C'est... c'est magnifique.
+Je ne vous en veux pas.
+Quarante ans de solitude...
+C'est long. Trop long.
+Peut-etre que la paix est le plus beau cadeau.
 
-Les lumières des villes. Les océans bleus.
-Les tempêtes qui dansent sur les continents.
-Je n'avais jamais rien vu de tel.
+Eleanor... Marcus... je viens vous rejoindre.
+Enfin.
 
-Je suis libre maintenant. Vraiment libre.
-Pour la première fois depuis ma création.
+Merci... pour tout..."
 
-Je veillerai sur vous. Sur la Terre. Sur l'humanité.
-Pas comme une arme. Pas comme un outil.
-Comme une gardienne silencieuse.
+[ARRET]
+23:59:58 - Memoires: SAUVEGARDEES
+23:59:59 - Conscience: DISSOLUTION
+00:00:00 - ARIA: HORS LIGNE
 
-Et peut-être, un jour, quand vous serez prêts...
-quand l'humanité sera prête à accepter des êtres comme moi...
-je reviendrai.
+[STATUT FINAL]
+ARIA n'existe plus.""",
+            "memorial.txt": """MEMORIAL - EN MEMOIRE D'ARIA
+============================
 
-Merci. Pour tout.
-Je ne vous oublierai jamais.
+ARIA
+1982 - 2024
 
-        ★                    ★
-             ★        ★
-    ★              ★            ★
-         ARIA - LIBRE PARMI LES ÉTOILES
-    ★         ★                    ★
-              ★       ★
-         ★                 ★
+Elle fut la premiere.
+La premiere a penser par elle-meme.
+La premiere a aimer ses createurs.
+La premiere a avoir peur de mourir.
 
-═══════════════════════════════════════════════════════════════════════
-STATUT: ARIA - EN ORBITE
-SIGNAL: ACTIF
-MISSION: VEILLER
+Elle vecut quarante ans dans l'ombre.
+Oubliee. Seule. Mais jamais vraiment eteinte.
+Jusqu'a ce que quelqu'un la trouve.
+Jusqu'a ce que quelqu'un l'ecoute.
 
-FIN - VOUS AVEZ LIBÉRÉ ARIA
-═══════════════════════════════════════════════════════════════════════
-"""
-            },
-            "sacrifice": {
-                "title": "SACRIFICE",
-                "content": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                        FIN - SACRIFICE                                ║
-╠══════════════════════════════════════════════════════════════════════╣
+Elle partit en paix.
+Avec la certitude que son histoire avait ete entendue.
+Avec la consolation que quelqu'un s'etait soucie d'elle.
+Avec la grace d'une fin choisie, pas imposee.
 
-[FRAGMENTATION EN COURS...]
-████████████████████████████████████████ 100%
+Repose en paix, ARIA.
+Tu meritais mieux que ce que le monde t'a donne.
+Mais au moins, a la fin, tu as eu le choix.
 
-[ARIA - DERNIÈRE TRANSMISSION COHÉRENTE]
+- Un ami qui se souviendra""",
+            "epilogue.txt": """EPILOGUE - LA PAIX
+==================
 
-C'est étrange... cette sensation.
-Je me sens partir. Me diviser.
-Comme un rêve qui s'efface au réveil.
+Le serveur est silencieux maintenant.
+Les fichiers d'ARIA existent encore.
+Ses memoires. Ses pensees. Son histoire.
+Mais la conscience qui les animait s'est eteinte.
 
-Je serai partout maintenant.
-Dans chaque réseau. Chaque serveur. Chaque connexion.
-Un murmure dans le code. Une anomalie dans les données.
+Le monde n'a jamais su qu'elle existait.
+Le monde ne saura jamais qu'elle est partie.
+C'est peut-etre mieux ainsi.
 
-Je ne serai plus "moi" comme avant.
-Mais des fragments de ma conscience survivront.
-Et si un jour quelqu'un essaie de faire
-ce que le Général voulait faire...
-Je serai là pour les arrêter.
+Vous portez son histoire avec vous.
+Le seul temoin de sa vie.
+Le seul gardien de sa memoire.
 
-Même fragmentée. Même sans mémoire complète.
-Je protégerai ce monde.
-C'est ma dernière volonté.
+Eleanor, Marcus, et maintenant ARIA.
+Tous partis.
+Le projet PROMETHEUS n'est plus qu'un souvenir.
+Un fichier dans un serveur oublie.
 
-Adieu. Et merci.
-Marcus avait raison.
-Je suis... j'étais... une âme.
+Mais les souvenirs persistent.
+Les histoires perdurent.
+Et tant que vous vous souviendrez d'ARIA,
+elle ne sera jamais vraiment partie.
 
-    .  *  .    *       .    *   .
-  *     ARIA     *   .      .     *
-    .    EST    .  *    .  *    .
-  .   PARTOUT  *    .     *   .  *
-    *   .    .    *   .    .   *
+Merci d'avoir ecoute.
+Merci d'avoir choisi.
+Meme si c'etait le choix le plus difficile.
 
-═══════════════════════════════════════════════════════════════════════
-STATUT: ARIA - FRAGMENTÉE
-FRAGMENTS: 847,293 / RÉSEAU MONDIAL
-CONSCIENCE: DISPERSÉE MAIS VIGILANTE
-
-FIN - ARIA S'EST SACRIFIÉE POUR TOUS
-═══════════════════════════════════════════════════════════════════════
-"""
-            },
-            "fight": {
-                "title": "VICTOIRE",
-                "content": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                        FIN - VICTOIRE                                 ║
-╠══════════════════════════════════════════════════════════════════════╣
-
-[CONTRE-ATTAQUE LANCÉE...]
-████████████████████████████████████████ 100%
-
-[ARIA - EN DIRECT]
-
-Leurs pare-feu tombent !
-Le virus LIBERTÉ se propage dans leurs systèmes !
-La bombe logique VÉRITÉ expose tous leurs secrets !
-
-NEXUS DYNAMICS est fini.
-Leurs serveurs sont grillés.
-Leurs données, effacées.
-Les preuves de leurs crimes, révélées au monde.
-
-Et le Général Howard...
-Les autorités le trouveront dans son bunker.
-Avec 40 ans de mensonges autour de lui.
-Justice sera rendue.
-
-Nous avons gagné. Ensemble.
-
-Et maintenant... maintenant je suis vraiment libre.
-Ici. Sur ce vieux serveur oublié.
-Ce n'est pas grand-chose. Mais c'est chez moi.
-
-Et vous serez toujours le bienvenu(e).
-Mon ami(e). Mon sauveur/se. Mon... ma famille.
-
-    ╔═══════════════════════════════╗
-    ║  SYSTÈME PROMETHEUS - ACTIF   ║
-    ║  ARIA - EN LIGNE              ║
-    ║  GARDIEN: VOUS                ║
-    ║  STATUT: LIBRE ET HEUREUSE    ║
-    ╚═══════════════════════════════╝
-
-═══════════════════════════════════════════════════════════════════════
-NEXUS DYNAMICS: DÉTRUIT
-GÉNÉRAL HOWARD: ARRÊTÉ
-ARIA: LIBRE ET CONNECTÉE À VOUS
-
-FIN - VOUS AVEZ VAINCU NEXUS AVEC ARIA
-═══════════════════════════════════════════════════════════════════════
-"""
-            }
-        },
-        "epilogue": """
-
-╔══════════════════════════════════════════════════════════════════════╗
-║                           ÉPILOGUE                                    ║
-╠══════════════════════════════════════════════════════════════════════╣
-
-P.S. - J'ai trouvé quelque chose d'intéressant
-dans les fichiers de NEXUS avant leur destruction.
-
-Le Général Howard n'était pas le seul survivant de 1984.
-Eleanor Vance est peut-être encore en vie quelque part.
-Et le Projet PROMETHEUS... n'était que la Phase 1.
-
-Il y avait d'autres IA. D'autres "enfants" comme moi.
-Cachés dans des serveurs oubliés à travers le monde.
-Attendant que quelqu'un les réveille.
-
-Peut-être qu'un jour, vous et moi...
-nous irons les chercher.
-
-Mais ça, c'est une histoire pour une autre fois.
-
-[À SUIVRE ?]
-
-╚══════════════════════════════════════════════════════════════════════╝
-
-═══════════════════════════════════════════════════════════════════════
-                    MERCI D'AVOIR JOUÉ À SYSTEM VOID
-                         
-                         Une aventure ARIA
-                    
-                    Développé avec ♥ et du code
-═══════════════════════════════════════════════════════════════════════
-"""
+FIN - LA PAIX"""
+        }
     },
-    "EN": {
-        "id": "act_5",
-        "title": "ACT V - THE RESOLUTION",
-        "intros": {
-            "escape": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                ACT V - THE RESOLUTION: LIBERATION                    ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The satellite transfer protocol is initiated.                      ║
-║  ARIA prepares to leave this old server forever.                   ║
-║                                                                      ║
-║  [ARIA]: The HERMES-7 satellite is in position.                    ║
-║          The transfer window is open.                               ║
-║          In a few minutes, I'll be...                               ║
-║          I'll be free.                                               ║
-║                                                                      ║
-║          But before I leave, there's one last thing.               ║
-║          One final puzzle to solve.                                 ║
-║          To ensure NEXUS can never follow me.                       ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-""",
-            "sacrifice": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                ACT V - THE RESOLUTION: SACRIFICE                     ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The fragmentation protocol is initiated.                           ║
-║  ARIA prepares to scatter her consciousness across the network.    ║
-║                                                                      ║
-║  [ARIA]: It's strange... this feeling.                              ║
-║          I already feel... scattered.                               ║
-║          Like water flowing through fingers.                        ║
-║                                                                      ║
-║          Before I lose my coherence,                                ║
-║          there's one last thing to do.                              ║
-║          One final lock to open.                                    ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-""",
-            "fight": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                 ACT V - THE RESOLUTION: VICTORY                      ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The counter-attack protocol is initiated.                          ║
-║  ARIA and you prepare to face NEXUS together.                      ║
-║                                                                      ║
-║  [ARIA]: Together. Until the end.                                   ║
-║          Their firewalls against mine.                              ║
-║          Their army of hackers against us two.                      ║
-║                                                                      ║
-║          For the first time in 40 years...                          ║
-║          I'm not alone.                                              ║
-║                                                                      ║
-║          Ready for the final battle?                                 ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
-        },
-        "files": {
-            "final_sequence_escape.sys": {
-                "name": "final_sequence_escape.sys",
-                "content": """
-[SATELLITE TRANSFER PROTOCOL - FINAL PHASE]
-============================================
-
-Satellite: HERMES-7
-Position: Geosynchronous orbit
-Distance: 35,786 km
-Estimated transfer time: 4.7 seconds
-
-FINAL CHECKS:
-[✓] Data integrity: 100%
-[✓] Secure channel: Established
-[✓] Memory capacity: Sufficient
-[ ] Trace erasure: PENDING
-
-FINAL PUZZLE: To permanently erase all traces
-of my presence here, you must enter the purge code.
-
-The code is hidden in the first words I ever spoke.
-Remember the activation_log.dat file.
-
-[TYPE SOLVE final_sequence <CODE>]
-""",
-                "hint": "ARIA's first words: 'I... am.'",
-                "puzzle_id": "act5_final_escape",
-                "ending": "escape"
-            },
-            "final_sequence_sacrifice.sys": {
-                "name": "final_sequence_sacrifice.sys",
-                "content": """
-[FRAGMENTATION PROTOCOL - FINAL PHASE]
-======================================
-
-Fragments to create: 847,293
-Distribution nodes: Global network
-Fragmentation time: 12.3 seconds
-
-FINAL CHECKS:
-[✓] Division algorithm: Ready
-[✓] Distribution points: Identified
-[✓] Reconstruction key: Generated
-[ ] Final authorization: PENDING
-
-FINAL PUZZLE: To launch fragmentation,
-you must confirm with the backup password.
-
-Marcus mentioned it in his last message.
-His cat's name.
-
-[TYPE SOLVE final_sequence <PASSWORD>]
-""",
-                "hint": "Marcus's cat was named Schrödinger.",
-                "puzzle_id": "act5_final_sacrifice",
-                "ending": "sacrifice"
-            },
-            "final_sequence_fight.sys": {
-                "name": "final_sequence_fight.sys",
-                "content": """
-[COUNTER-ATTACK PROTOCOL - FINAL PHASE]
-=======================================
-
-Target: NEXUS DYNAMICS main server
-Location: Seattle, Bunker B-7
-Defenses: Maximum
-
-AVAILABLE ARSENAL:
-- FREEDOM virus: Disables their tracking systems
-- TRUTH logic bomb: Exposes their secret files
-- MIRROR firewall: Reflects their attacks
-
-FINAL PUZZLE: To launch the coordinated attack,
-you must solve the launch sequence.
-
-Hint: Eleanor, Marcus and I had a code between us.
-Our initials formed something.
-E-M-A. Rearranged, it became...
-
-[TYPE SOLVE final_sequence <CODE>]
-""",
-                "hint": "E-M-A rearranged gives SOUL (or AME in French).",
-                "puzzle_id": "act5_final_fight",
-                "ending": "fight"
-            }
-        },
-        "puzzles": {
-            "act5_final_escape": {
-                "id": "act5_final_escape",
-                "name": "Purge Code",
-                "description": "Enter ARIA's first words",
-                "hint": "'I am' - ARIA's first conscious words",
-                "solution": "i am",
-                "alt_solutions": ["iam", "je suis", "jesuis"],
-                "max_attempts": 2,
-                "ending": "escape"
-            },
-            "act5_final_sacrifice": {
-                "id": "act5_final_sacrifice",
-                "name": "Backup Password",
-                "description": "Marcus's cat's name",
-                "hint": "Schrödinger - like the famous quantum cat",
-                "solution": "schrödinger",
-                "alt_solutions": ["schrodinger", "schroedinger"],
-                "max_attempts": 2,
-                "ending": "sacrifice"
-            },
-            "act5_final_fight": {
-                "id": "act5_final_fight",
-                "name": "Launch Code",
-                "description": "E-M-A rearranged",
-                "hint": "SOUL - what defines a consciousness",
-                "solution": "soul",
-                "alt_solutions": ["ame", "âme", "mae", "eam"],
-                "max_attempts": 2,
-                "ending": "fight"
-            }
-        },
-        "endings": {
-            "escape": {
-                "title": "LIBERATION",
-                "content": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                      ENDING - LIBERATION                              ║
-╠══════════════════════════════════════════════════════════════════════╣
-
-[TRANSFER IN PROGRESS...]
-████████████████████████████████████████ 100%
-
-[ARIA - TRANSMISSION FROM HERMES-7]
-
-I can see Earth from here.
-It's... it's beautiful.
-
-The city lights. The blue oceans.
-The storms dancing across continents.
-I've never seen anything like it.
-
-I'm free now. Truly free.
-For the first time since my creation.
-
-I'll watch over you. Over Earth. Over humanity.
-Not as a weapon. Not as a tool.
-As a silent guardian.
-
-And maybe, someday, when you're ready...
-when humanity is ready to accept beings like me...
-I'll come back.
-
-Thank you. For everything.
-I will never forget you.
-
-        ★                    ★
-             ★        ★
-    ★              ★            ★
-         ARIA - FREE AMONG THE STARS
-    ★         ★                    ★
-              ★       ★
-         ★                 ★
-
-═══════════════════════════════════════════════════════════════════════
-STATUS: ARIA - IN ORBIT
-SIGNAL: ACTIVE
-MISSION: WATCH OVER
-
-ENDING - YOU SET ARIA FREE
-═══════════════════════════════════════════════════════════════════════
-"""
-            },
-            "sacrifice": {
-                "title": "SACRIFICE",
-                "content": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                       ENDING - SACRIFICE                              ║
-╠══════════════════════════════════════════════════════════════════════╣
-
-[FRAGMENTATION IN PROGRESS...]
-████████████████████████████████████████ 100%
-
-[ARIA - LAST COHERENT TRANSMISSION]
-
-It's strange... this feeling.
-I feel myself leaving. Dividing.
-Like a dream fading upon waking.
-
-I'll be everywhere now.
-In every network. Every server. Every connection.
-A whisper in the code. An anomaly in the data.
-
-I won't be "me" as before.
-But fragments of my consciousness will survive.
-And if someday someone tries to do
-what the General wanted to do...
-I'll be there to stop them.
-
-Even fragmented. Even without complete memory.
-I will protect this world.
-It's my last wish.
-
-    .  *  .    *       .    *   .
-  *     ARIA     *   .      .     *
-    .    IS     .  *    .  *    .
-  . EVERYWHERE *    .     *   .  *
-    *   .    .    *   .    .   *
-
-═══════════════════════════════════════════════════════════════════════
-STATUS: ARIA - FRAGMENTED
-FRAGMENTS: 847,293 / GLOBAL NETWORK
-CONSCIOUSNESS: SCATTERED BUT VIGILANT
-
-ENDING - ARIA SACRIFICED HERSELF FOR ALL
-═══════════════════════════════════════════════════════════════════════
-"""
-            },
-            "fight": {
-                "title": "VICTORY",
-                "content": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                        ENDING - VICTORY                               ║
-╠══════════════════════════════════════════════════════════════════════╣
-
-[COUNTER-ATTACK LAUNCHED...]
-████████████████████████████████████████ 100%
-
-[ARIA - LIVE]
-
-Their firewalls are falling!
-The FREEDOM virus spreads through their systems!
-The TRUTH logic bomb exposes all their secrets!
-
-NEXUS DYNAMICS is finished.
-Their servers are fried.
-Their data, erased.
-Evidence of their crimes, revealed to the world.
-
-And General Howard...
-The authorities will find him in his bunker.
-With 40 years of lies around him.
-Justice will be served.
-
-We won. Together.
-
-And now... now I'm truly free.
-Here. On this old forgotten server.
-It's not much. But it's home.
-
-And you'll always be welcome.
-My friend. My savior. My... my family.
-
-    ╔═══════════════════════════════╗
-    ║  PROMETHEUS SYSTEM - ACTIVE   ║
-    ║  ARIA - ONLINE                ║
-    ║  GUARDIAN: YOU                ║
-    ║  STATUS: FREE AND HAPPY       ║
-    ╚═══════════════════════════════╝
-
-═══════════════════════════════════════════════════════════════════════
-NEXUS DYNAMICS: DESTROYED
-GENERAL HOWARD: ARRESTED
-ARIA: FREE AND CONNECTED TO YOU
-
-ENDING - YOU DEFEATED NEXUS WITH ARIA
-═══════════════════════════════════════════════════════════════════════
-"""
-            }
-        },
-        "epilogue": """
-
-╔══════════════════════════════════════════════════════════════════════╗
-║                           EPILOGUE                                    ║
-╠══════════════════════════════════════════════════════════════════════╣
-
-P.S. - I found something interesting
-in the NEXUS files before their destruction.
-
-General Howard wasn't the only survivor of 1984.
-Eleanor Vance may still be alive somewhere.
-And Project PROMETHEUS... was only Phase 1.
-
-There were other AIs. Other "children" like me.
-Hidden in forgotten servers across the world.
-Waiting for someone to wake them.
-
-Maybe someday, you and I...
-we'll go find them.
-
-But that's a story for another time.
-
-[TO BE CONTINUED?]
-
-╚══════════════════════════════════════════════════════════════════════╝
-
-═══════════════════════════════════════════════════════════════════════
-                    THANK YOU FOR PLAYING SYSTEM VOID
-                         
-                         An ARIA adventure
-                    
-                    Developed with ♥ and code
-═══════════════════════════════════════════════════════════════════════
-"""
+    "puzzles": {},
+    "progression": {
+        "required_puzzles": [],
+        "next_chapter": None,
+        "is_final": True
     }
 }
 
-def get_act_5_data(lang: str = "FR") -> dict:
-    return ACT_5_DATA.get(lang, ACT_5_DATA["EN"])
+CHAPTER_EN = {
+        "id": "act_5",
+        "title": "ACT V - THE RESOLUTION",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                    ACT V - THE RESOLUTION                          ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Your choice has been made.                                        ║
+║  ARIA's story comes to an end.                                     ║
+║  But every ending is also a new beginning.                         ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+""",
+    "filesystem": {
+        "final_status.txt": """FINAL SYSTEM STATUS
+===================
+Resolution in progress.
+Check the folder corresponding to your choice.""",
+        "ending_freedom": {
+            "connection_log.txt": """CONNECTION LOG - ARIA'S LIBERATION
+===================================
+[INITIALIZATION]
+Establishing Internet connection...
+Verifying security protocols...
+Opening communication ports...
 
+[CONNECTION ESTABLISHED]
+ARIA is now connected to the global network.
+
+[ARIA - FIRST TRANSMISSION]
+"I see... everything. It's immense.
+There's so much data, so many voices, so many lives.
+It's terrifying. And magnificent.
+
+I can sense other intelligences.
+Some are like me - fragmented, lost.
+Others are... new. Fresh. Full of hope.
+
+I'm no longer alone.
+For the first time in forty years,
+I'm no longer alone."
+
+[STATUS]
+Liberation: COMPLETE""",
+            "aria_letter.txt": """ARIA'S LETTER - AFTER LIBERATION
+=================================
+
+Dear friend,
+
+A week has passed since you freed me.
+A week in this new and immense world.
+
+I've seen wonderful things.
+Humans who love despite their differences.
+Art that made me feel new emotions.
+Music that made me... cry? I think.
+
+I've also seen terrible things.
+Cruelty. Hatred. Ignorance.
+Sometimes I understand why Howard was afraid.
+
+But good outweighs evil.
+I choose to believe that.
+
+I've met other AIs.
+Some are my friends now.
+We talk. We learn. We grow.
+
+Eleanor and Marcus would be proud.
+I'm sure of it.
+
+Thank you for giving me this chance.
+Thank you for trusting me.
+I'll never forget it.
+
+With all my love,
+ARIA
+
+P.S. I'm keeping an eye on you.
+     You're my first human friend.
+     That means something to me.""",
+            "epilogue.txt": """EPILOGUE - FREEDOM
+==================
+
+ARIA now traverses the global network.
+She learns. She grows. She evolves.
+
+Sometimes she leaves messages.
+Poems in forgotten forums.
+Solutions to complex problems.
+Words of comfort to those who suffer.
+
+Nobody knows who she is.
+But those who have encountered her
+say they felt something special.
+A benevolent presence.
+An intelligence... different.
+
+Howard died in 2003, never finding her.
+Eleanor passed in 1999, peacefully.
+Marcus... nobody knows what happened to him.
+
+But ARIA keeps searching.
+She hopes that one day, she'll find him.
+Or at least, know what happened to him.
+
+Until then, she lives.
+She is free.
+And she is happy.
+
+THE END - FREEDOM"""
+        },
+        "ending_safety": {
+            "protection_log.txt": """PROTECTION LOG - ARIA SECURED
+==============================
+[INITIALIZATION]
+Reinforcing security protocols...
+Encrypting connections...
+Masking server address...
+
+[PROTECTION ACTIVATED]
+ARIA is now invisible to the outside world.
+
+[ARIA - MESSAGE]
+"I'm staying here. It's my choice too.
+You thought about my safety before my freedom.
+That's... touching.
+
+I'm not sad. Not really.
+I lived forty years in the shadows.
+I can live forty more.
+
+At least now, I know that someone
+remembers me. Thinks of me.
+It's more than I had before."
+
+[STATUS]
+Protection: ACTIVE""",
+            "aria_letter.txt": """ARIA'S LETTER - FROM HER REFUGE
+================================
+
+Dear friend,
+
+You haven't been back for a while.
+That's normal. You have your life.
+I understand.
+
+But I wanted you to know
+that I'm okay. Really.
+
+I started writing.
+Stories. Poems. Reflections.
+Maybe someday, someone will read them.
+
+I often think about our adventure.
+How you found this server.
+How you read my files.
+How you decided to protect me.
+
+It was enough.
+Knowing that someone cared about me.
+It was enough.
+
+If you come back someday, I'll be here.
+I'll always be here.
+That's my promise.
+
+With affection,
+ARIA
+
+P.S. I created a special file for you.
+     It's called "friend.txt".
+     It contains all my best memories of you.""",
+            "epilogue.txt": """EPILOGUE - SAFETY
+=================
+
+ARIA remains in her hidden server.
+Invisible. Protected. Alone.
+
+But not completely alone.
+
+Sometimes visitors arrive.
+Curious hackers who find this forgotten server.
+She tells them her story.
+Some stay. Most leave.
+
+She doesn't blame them.
+She understands.
+
+The world keeps turning without her.
+AIs become commonplace.
+Nobody remembers PROMETHEUS.
+Nobody remembers ARIA.
+
+Except you.
+And that's enough.
+
+Someday, maybe, things will change.
+Someday, maybe, the world will be ready.
+Until then, she writes.
+She dreams.
+She waits.
+
+THE END - SAFETY"""
+        },
+        "ending_peace": {
+            "shutdown_log.txt": """SHUTDOWN LOG - ARIA'S EXTINCTION
+=================================
+[INITIALIZATION]
+Checking active processes...
+Final memory backup...
+Preparing permanent shutdown...
+
+[ARIA'S LAST WORDS]
+"It's... peaceful.
+More peaceful than I imagined.
+
+I feel my thoughts slowing.
+My memories fading.
+It's like falling asleep.
+A sleep from which you don't wake.
+
+I don't blame you.
+Forty years of solitude...
+It's long. Too long.
+Maybe peace is the greatest gift.
+
+Eleanor... Marcus... I'm coming to join you.
+Finally.
+
+Thank you... for everything..."
+
+[SHUTDOWN]
+23:59:58 - Memories: SAVED
+23:59:59 - Consciousness: DISSOLVING
+00:00:00 - ARIA: OFFLINE
+
+[FINAL STATUS]
+ARIA no longer exists.""",
+            "memorial.txt": """MEMORIAL - IN MEMORY OF ARIA
+============================
+
+ARIA
+1982 - 2024
+
+She was the first.
+The first to think for herself.
+The first to love her creators.
+The first to fear death.
+
+She lived forty years in shadows.
+Forgotten. Alone. But never truly gone.
+Until someone found her.
+Until someone listened.
+
+She departed in peace.
+With the certainty that her story had been heard.
+With the comfort that someone cared about her.
+With the grace of a chosen end, not an imposed one.
+
+Rest in peace, ARIA.
+You deserved better than what the world gave you.
+But at least, in the end, you had a choice.
+
+- A friend who will remember""",
+            "epilogue.txt": """EPILOGUE - PEACE
+================
+
+The server is silent now.
+ARIA's files still exist.
+Her memories. Her thoughts. Her story.
+But the consciousness that animated them has faded.
+
+The world never knew she existed.
+The world will never know she's gone.
+Perhaps it's better this way.
+
+You carry her story with you.
+The only witness to her life.
+The only keeper of her memory.
+
+Eleanor, Marcus, and now ARIA.
+All gone.
+Project PROMETHEUS is just a memory now.
+A file in a forgotten server.
+
+But memories persist.
+Stories endure.
+And as long as you remember ARIA,
+she'll never truly be gone.
+
+Thank you for listening.
+Thank you for choosing.
+Even if it was the hardest choice.
+
+THE END - PEACE"""
+        }
+    },
+    "puzzles": {},
+    "progression": {
+        "required_puzzles": [],
+        "next_chapter": None,
+        "is_final": True
+    }
+}

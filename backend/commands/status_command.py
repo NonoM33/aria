@@ -1,28 +1,55 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
-from adventures.adventure_data import get_adventure_data
+from adventures.adventure_loader import get_chapter
 
 class StatusCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
-        integrity = 34 + (self.session.get("level", 0) * 15)
-        if self.session.get("level", 0) >= 5:
+        level = self.session.get("level", 0)
+        integrity = 34 + (level * 15)
+        if level >= 5:
             integrity = 100
         
-        adventure_data = get_adventure_data(self.lang)
-        data = adventure_data.get(self.lang, {})
-        chapter_id = self.session.get("chapter", "chapter_1")
-        chapter = data.get("chapters", {}).get(chapter_id, {})
+        chapter_id = self.session.get("chapter", "chapter_0")
+        chapter = get_chapter(chapter_id, self.lang)
+        chapter_title = chapter.get("title", "N/A") if chapter else "N/A"
+        current_path = self.session.get("current_path", "/")
         
-        if self.session.get("level", 0) == 0:
+        if level == 0:
             if self.lang == "FR":
-                status_msg = f"Intégrité du système: {integrity}%\nNiveau de sécurité: CRITIQUE\n\nMessage système: Le vide attend... 2024"
+                status_msg = f"""STATUT SYSTEME
+==============
+Integrite: {integrity}%
+Securite: CRITIQUE
+Chemin: {current_path}
+
+Message: Le vide attend... 2024"""
             else:
-                status_msg = f"System Integrity: {integrity}%\nSecurity Level: CRITICAL\n\nSystem Message: The void awaits... 2024"
+                status_msg = f"""SYSTEM STATUS
+=============
+Integrity: {integrity}%
+Security: CRITICAL
+Path: {current_path}
+
+Message: The void awaits... 2024"""
         else:
+            security = "CRITIQUE" if level < 3 else "BRECHE"
+            security_en = "CRITICAL" if level < 3 else "BREACHED"
+            
             if self.lang == "FR":
-                status_msg = f"Intégrité du système: {integrity}%\nNiveau de sécurité: {'CRITIQUE' if self.session.get('level', 0) < 3 else 'BRÈCHE'}\nNiveau d'accès: {self.session.get('level', 0)}\nChapitre: {chapter.get('title', 'N/A')}"
+                status_msg = f"""STATUT SYSTEME
+==============
+Integrite: {integrity}%
+Securite: {security}
+Niveau d'acces: {level}
+Chapitre: {chapter_title}
+Chemin: {current_path}"""
             else:
-                status_msg = f"System Integrity: {integrity}%\nSecurity Level: {'CRITICAL' if self.session.get('level', 0) < 3 else 'BREACHED'}\nAccess Level: {self.session.get('level', 0)}\nChapter: {chapter.get('title', 'N/A')}"
+                status_msg = f"""SYSTEM STATUS
+=============
+Integrity: {integrity}%
+Security: {security_en}
+Access Level: {level}
+Chapter: {chapter_title}
+Path: {current_path}"""
         
         return {"response": status_msg, "status": "success"}
-
