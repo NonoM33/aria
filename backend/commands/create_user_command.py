@@ -10,6 +10,12 @@ class CreateUserCommand(BaseCommand):
             else:
                 return {"response": "Usage: CREATE_USER <username> <password>\nExample: CREATE_USER hacker password123", "status": "info"}
         
+        if "exploit_success" not in self.session.get("flags", []) and "CVE-2024-DB-001" not in str(self.session.get("solved_puzzles", [])):
+            if self.lang == "FR":
+                return {"response": "Vous devez d'abord exploiter la vulnérabilité avec: EXPLOIT CVE-2024-DB-001", "status": "error"}
+            else:
+                return {"response": "You must first exploit the vulnerability with: EXPLOIT CVE-2024-DB-001", "status": "error"}
+        
         parts = args.split(" ", 1)
         if len(parts) < 2:
             if self.lang == "FR":
@@ -29,10 +35,12 @@ class CreateUserCommand(BaseCommand):
         result = hack_database_and_create_user(self.db, username, password)
         
         if result.get("success"):
+            token = result.get("token")
             self.update_session({
                 "username": result["username"],
                 "player_id": result.get("player_id"),
-                "logged_in": True
+                "logged_in": True,
+                "ssh_token": token
             })
             
             if self.lang == "FR":
@@ -43,7 +51,7 @@ Compte SSH créé via exploit de base de données.
 Vous pouvez maintenant vous connecter avec:
 ssh {username}@system-void.local""",
                     "status": "success",
-                    "token": result.get("token")
+                    "token": token
                 }
             else:
                 return {
@@ -53,7 +61,7 @@ SSH account created via database exploit.
 You can now connect with:
 ssh {username}@system-void.local""",
                     "status": "success",
-                    "token": result.get("token")
+                    "token": token
                 }
         else:
             if self.lang == "FR":

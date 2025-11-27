@@ -5,14 +5,14 @@ def get_adventure_data(language: str = "FR"):
     
     system_messages = {
         "FR": {
-            "welcome": "SYSTEM_VOID v2.0 initialisé.\nTapez HELP pour commencer.",
+            "welcome": "SYSTEM_VOID v2.0 - Système de base de données compromis\n\nVous devez exploiter une vulnérabilité pour créer un accès SSH.\nTapez SCAN pour commencer.",
             "level_up": "Niveau {level} débloqué!",
             "file_accessed": "Fichier {filename} ouvert.",
             "puzzle_solved": "Énigme résolue!",
             "chapter_complete": "Chapitre '{title}' terminé!"
         },
         "EN": {
-            "welcome": "SYSTEM_VOID v2.0 initialized.\nType HELP to start.",
+            "welcome": "SYSTEM_VOID v2.0 - Compromised Database System\n\nYou must exploit a vulnerability to create SSH access.\nType SCAN to start.",
             "level_up": "Level {level} unlocked!",
             "file_accessed": "File {filename} opened.",
             "puzzle_solved": "Riddle solved!",

@@ -4,12 +4,6 @@ from adventures.adventure_data import get_adventure_data
 
 class ScanCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
-        if not self.check_level(1):
-            if self.lang == "FR":
-                return {"response": "Niveau d'accès insuffisant. Utilisez LOGIN d'abord.", "status": "error"}
-            else:
-                return {"response": "Insufficient access level. Use LOGIN first.", "status": "error"}
-        
         adventure_data = get_adventure_data(self.lang)
         data = adventure_data.get(self.lang, {})
         chapter = self.get_chapter_data(data)
