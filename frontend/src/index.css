@@ -1159,3 +1159,50 @@ body {
   white-space: pre-wrap;
 }
 
+/* Autocomplete menu styles */
+.autocomplete-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+  margin-left: 20px;
+  border-left: 2px solid #00FF00;
+  padding-left: 12px;
+  margin-top: 4px;
+  animation: autocomplete-fade-in 0.15s ease;
+}
+
+@keyframes autocomplete-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.autocomplete-option {
+  padding: 4px 12px;
+  border-radius: 4px;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  font-size: 13px;
+}
+
+.autocomplete-option:hover {
+  background: rgba(0, 255, 0, 0.2);
+  border-color: rgba(0, 255, 0, 0.5);
+}
+
+.autocomplete-selected {
+  background: rgba(0, 255, 0, 0.4) !important;
+  border-color: #00FF00 !important;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  color: #000;
+  font-weight: bold;
+}
+
