@@ -11,6 +11,48 @@ const AVAILABLE_COMMANDS = [
 
 const AVAILABLE_PACKAGES = ['file-viewer']
 
+const getPathContents = (fs, basePath, targetPath) => {
+  let fullPath = targetPath
+  if (!targetPath.startsWith('/')) {
+    if (basePath === '/') {
+      fullPath = '/' + targetPath
+    } else {
+      fullPath = basePath + '/' + targetPath
+    }
+  }
+  fullPath = fullPath.replace(/\/+/g, '/')
+  if (fullPath !== '/' && fullPath.endsWith('/')) {
+    fullPath = fullPath.slice(0, -1)
+  }
+  
+  if (fullPath === '/') return fs
+  
+  const parts = fullPath.split('/').filter(p => p)
+  let current = fs
+  for (const part of parts) {
+    if (current && typeof current === 'object' && part in current) {
+      current = current[part]
+    } else {
+      return null
+    }
+  }
+  return typeof current === 'object' ? current : null
+}
+
+const getDirsAndFiles = (contents) => {
+  if (!contents || typeof contents !== 'object') return { dirs: [], files: [] }
+  const dirs = []
+  const files = []
+  for (const [name, value] of Object.entries(contents)) {
+    if (typeof value === 'object') {
+      dirs.push(name + '/')
+    } else {
+      files.push(name)
+    }
+  }
+  return { dirs, files }
+}
+
 export const useTerminal = () => {
   const { language } = useLanguage()
   const [history, setHistory] = useState([])
@@ -20,6 +62,8 @@ export const useTerminal = () => {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [autocompleteOptions, setAutocompleteOptions] = useState([])
   const [availableFiles, setAvailableFiles] = useState([])
+  const [availableDirs, setAvailableDirs] = useState([])
+  const [filesystem, setFilesystem] = useState({})
   const [unlockedCommands, setUnlockedCommands] = useState(['HELP', 'STATUS', 'LOGIN', 'CLEAR'])
   const [installedPackages, setInstalledPackages] = useState([])
   const [isPasswordMode, setIsPasswordMode] = useState(false)
@@ -164,6 +208,22 @@ export const useTerminal = () => {
       if (data.files) {
         setAvailableFiles(data.files)
       }
+      if (data.dirs) {
+        setAvailableDirs(data.dirs)
+      }
+      if (data.current_path) {
+        setCurrentPath(data.current_path)
+      }
+    } else if (data.type === 'filesystem_update') {
+      if (data.filesystem) {
+        setFilesystem(data.filesystem)
+        const { dirs, files } = getDirsAndFiles(getPathContents(data.filesystem, data.current_path || '/', ''))
+        setAvailableDirs(dirs)
+        setAvailableFiles(files)
+      }
+      if (data.current_path) {
+        setCurrentPath(data.current_path)
+      }
     } else if (data.type === 'commands_update') {
       if (data.commands) {
         setUnlockedCommands(data.commands)
@@ -195,29 +255,51 @@ export const useTerminal = () => {
     const command = parts[0]?.toUpperCase() || ''
     const arg = parts.slice(1).join(' ') || ''
     
-    // Commandes qui prennent des noms de fichiers en argument
     const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT']
+    const dirCommands = ['CD', 'LS']
+    const navCommands = [...fileCommands, ...dirCommands]
     
-    // Auto-complétion pour LS (liste les fichiers)
-    if (command === 'LS') {
-      return availableFiles.length > 0 ? availableFiles : []
-    }
-    
-    // Auto-complétion pour les commandes de fichiers
-    if (fileCommands.includes(command)) {
-      if (arg && arg.trim()) {
-        const lowerArg = arg.toLowerCase().trim()
-        const matches = availableFiles.filter(file => 
-          file.toLowerCase().startsWith(lowerArg) && file.toLowerCase() !== lowerArg
-        )
-        return matches
-      } else if (trimmed.endsWith(' ') || arg === '') {
-        // Si juste "COMMANDE " (avec espace) ou commande complète sans arg, retourner tous les fichiers
-        return availableFiles.length > 0 ? availableFiles : []
+    if (navCommands.includes(command)) {
+      let dirPath = ''
+      let prefix = ''
+      
+      if (arg.includes('/')) {
+        const lastSlash = arg.lastIndexOf('/')
+        dirPath = arg.substring(0, lastSlash + 1)
+        prefix = arg.substring(lastSlash + 1).toLowerCase()
+      } else {
+        dirPath = ''
+        prefix = arg.toLowerCase()
       }
+      
+      const targetPath = dirPath || '.'
+      const contents = getPathContents(filesystem, currentPath, targetPath === '.' ? '' : targetPath)
+      
+      if (!contents) {
+        return dirCommands.includes(command) ? ['../'] : []
+      }
+      
+      const { dirs, files } = getDirsAndFiles(contents)
+      let options = []
+      
+      if (dirCommands.includes(command)) {
+        options = [...dirs]
+        if (!dirPath) {
+          options = ['../', ...options]
+        }
+      } else {
+        options = [...dirs, ...files]
+      }
+      
+      if (prefix) {
+        options = options.filter(item => 
+          item.toLowerCase().startsWith(prefix)
+        )
+      }
+      
+      return options.map(opt => dirPath + opt)
     }
     
-    // Auto-complétion pour MAN <commande>
     if (command === 'MAN') {
       if (arg) {
         const upperArg = arg.toUpperCase()
@@ -229,7 +311,6 @@ export const useTerminal = () => {
       }
     }
     
-    // Auto-complétion pour PKG INSTALL/UNINSTALL
     if (command === 'PKG') {
       const subcommand = arg.split(' ')[0]?.toUpperCase()
       const packageArg = arg.split(' ').slice(1).join(' ')
@@ -250,7 +331,6 @@ export const useTerminal = () => {
       }
     }
     
-    // Auto-complétion pour les commandes simples
     if (command && !arg) {
       const upper = command.toUpperCase()
       return unlockedCommands.filter(cmd => 
@@ -259,7 +339,7 @@ export const useTerminal = () => {
     }
     
     return []
-  }, [availableFiles, unlockedCommands])
+  }, [filesystem, currentPath, unlockedCommands])
 
   const sendCommand = useCallback((command) => {
     if (isTyping && !isPasswordMode) return
@@ -403,67 +483,43 @@ export const useTerminal = () => {
     const command = parts[0]?.toUpperCase() || ''
     const arg = parts.slice(1).join(' ') || ''
     
-    // Commandes qui prennent des fichiers
     const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT']
-    
-    // Auto-complétion pour LS (retourne les fichiers disponibles)
-    if (command === 'LS') {
-      return availableFiles.length > 0 ? availableFiles : []
-    }
+    const dirCommands = ['CD', 'LS']
+    const allNavCommands = [...fileCommands, ...dirCommands]
     
     if (options.length === 1) {
-      // Une seule option : compléter automatiquement
-      if (fileCommands.includes(command)) {
+      if (allNavCommands.includes(command)) {
         setInput(`${command} ${options[0]}`)
       } else if (command === 'MAN') {
         setInput(`MAN ${options[0]}`)
       } else if (command === 'PKG') {
         const subcommand = arg.split(' ')[0]?.toUpperCase()
         if (subcommand === 'INSTALL' || subcommand === 'UNINSTALL') {
-          const packageArg = arg.split(' ').slice(1).join(' ')
-          if (packageArg) {
-            setInput(`${command} ${subcommand} ${options[0]}`)
-          } else {
-            setInput(`${command} ${subcommand} ${options[0]}`)
-          }
+          setInput(`${command} ${subcommand} ${options[0]}`)
         } else {
           setInput(`${command} ${options[0]}`)
         }
       } else {
-        // Commande simple
         setInput(options[0])
       }
       setAutocompleteOptions([])
       return true
     } else if (options.length > 1) {
-      // Plusieurs options : compléter avec le premier et afficher la liste
       setAutocompleteOptions(options)
       
-      if (fileCommands.includes(command)) {
-        if (arg && arg.trim()) {
-          // Si on a déjà tapé quelque chose, compléter avec le premier match
-          setInput(`${command} ${options[0]}`)
-        } else {
-          // Si juste la commande, ne pas compléter mais afficher les options
-          setInput(currentInput)
-        }
-        addToHistory('system', `Fichiers disponibles: ${options.join(', ')}`)
+      if (allNavCommands.includes(command)) {
+        const displayOptions = options.map(o => o.split('/').filter(p => p).pop() + (o.endsWith('/') ? '/' : ''))
+        addToHistory('system', `${displayOptions.join('  ')}`)
       } else if (command === 'MAN') {
-        if (arg) {
-          setInput(`MAN ${options[0]}`)
-        } else {
-          setInput(currentInput)
-        }
-        addToHistory('system', `Commandes disponibles: ${options.join(', ')}`)
+        addToHistory('system', `${options.join('  ')}`)
       } else {
-        setInput(options[0])
-        addToHistory('system', `Suggestions: ${options.join(', ')}`)
+        addToHistory('system', `${options.join('  ')}`)
       }
       return true
     }
     
     return false
-  }, [getAutocompleteOptions, addToHistory, availableFiles])
+  }, [getAutocompleteOptions, addToHistory])
 
   return {
     history,
