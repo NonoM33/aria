@@ -15,7 +15,9 @@ const Terminal = () => {
     navigateHistory, 
     handleTab,
     autocompleteOptions,
-    installedPackages
+    installedPackages,
+    isPasswordMode,
+    passwordUsername
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
@@ -35,24 +37,28 @@ const Terminal = () => {
   useEffect(() => {
     const checkUsername = () => {
       const storedUsername = localStorage.getItem('system_void_username')
-      if (storedUsername !== username) {
-        setUsername(storedUsername || null)
+      const newUsername = storedUsername || null
+      if (newUsername !== username) {
+        setUsername(newUsername)
       }
     }
     
     checkUsername()
-    const interval = setInterval(checkUsername, 200)
+    const interval = setInterval(checkUsername, 50)
     
     const handleStorageChange = (e) => {
-      if (e.key === 'system_void_username') {
-        setUsername(e.newValue || null)
+      if (e.key === 'system_void_username' || !e.key) {
+        const storedUsername = localStorage.getItem('system_void_username')
+        setUsername(storedUsername || null)
       }
     }
     
     window.addEventListener('storage', handleStorageChange)
     
     const handleCustomStorageChange = () => {
-      checkUsername()
+      const storedUsername = localStorage.getItem('system_void_username')
+      const newUsername = storedUsername || null
+      setUsername(newUsername)
     }
     
     window.addEventListener('localStorageChange', handleCustomStorageChange)
@@ -94,12 +100,45 @@ const Terminal = () => {
   }, [language, history.length]) // Dépendre de language et history.length
 
   useEffect(() => {
-    if (inputRef.current && !isTyping) {
+    if (isPasswordMode) {
+      setShowInput(true)
       setTimeout(() => {
-        inputRef.current?.focus()
-      }, 50)
+        if (inputRef.current) {
+          inputRef.current.focus()
+          inputRef.current.select()
+        }
+      }, 100)
     }
-  }, [history, isTyping])
+  }, [isPasswordMode])
+
+  useEffect(() => {
+    const handlePasswordPrompt = () => {
+      setShowInput(true)
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+          inputRef.current.select()
+        }
+      }, 150)
+    }
+    
+    window.addEventListener('passwordPrompt', handlePasswordPrompt)
+    return () => window.removeEventListener('passwordPrompt', handlePasswordPrompt)
+  }, [])
+
+  useEffect(() => {
+    if (inputRef.current && !isTyping && showInput) {
+      const timer = setTimeout(() => {
+        if (inputRef.current && showInput) {
+          inputRef.current.focus()
+          if (isPasswordMode) {
+            inputRef.current.select()
+          }
+        }
+      }, isPasswordMode ? 250 : 50)
+      return () => clearTimeout(timer)
+    }
+  }, [history, isTyping, isPasswordMode, showInput])
 
   useEffect(() => {
     if (!isTyping) {
@@ -109,9 +148,19 @@ const Terminal = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (input.trim() && !isTyping) {
+    if (isTyping) return
+    
+    if (isPasswordMode) {
+      const password = input
+      sendCommand(password)
+      setInput('')
+      return
+    }
+    
+    if (input.trim()) {
       const command = input.trim()
       sendCommand(command)
+      setInput('')
       setShowInput(false)
       setTimeout(() => {
         setShowInput(true)
@@ -130,17 +179,21 @@ const Terminal = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(e)
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === 'ArrowUp' && !isPasswordMode) {
       e.preventDefault()
       navigateHistory('up')
-    } else if (e.key === 'ArrowDown') {
+    } else if (e.key === 'ArrowDown' && !isPasswordMode) {
       e.preventDefault()
       navigateHistory('down')
-    } else if (e.key === 'Tab') {
+    } else if (e.key === 'Tab' && !isPasswordMode) {
       e.preventDefault()
       handleTab(input)
     } else if (e.key === 'Escape') {
       e.preventDefault()
+      if (isPasswordMode) {
+        setIsPasswordMode(false)
+        setPasswordUsername(null)
+      }
       setInput('')
     }
   }
@@ -285,11 +338,11 @@ const Terminal = () => {
           {showInput && !isTyping && (
             <div className="terminal-input-line">
               <span className="prompt">
-                {username ? `${username}@system-void > ` : '> '}
+                {isPasswordMode ? `${passwordUsername || 'user'}@system-void.local's password: ` : (username ? `${username}@system-void > ` : '> ')}
               </span>
               <input
                 ref={inputRef}
-                type="text"
+                type={isPasswordMode ? "password" : "text"}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -298,6 +351,7 @@ const Terminal = () => {
                 autoFocus
                 autoComplete="off"
                 spellCheck="false"
+                placeholder={isPasswordMode ? "" : ""}
               />
               <span className="cursor"></span>
             </div>

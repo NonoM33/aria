@@ -22,6 +22,8 @@ export const useTerminal = () => {
   const [availableFiles, setAvailableFiles] = useState([])
   const [unlockedCommands, setUnlockedCommands] = useState(['HELP', 'STATUS', 'LOGIN'])
   const [installedPackages, setInstalledPackages] = useState([])
+  const [isPasswordMode, setIsPasswordMode] = useState(false)
+  const [passwordUsername, setPasswordUsername] = useState(null)
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -57,11 +59,57 @@ export const useTerminal = () => {
     if (data.type === 'command_response') {
       const systemResponse = data.response || 'No response from system.'
       
+      if (systemResponse.includes("Vous n'êtes pas connecté") || 
+          systemResponse.includes("You are not connected") ||
+          systemResponse.includes("not connected")) {
+        localStorage.removeItem('system_void_username')
+        localStorage.removeItem('system_void_token')
+        window.dispatchEvent(new Event('localStorageChange'))
+      }
+      
+      if (data.password_prompt) {
+        setIsPasswordMode(true)
+        setPasswordUsername(data.username || null)
+        setInput('')
+        setIsTyping(false)
+        
+        setHistory(prev => [...prev, {
+          type: 'system',
+          content: systemResponse,
+          timestamp: new Date().toISOString()
+        }])
+        
+        window.dispatchEvent(new CustomEvent('passwordPrompt', { detail: { username: data.username } }))
+        
+        setTimeout(() => {
+          const inputElement = document.querySelector('.terminal-input-inline')
+          if (inputElement) {
+            inputElement.focus()
+            inputElement.click()
+          }
+        }, 200)
+        
+        return
+      }
+      
+      const wasPasswordMode = isPasswordMode
+      
+      if (wasPasswordMode && !data.password_prompt) {
+        setIsPasswordMode(false)
+        setPasswordUsername(null)
+      }
+      
       setHistory(prev => [...prev, {
         type: 'system',
         content: '',
         timestamp: new Date().toISOString()
       }])
+      
+      if (data.logout || data.username === null) {
+        localStorage.removeItem('system_void_username')
+        localStorage.removeItem('system_void_token')
+        window.dispatchEvent(new Event('localStorageChange'))
+      }
       
       typeText(systemResponse, (partialText) => {
         setHistory(prev => {
@@ -192,7 +240,29 @@ export const useTerminal = () => {
   }, [availableFiles, unlockedCommands])
 
   const sendCommand = useCallback((command) => {
-    if (isTyping) return
+    if (isTyping && !isPasswordMode) return
+    
+    if (isPasswordMode) {
+      const password = command || ''
+      
+      setInput('')
+      setAutocompleteOptions([])
+      setIsPasswordMode(false)
+      setPasswordUsername(null)
+      
+      if (!isConnected) {
+        setHistory(prev => [...prev, {
+          type: 'system',
+          content: 'ERROR: WebSocket not connected. Please wait...',
+          timestamp: new Date().toISOString()
+        }])
+        return
+      }
+
+      const token = localStorage.getItem('system_void_token')
+      wsSendCommand('', token, password)
+      return
+    }
     
     const userCommand = command.trim()
     
@@ -230,7 +300,7 @@ export const useTerminal = () => {
         timestamp: new Date().toISOString()
       }])
     }
-  }, [addToHistory, isTyping, isConnected, wsSendCommand])
+  }, [addToHistory, isTyping, isConnected, wsSendCommand, isPasswordMode])
 
   const navigateHistory = useCallback((direction) => {
     if (commandHistory.length === 0) return
@@ -352,7 +422,9 @@ export const useTerminal = () => {
     navigateHistory,
     handleTab,
     autocompleteOptions,
-    installedPackages
+    installedPackages,
+    isPasswordMode,
+    passwordUsername
   }
 }
 
