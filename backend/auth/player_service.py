@@ -119,6 +119,7 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
         "discovered_secrets": discovered_secrets,
         "aria_dialogue_progress": aria_dialogue_progress,
         "ending": ending,
-        "game_completed": game_completed
+        "game_completed": game_completed,
+        "aliases": aliases
     }
 

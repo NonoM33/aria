@@ -35,6 +35,7 @@ class Player(Base):
     aria_dialogue_progress = Column(Integer, default=0)
     ending = Column(String, nullable=True)
     game_completed = Column(Boolean, default=False)
+    aliases = Column(JSON, default=dict)
     
     total_commands = Column(Integer, default=0)
     total_playtime = Column(Integer, default=0)
@@ -94,6 +95,7 @@ def _migrate_installed_packages():
                 ("aria_dialogue_progress", "INTEGER DEFAULT 0"),
                 ("ending", "TEXT"),
                 ("game_completed", "BOOLEAN DEFAULT 0"),
+                ("aliases", "TEXT DEFAULT '{}'"),
             ]
             
             for col_name, col_def in new_columns:

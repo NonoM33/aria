@@ -82,6 +82,12 @@ def save_session_to_db(db: Session, session: Dict[str, Any], player: Optional[Pl
             except (AttributeError, KeyError):
                 pass
         
+        if hasattr(player, 'aliases'):
+            try:
+                player.aliases = session.get("aliases", {})
+            except (AttributeError, KeyError):
+                pass
+        
         save_player_progress(db, player)
         return True
     except Exception as e:
