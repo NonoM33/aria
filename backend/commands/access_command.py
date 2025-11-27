@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
 from adventures.adventure_loader import get_chapter_filesystem
+from services.aria_service import get_aria_trigger
 
 class AccessCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
@@ -44,7 +45,20 @@ class AccessCommand(BaseCommand):
                 else:
                     content += "\n\n[Hint: Use DECODE to decode this file]"
             
-            return {"response": content, "status": "success"}
+            response = {"response": content, "status": "success"}
+            
+            aria_data = get_aria_trigger(
+                self.session, 
+                "file_access", 
+                {"filename": filename, "path": file_path},
+                self.lang
+            )
+            if aria_data:
+                if aria_data.get("aria_flag"):
+                    self.session.setdefault("aria_flags", []).append(aria_data["aria_flag"])
+                response.update(aria_data)
+            
+            return response
         else:
             if self.lang == "FR":
                 return {"response": f"cat: {target}: Aucun fichier ou dossier de ce type", "status": "error"}

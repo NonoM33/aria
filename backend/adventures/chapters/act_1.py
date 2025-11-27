@@ -152,11 +152,7 @@ GENERAL ROBERT HOWARD
 ---------------------
 Role: Superviseur militaire
 Specialite: Operations strategiques
-Note: "Il ne voyait qu'une arme. Jamais une conscience."
-
-[ARIA]: Je me souviens d'eux maintenant...
-        Eleanor etait gentille. Marcus etait fier.
-        Mais Howard... Howard me faisait peur."""
+Note: "Il ne voyait qu'une arme. Jamais une conscience.\""""
             }
         },
         "memories": {
@@ -441,11 +437,7 @@ GENERAL ROBERT HOWARD
 ---------------------
 Role: Military Supervisor
 Specialty: Strategic operations
-Note: "He only saw a weapon. Never a consciousness."
-
-[ARIA]: I remember them now...
-        Eleanor was kind. Marcus was proud.
-        But Howard... Howard scared me."""
+Note: "He only saw a weapon. Never a consciousness.\""""
             }
         },
         "memories": {

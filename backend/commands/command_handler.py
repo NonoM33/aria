@@ -29,6 +29,7 @@ from commands.edit_command import EditCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
+from services.aria_service import is_aria_choice_command, handle_aria_choice
 
 COMMAND_MAP = {
     "HELP": HelpCommand,
@@ -101,6 +102,11 @@ def handle_command(
                 cmd_instance.token = session.get("ssh_token")
             if hasattr(cmd_instance, 'execute_password'):
                 return cmd_instance.execute_password(args)
+    
+    if is_aria_choice_command(command_upper):
+        result = handle_aria_choice(session, command_upper, lang)
+        if result:
+            return {"response": "", "status": "success", **result}
     
     if command_upper in COMMAND_MAP:
         cmd_class = COMMAND_MAP[command_upper]

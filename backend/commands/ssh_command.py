@@ -2,6 +2,7 @@ from typing import Dict, Any
 from commands.base_command import BaseCommand
 from auth.ssh_auth import ssh_connect
 from auth.player_service import get_player_by_id, player_to_session_dict
+from services.aria_service import get_aria_trigger
 import re
 
 
@@ -114,20 +115,27 @@ class SshCommand(BaseCommand):
                         else:
                             alias_msg = f"\n{alias_count} alias(es) loaded from .voidrc"
                     
+                    aria_data = get_aria_trigger(self.session, "ssh_login", {}, self.lang)
+                    
                     if self.lang == "FR":
-                        return {
+                        response = {
                             "response": f"Connexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS{alias_msg}\n\nTapez LS pour explorer.",
                             "status": "success",
                             "token": new_token,
                             "username": result["username"]
                         }
                     else:
-                        return {
+                        response = {
                             "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted.\nNew commands: SCAN, DECODE, ACCESS{alias_msg}\n\nType LS to explore.",
                             "status": "success",
                             "token": new_token,
                             "username": result["username"]
                         }
+                    
+                    if aria_data:
+                        response.update(aria_data)
+                    
+                    return response
             except Exception:
                 pass
         
@@ -212,20 +220,27 @@ class SshCommand(BaseCommand):
                     else:
                         alias_msg = f"\n{alias_count} alias(es) loaded from .voidrc"
                 
+                aria_data = get_aria_trigger(self.session, "ssh_login", {}, self.lang)
+                
                 if self.lang == "FR":
-                    return {
+                    response = {
                         "response": f"\nConnexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS{alias_msg}\n\nTapez LS pour explorer.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
                     }
                 else:
-                    return {
+                    response = {
                         "response": f"\nSSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted.\nNew commands: SCAN, DECODE, ACCESS{alias_msg}\n\nType LS to explore.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
                     }
+                
+                if aria_data:
+                    response.update(aria_data)
+                
+                return response
             else:
                 if "ssh_pending_username" in self.session:
                     del self.session["ssh_pending_username"]
