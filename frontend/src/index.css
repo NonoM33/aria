@@ -1512,3 +1512,122 @@ body {
   opacity: 0.7;
 }
 
+/* ========================================
+   ADMIN MODE - FALLOUT TERMINAL STYLE
+   ======================================== */
+
+.terminal-container.admin-mode {
+  background-color: #0a0f0a;
+  color: #33ff33;
+}
+
+.terminal-container.admin-mode .scanlines {
+  background: linear-gradient(
+    transparent 50%,
+    rgba(51, 255, 51, 0.04) 50%
+  );
+  animation: admin-scanline 6s linear infinite;
+}
+
+@keyframes admin-scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 200%;
+  }
+}
+
+.terminal-container.admin-mode::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(51, 255, 51, 0.03) 0px,
+      rgba(51, 255, 51, 0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.terminal-container.admin-mode::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(51, 255, 51, 0.1) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: admin-glow 4s ease-in-out infinite;
+}
+
+@keyframes admin-glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.terminal-container.admin-mode .terminal-content {
+  text-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+}
+
+.terminal-container.admin-mode .prompt {
+  color: #ffcc00;
+  text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
+
+.terminal-container.admin-mode .prompt.admin-prompt {
+  color: #ff3333;
+  text-shadow: 0 0 15px rgba(255, 51, 51, 0.7);
+  font-weight: bold;
+}
+
+.terminal-container.admin-mode .terminal-input-inline {
+  color: #33ff33;
+  text-shadow: 0 0 5px rgba(51, 255, 51, 0.5);
+  caret-color: #33ff33;
+}
+
+.terminal-container.admin-mode .cursor {
+  background-color: #33ff33;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.8);
+}
+
+.terminal-container.admin-mode .terminal-text {
+  color: #33ff33;
+}
+
+.terminal-container.admin-mode .terminal-entry-system .terminal-text {
+  color: #33ff33;
+}
+
+.terminal-container.admin-mode .terminal-entry-error .terminal-text {
+  color: #ff3333;
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+}
+
+.terminal-container.admin-mode .terminal-content::-webkit-scrollbar-thumb {
+  background: #33ff33;
+}
+
+.terminal-container.admin-mode .terminal-content::-webkit-scrollbar-track {
+  background: #0a0f0a;
+}
+

@@ -436,8 +436,12 @@ const Terminal = () => {
           {showInput && !isTyping && (
             <>
               <div className="terminal-input-line">
-                <span className="prompt">
-                  {isPasswordMode ? `${passwordUsername || 'user'}@system-void.local's password: ` : (username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `)}
+                <span className={`prompt ${isAdminMode ? 'admin-prompt' : ''}`}>
+                  {isPasswordMode 
+                    ? `${passwordUsername || 'user'}@system-void.local's password: ` 
+                    : isAdminMode 
+                      ? `root@system-void# ` 
+                      : (username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `)}
                 </span>
                 <input
                   ref={inputRef}
