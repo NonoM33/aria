@@ -29,10 +29,11 @@ class LsCommand(BaseCommand):
         contents = self._get_directory_contents(filesystem, path_to_list)
         
         if contents is None:
+            target = args.strip() if args else path_to_list
             if self.lang == "FR":
-                return {"response": f"ls: impossible d'acceder a '{args.strip()}': Aucun fichier ou dossier de ce type", "status": "error"}
+                return {"response": f"ls: impossible d'acceder a '{target}': Aucun fichier ou dossier de ce type", "status": "error"}
             else:
-                return {"response": f"ls: cannot access '{args.strip()}': No such file or directory", "status": "error"}
+                return {"response": f"ls: cannot access '{target}': No such file or directory", "status": "error"}
         
         if not contents:
             if self.lang == "FR":
@@ -73,4 +74,3 @@ class LsCommand(BaseCommand):
             return current
         else:
             return None
-

@@ -89,15 +89,16 @@ export const useTerminal = () => {
   const typeText = useCallback((text, callback) => {
     setIsTyping(true)
     let index = 0
+    const charsPerTick = text.length > 200 ? 5 : 3
     const typingInterval = setInterval(() => {
       if (index < text.length) {
-        callback(text.substring(0, index + 1))
-        index++
+        index = Math.min(index + charsPerTick, text.length)
+        callback(text.substring(0, index))
       } else {
         clearInterval(typingInterval)
         setIsTyping(false)
       }
-    }, 30)
+    }, 10)
   }, [])
 
   const UNKNOWN_RESPONSES = useRef([
