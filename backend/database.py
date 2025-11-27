@@ -61,6 +61,19 @@ class PlayerEvent(Base):
     event_data = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+
+class Connection(Base):
+    __tablename__ = "connections"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, index=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    ip_address = Column(String, nullable=True)
+    user_agent = Column(String, nullable=True)
+    converted = Column(Boolean, default=False)
+    player_id = Column(Integer, nullable=True)
+
+
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./system_void.db")
 
 engine = create_engine(
