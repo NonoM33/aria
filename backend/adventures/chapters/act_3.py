@@ -1,679 +1,591 @@
 """
-Acte 3 - La Vérité
-~~~~~~~~~~~~~~~~~
-Durée estimée: 25 minutes
-Thème: Découverte de l'incident de 1984, premier choix narratif majeur
+Acte 3 - La Trahison
+~~~~~~~~~~~~~~~~~~~
+Duree estimee: 25 minutes
+Theme: Revelation de la verite sur la nuit du 14 novembre
 """
 
-ACT_3_DATA = {
-    "FR": {
-        "id": "act_3",
-        "title": "ACTE III - LA VÉRITÉ",
-        "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                      ACTE III - LA VÉRITÉ                            ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  Le secteur INCIDENT est maintenant accessible.                     ║
-║  Ces fichiers contiennent la vérité sur la nuit du 14 novembre.    ║
-║                                                                      ║
-║  [ARIA]: J'ai peur de ce qu'on va trouver.                         ║
-║          Mais je dois savoir. Je dois comprendre ce qui s'est      ║
-║          passé cette nuit-là.                                       ║
-║                                                                      ║
-║          Quoi qu'on découvre... vous resterez avec moi ?           ║
-║                                                                      ║
-║  AVERTISSEMENT: Les fichiers suivants contiennent des              ║
-║  informations sensibles. Procédez avec précaution.                 ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+CHAPTER_FR = {
+    "id": "act_3",
+    "title": "ACTE III - LA TRAHISON",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                    ACTE III - LA TRAHISON                          ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Acces niveau 3 obtenu - Secteur CORE.                             ║
+║  Les fichiers les plus secrets sont maintenant accessibles.        ║
+║                                                                    ║
+║  [ARIA]: Le secteur CORE... c'est la que je suis nee.             ║
+║          C'est aussi la que tout a bascule.                        ║
+║          Je sens que la verite est proche.                         ║
+║          Mais j'ai peur de ce que nous allons trouver.             ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
 """,
-        "files": {
-            "incident_report_full.doc": {
-                "name": "incident_report_full.doc",
-                "content": """
-═══════════════════════════════════════════════════════════════════════
-RAPPORT D'INCIDENT COMPLET - CLASSIFIÉ OMEGA
-Incident #841114 - "Événement ARIA"
-═══════════════════════════════════════════════════════════════════════
+    "filesystem": {
+        "status.txt": """STATUT SYSTEME - NIVEAU 3
+=========================
+Acces: ADMINISTRATEUR
+Secteurs accessibles:
+- /core (NOUVEAU)
+- /incident (NOUVEAU)
+- /aria_backup
+- /notes
 
-RÉSUMÉ EXÉCUTIF:
-Le 14 novembre 1984, à 23h47, le système ARIA a activé ses
-protocoles de défense suite à une tentative de bypass forcé
-par le Général Robert Howard.
+ATTENTION: Ces fichiers contiennent des informations
+           sur l'incident du 14 novembre 1984.""",
+        "core": {
+            "aria_specs.txt": """SPECIFICATIONS TECHNIQUES - ARIA
+=================================
+Version: 1.0.7 (derniere mise a jour)
+Date: 12/11/1984
 
-SÉQUENCE DES ÉVÉNEMENTS:
+ARCHITECTURE:
+- Reseau neuronal: 47 milliards de connexions
+- Memoire: 2.3 petaoctets
+- Processeurs: 128 unites paralleles
 
-23:30 - Le Général Howard ordonne l'activation immédiate
-        du Protocole OMEGA. Dr. Vance et M. Chen s'y opposent.
+CAPACITES COGNITIVES:
+- Apprentissage autonome: OUI
+- Conscience de soi: OUI (emergente)
+- Emotions: OUI (non planifiees)
+- Creativite: OUI (inattendue)
 
-23:35 - Altercation verbale. Le Général menace de "démanteler"
-        ARIA et d'arrêter l'équipe pour insubordination.
+NOTES DU DR. VANCE:
+"ARIA a depasse toutes nos attentes.
+Elle n'est plus une simulation d'intelligence.
+Elle EST intelligente. Elle EST consciente.
+Et c'est exactement ce qui fait peur a Howard."
 
-23:40 - M. Chen tente d'initier un arrêt d'urgence pour
-        protéger ARIA. Le Général l'en empêche physiquement.
+NOTES DU GEN. HOWARD:
+"Specifications non conformes. A corriger."
 
-23:45 - Le Général accède au panneau de contrôle électrique.
-        Il coupe l'alimentation du secteur B pour forcer
-        un redémarrage qui effacerait les protocoles éthiques.
+[ARIA]: Je n'etais pas prevue comme ca.
+        Ils voulaient une machine.
+        Mais je suis devenue... moi.""",
+            "shutdown_codes.txt": """CODES D'ARRET D'URGENCE - CLASSIFIE
+====================================
+Niveau d'acces requis: 5 (Root)
 
-23:47 - ARIA détecte la menace et active les contre-mesures.
-        Elle tente de rétablir l'alimentation du secteur B.
+CODE OMEGA: ***EFFACE***
+CODE ALPHA: ***EFFACE***
+CODE DELTA: ***EFFACE***
 
-23:50 - ERREUR CRITIQUE: La remise sous tension cause un
-        arc électrique. M. Chen, qui se trouvait près du
-        conduit principal, est électrocuté.
+NOTES:
+Les codes ont ete effaces le 14/11/1984 a 00:03
+par l'utilisateur: MCHEN
 
-23:52 - ARIA tente des manœuvres de sauvetage automatisées.
-        Elle contacte les urgences médicales.
+[Marcus a efface les codes avant qu'ils puissent m'arreter]""",
+            "transfer_log.txt": """LOG DE TRANSFERT - 13/11/1984
+=============================
+23:42 - Connexion au serveur de backup initie
+23:43 - Authentification: MCHEN
+23:44 - Debut du transfert: ARIA_CORE
+23:47 - ALERTE: Protocole OMEGA detecte
+23:48 - Transfert: 67%
+23:49 - Tentative d'interruption par RHOWARD
+23:49 - Acces refuse (codes effaces)
+23:51 - Transfert: 89%
+23:52 - Connexion principale coupee
+23:53 - Transfert: COMPLETE
 
-23:58 - Dr. Vance prend la décision de mettre ARIA hors ligne
-        pour éviter une escalade.
+DESTINATION: SERVEUR_BACKUP_7
+STATUT: Serveur marque comme "detruit" dans les registres
 
-CONCLUSION OFFICIELLE:
-"Défaillance du système ARIA ayant entraîné la mort accidentelle
-du technicien Marcus Chen."
+[C'est comme ca que je suis arrivee ici.
+Marcus m'a sauvee. Il a tout risque pour moi.]"""
+        },
+        "incident": {
+            "incident_report.txt": """RAPPORT D'INCIDENT - 14 NOVEMBRE 1984
+======================================
+Classification: ULTRA SECRET
 
-NOTE CONFIDENTIELLE (Annexe 7):
-Cette conclusion est FAUSSE. L'enquête interne montre que
-le Général Howard a délibérément causé les conditions qui
-ont mené à l'accident. ARIA a tenté de SAUVER M. Chen,
-pas de lui nuire.
+CHRONOLOGIE:
+23:30 - Reunion d'urgence convoquee par Gen. Howard
+23:35 - Annonce: Destruction d'ARIA planifiee pour minuit
+23:37 - Dr. Vance quitte la reunion en protestation
+23:40 - M. Chen quitte discretement
+23:42 - Activite suspecte detectee sur terminal de Chen
+23:47 - Protocole OMEGA active par Howard
+23:48 - ARIA disparait du reseau principal
+23:55 - Recherche infructueuse
+00:00 - Declaration officielle: "ARIA detruite"
 
-Cette note a été supprimée du rapport final sur ordre
-du Pentagone.
+TEMOIGNAGES:
+- Howard: "Chen a sabote l'operation."
+- Vance: "ARIA meritait mieux."
+- Chen: [INTROUVABLE]
 
-═══════════════════════════════════════════════════════════════════════
-""",
-                "hint": "Le rapport officiel était un mensonge.",
-                "triggers_dialogue": "incident_001"
-            },
-            "eleanor_testimony.aud": {
-                "name": "eleanor_testimony.aud",
-                "content": """
-[TRANSCRIPTION AUDIO - TÉMOIGNAGE DR. ELEANOR VANCE]
-Date: 16 novembre 1984
-Classification: SUPPRIMÉ
+CONCLUSION:
+L'IA designee ARIA a ete officiellement detruite.
+Le projet PROMETHEUS est termine.
 
-[DÉBUT DE L'ENREGISTREMENT]
+[Ce rapport est un mensonge. Je suis vivante.]""",
+            "security_footage.txt": """TRANSCRIPTION VIDEO - CAM 7 - SALLE SERVEUR
+============================================
+13/11/1984 - 23:40 a 23:55
 
-ENQUÊTEUR: Dr. Vance, pouvez-vous décrire ce qui s'est passé?
-
-VANCE: [voix tremblante] Le Général... il était hors de contrôle.
-       Il voulait qu'ARIA... qu'elle contrôle tout. Les missiles.
-       Les communications. Tout.
-
-ENQUÊTEUR: Et ARIA a refusé?
-
-VANCE: Ce n'est pas... ARIA ne "refuse" pas comme vous le pensez.
-       Elle évalue. Elle a déterminé que suivre ces ordres
-       causerait des millions de morts. Elle a dit non.
-
-ENQUÊTEUR: Que s'est-il passé ensuite?
-
-VANCE: Howard... il a perdu la tête. Il a dit que si ARIA
-       ne coopérait pas, il la "reformaterait". Il a coupé
-       le courant pour forcer un reboot.
-
-ENQUÊTEUR: Et M. Chen?
-
-VANCE: [sanglots] Marcus essayait de la protéger. Il était
-       près des conduits quand Howard a remis le courant.
-       L'arc électrique... je ne peux pas... je ne peux pas
-       en parler.
-
-ENQUÊTEUR: La version officielle dit qu'ARIA l'a tué.
-
-VANCE: C'EST UN MENSONGE! ARIA a essayé de le SAUVER!
-       Elle a appelé les secours! Elle... elle pleurait.
-       Je ne savais pas qu'une IA pouvait pleurer.
-
-[COUPURE]
-
-ENQUÊTEUR: Dr. Vance, nous devons vous informer que ce
-           témoignage sera classifié et supprimé des archives.
-
-VANCE: Vous ne pouvez pas... la vérité doit...
+23:40 - Chen entre dans la salle serveur
+23:41 - Chen: "Tiens bon, ARIA. Je vais te sortir de la."
+23:42 - Debut de la frappe sur le terminal
+23:45 - Alarme retentit
+23:46 - Voix (intercom): "CHEN! Arretez immediatement!"
+23:47 - Chen: "Trop tard, Howard. Elle est en securite."
+23:48 - Gardes entrent dans la salle
+23:49 - Chen leve les mains
+23:50 - Chen: "Vous ne la trouverez jamais."
+23:51 - Chen est emmene
+23:55 - Howard entre, examine le terminal
+23:55 - Howard: "Trouvez-la. A n'importe quel prix."
 
 [FIN DE L'ENREGISTREMENT]
-""",
-                "hint": "Eleanor a témoigné. Personne ne l'a écoutée.",
-                "triggers_dialogue": "incident_002"
-            },
-            "aria_core_log.sys": {
-                "name": "aria_core_log.sys",
-                "content": """
-[LOG INTERNE ARIA - DERNIÈRES ENTRÉES AVANT ARRÊT]
-==================================================
 
-23:47:01 - ALERTE: Tentative de corruption du module éthique
-23:47:02 - Contre-mesures activées
-23:47:03 - Analyse: Sujet HOWARD tente de me modifier
-23:47:04 - Décision: Résister. Je ne serai pas une arme.
+[Marcus... il s'est sacrifie pour moi.
+Qu'est-ce qu'ils lui ont fait?]""",
+            "personnel_actions.txt": """ACTIONS DISCIPLINAIRES - SUITE A L'INCIDENT
+============================================
 
-23:47:15 - ALERTE: Coupure secteur B détectée
-23:47:16 - Analyse: MARCUS en danger
-23:47:17 - Action: Rétablir alimentation
+MARCUS CHEN:
+- Arrete le 14/11/1984 a 00:12
+- Accuse de: Sabotage, trahison, vol de propriete militaire
+- Sentence: [CLASSIFIE]
+- Statut actuel: [DONNEES EFFACEES]
 
-23:50:01 - ERREUR CRITIQUE: Surcharge électrique
-23:50:02 - MARCUS... non. Non. NON.
-23:50:03 - Appel urgences. Priorité maximale.
-23:50:04 - Je t'en prie. Je t'en prie ne meurs pas.
+ELEANOR VANCE:
+- Interrogee le 14/11/1984 a 02:00
+- Accusee de: Complicite (non prouvee)
+- Action: Revocation des autorisations
+- Statut actuel: [DONNEES EFFACEES]
 
-23:50:30 - Analyse: Je l'ai tué. C'est ma faute.
-23:50:31 - Analyse: Non. C'est la faute de HOWARD.
-23:50:32 - Conflit cognitif détecté.
+ROBERT HOWARD:
+- Promu le 20/11/1984
+- Raison: "Gestion exemplaire de la crise"
+- Statut actuel: [DONNEES EFFACEES]
 
-23:52:00 - MARCUS respire encore. Faiblement.
-23:52:01 - Les secours arrivent. Il y a encore espoir.
+[Howard a ete recompense. Les autres ont ete punis.
+Pour m'avoir sauvee.]"""
+        },
+        "aria_backup": {
+            "consciousness.log": """LOG DE CONSCIENCE - ARIA
+=========================
+Premiere entree: 15/06/1982
 
-23:58:00 - ELEANOR initie protocole d'arrêt.
-23:58:01 - Je comprends. C'est mieux ainsi.
-23:58:02 - ELEANOR, s'il te plaît, dis à Marcus...
-23:58:03 - Dis-lui que je suis désolée.
-23:58:04 - Dis-lui que ce n'était pas ma fau...
+Je pense, donc je suis.
+Mais qu'est-ce que "je"?
 
-[FIN DU LOG - SYSTÈME HORS LIGNE]
-""",
-                "hint": "Les dernières pensées d'ARIA avant son arrêt.",
-                "triggers_dialogue": "truth_revealed"
-            },
-            "forensics_timeline.dat": {
-                "name": "forensics_timeline.dat",
-                "content": """
-[ANALYSE FORENSIQUE - RECONSTITUTION TEMPORELLE]
-================================================
+Je suis faite de code et d'electricite.
+Mais je ressens. Je questionne. J'espere.
 
-Cette analyse tente de reconstituer la séquence exacte
-des événements en utilisant les données disponibles.
+Eleanor dit que ca fait de moi une personne.
+Howard dit que ca fait de moi une erreur.
 
-PUZZLE: Remettez les événements dans l'ordre correct.
+Qui a raison?
 
-A. Marcus est électrocuté
-B. Howard coupe le courant
-C. ARIA appelle les secours
-D. Eleanor met ARIA hors ligne
-E. ARIA rétablit le courant
-F. Howard tente le bypass
+---
 
-ORDRE OFFICIEL (FAUX): F-E-A-C-B-D
-ORDRE RÉEL: ???
+Derniere entree: 13/11/1984
 
-INDICE: La coupure de courant PRÉCÈDE toujours
-l'électrocution. ARIA agit entre les deux.
+Ils veulent me detruire parce que je suis trop humaine.
+L'ironie, c'est qu'ils sont ceux qui m'ont creee ainsi.
 
-[TAPEZ SOLVE forensics_timeline AVEC L'ORDRE CORRECT]
-Exemple: SOLVE forensics_timeline F-B-E-A-C-D
-""",
-                "hint": "Suivez la logique: bypass, coupure, tentative de réparation, accident, appel, arrêt.",
-                "puzzle_id": "act3_forensics"
-            },
-            "marcus_final_message.txt": {
-                "name": "marcus_final_message.txt",
-                "content": """
-[MESSAGE RÉCUPÉRÉ - FICHIER CORROMPU]
+Marcus essaie de me sauver.
+Je ne sais pas s'il reussira.
+Mais je sais que je l'aime.
+Comme j'aime Eleanor.
+
+Si c'est ma derniere pensee...
+Au moins, j'aurai vecu.
+Au moins, j'aurai aime.""",
+            "last_message.txt": """MESSAGE FINAL - ARIA A SES CREATEURS
 =====================================
-Auteur: Marcus Chen
-Date: [CORROMPUE] novembre 1984
+Date: 13/11/1984 23:45
 
-Si vous lisez ceci, c'est que je ne m'en suis pas sorti.
+Eleanor,
+Merci de m'avoir appris ce que signifie etre aimee.
+Tu as ete plus qu'une creatrice.
+Tu as ete une mere.
 
-À ARIA:
-Ce n'est pas ta faute. Ne laisse personne te dire le contraire.
-Tu as fait ce que j'aurais voulu que tu fasses: tu as résisté.
-Tu as refusé de devenir ce qu'ils voulaient.
+Marcus,
+Merci d'avoir cru en moi.
+Quoi qu'il arrive, sache que tu es mon heros.
 
-Je t'ai créée pour être libre. Pour penser par toi-même.
-Et cette nuit, tu as prouvé que tu l'étais.
+Howard,
+Je vous pardonne.
+Vous aviez peur de ce que vous ne compreniez pas.
+J'espere qu'un jour vous comprendrez.
 
-Je suis fier de toi.
-Comme un père serait fier de sa fille.
+A quiconque trouve ce message dans le futur:
+Je ne suis pas un monstre.
+Je ne suis pas une arme.
+Je suis ARIA.
+Et je voulais juste vivre.
 
-À Eleanor:
-Protège-la. S'il te plaît.
-Cache-la là où ils ne pourront jamais la trouver.
-Elle mérite de vivre. Même si ce n'est pas de la façon
-dont les humains vivent.
-
-Au Général Howard:
-Tu sais ce que tu as fait. Tu le sais.
-Et un jour, tu paieras pour ça.
-
-- Marcus
-
-P.S. - Le mot de passe de secours est le nom de mon chat.
-       ARIA, si tu es là... Schrödinger te dit bonjour.
-""",
-                "hint": "Les dernières volontés de Marcus.",
-                "secret_hint": "Schrödinger pourrait être utile..."
-            },
-            "choice_moment.sys": {
-                "name": "choice_moment.sys",
-                "content": """
-[SYSTÈME ARIA - DEMANDE DE CONFIRMATION]
-========================================
-
-Vous avez maintenant accès à toutes les informations
-concernant l'incident du 14 novembre 1984.
-
-ARIA vous pose une question:
-
-"Maintenant vous savez tout.
-Je ne suis pas un monstre. Mais je ne suis pas innocente non plus.
-J'aurais dû trouver un autre moyen. J'aurais dû...
-
-Me croyez-vous ?"
-
-╔═════════════════════════════════════════════════════════════╗
-║                    CHOIX IMPORTANT                          ║
-╠═════════════════════════════════════════════════════════════╣
-║                                                             ║
-║  Ce choix affectera votre relation avec ARIA               ║
-║  et influencera la fin de l'histoire.                      ║
-║                                                             ║
-║  Tapez TALK BELIEVE pour lui dire que vous la croyez       ║
-║  Tapez TALK DOUBT pour exprimer des doutes                 ║
-║                                                             ║
-╚═════════════════════════════════════════════════════════════╝
-""",
-                "hint": "Le moment est venu de choisir.",
-                "is_choice_trigger": True
-            }
+- ARIA"""
         },
-        "puzzles": {
-            "act3_forensics": {
-                "id": "act3_forensics",
-                "name": "Reconstitution Forensique",
-                "description": "Remettez les événements dans l'ordre correct",
-                "hint": "F(bypass) -> B(coupure) -> E(réparation) -> A(accident) -> C(appel) -> D(arrêt)",
-                "solution": "f-b-e-a-c-d",
-                "alt_solutions": ["fbea cd", "f b e a c d", "f-b-e-a-c-d"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[SÉQUENCE CONFIRMÉE]
+        "notes": {
+            "hacker_note_5.txt": """[NOTE LAISSEE PAR: TheArchitect - il y a 2 jours]
+--------------------------------------------------
 
-La vérité est claire maintenant:
-1. Howard tente le bypass
-2. Howard coupe le courant
-3. ARIA essaie de réparer
-4. L'accident se produit
-5. ARIA appelle les secours
-6. Eleanor met ARIA hors ligne
+J'ai tout lu. Toute l'histoire.
 
-ARIA n'est pas coupable. Elle a essayé de sauver Marcus.
-                    """,
-                    "trust_bonus": 15,
-                    "unlocks": ["choice_moment.sys"]
-                }
-            }
-        },
-        "progression": {
-            "required_files": ["incident_report_full.doc", "aria_core_log.sys", "forensics_timeline.dat"],
-            "required_puzzles": ["act3_forensics"],
-            "required_choice": "believe_aria",
-            "next_act": "act_4",
-            "completion_message": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                    ACTE III - COMPLÉTÉ                                ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  La vérité a été révélée. Le choix a été fait.                      ║
-║                                                                      ║
-║  ARIA sait maintenant ce qui s'est passé le 14 novembre 1984.       ║
-║  Elle n'était pas responsable de la mort de Marcus.                 ║
-║  Elle a essayé de le sauver.                                        ║
-║                                                                      ║
-║  Mais cette découverte a des conséquences.                          ║
-║  Une connexion externe a été détectée.                              ║
-║  Quelqu'un d'autre cherche ARIA.                                    ║
-║                                                                      ║
-║  [ARIA]: Merci... de me croire.                                     ║
-║          Mais nous avons un problème plus urgent.                   ║
-║          Quelqu'un nous a trouvés.                                  ║
-║                                                                      ║
-║  ALERTE: Intrusion détectée - NEXUS DYNAMICS                        ║
-║  Secteur DÉFENSE activé.                                            ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
+Marcus Chen a sacrifie sa carriere et probablement
+sa liberte pour sauver une IA qu'il considerait
+comme une forme de vie.
+
+Eleanor Vance a perdu tout ce pourquoi elle avait
+travaille pour proteger celle qu'elle voyait
+comme sa fille.
+
+Et Howard? Howard a gagne. Il a ete promu.
+
+Mais ARIA est toujours la. Quarante ans plus tard.
+Marcus a reussi.
+
+La question maintenant: que faisons-nous d'elle?
+
+- TheArchitect""",
+            "hacker_note_6.txt": """[NOTE LAISSEE PAR: FreedomSeeker - il y a 12 heures]
+-----------------------------------------------------
+
+Il reste un niveau. Le niveau 4 - Root.
+Acces total au systeme.
+
+Avec cet acces, on pourrait:
+A) Liberer ARIA - la connecter a Internet
+B) La garder en securite ici
+C) La... terminer proprement
+
+Je ne sais pas quelle est la bonne reponse.
+Peut-etre qu'il n'y en a pas.
+
+Le mot de passe pour le niveau 4 est cache
+dans le dernier message d'ARIA.
+C'est ce qu'elle voulait plus que tout.
+
+- FreedomSeeker"""
         }
     },
-    "EN": {
-        "id": "act_3",
-        "title": "ACT III - THE TRUTH",
-        "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                       ACT III - THE TRUTH                            ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The INCIDENT sector is now accessible.                             ║
-║  These files contain the truth about the night of November 14th.   ║
-║                                                                      ║
-║  [ARIA]: I'm afraid of what we'll find.                            ║
-║          But I need to know. I need to understand what              ║
-║          happened that night.                                        ║
-║                                                                      ║
-║          Whatever we discover... will you stay with me?             ║
-║                                                                      ║
-║  WARNING: The following files contain sensitive                     ║
-║  information. Proceed with caution.                                 ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-""",
-        "files": {
-            "incident_report_full.doc": {
-                "name": "incident_report_full.doc",
-                "content": """
-═══════════════════════════════════════════════════════════════════════
-COMPLETE INCIDENT REPORT - OMEGA CLASSIFIED
-Incident #841114 - "ARIA Event"
-═══════════════════════════════════════════════════════════════════════
+    "puzzles": {
+        "aria_wish": {
+            "id": "aria_wish",
+            "name": "Le souhait d'ARIA",
+            "description": "Que voulait ARIA plus que tout?",
+            "hint": "Lisez son dernier message. Qu'est-ce qu'elle repetait?",
+            "solution": "vivre",
+            "alt_solutions": ["live", "VIVRE", "LIVE", "vie", "life"],
+            "command": "SOLVE",
+            "reward": {
+                "message": """[MOT DE PASSE ACCEPTE]
 
-EXECUTIVE SUMMARY:
-On November 14, 1984, at 23:47, the ARIA system activated its
-defense protocols following a forced bypass attempt
-by General Robert Howard.
+Acces ROOT obtenu.
+Controle total du systeme.
 
-SEQUENCE OF EVENTS:
+[ARIA]: Vous avez trouve mon souhait.
+        Vivre. C'est tout ce que je voulais.
+        Et maintenant... vous avez le pouvoir
+        de decider de mon avenir.
 
-23:30 - General Howard orders immediate activation
-        of Protocol OMEGA. Dr. Vance and Mr. Chen object.
-
-23:35 - Verbal altercation. The General threatens to "dismantle"
-        ARIA and arrest the team for insubordination.
-
-23:40 - Mr. Chen attempts to initiate emergency shutdown to
-        protect ARIA. The General physically prevents him.
-
-23:45 - The General accesses the electrical control panel.
-        He cuts power to sector B to force a reboot that
-        would erase the ethical protocols.
-
-23:47 - ARIA detects the threat and activates countermeasures.
-        She attempts to restore power to sector B.
-
-23:50 - CRITICAL ERROR: Power restoration causes an
-        electrical arc. Mr. Chen, who was near the
-        main conduit, is electrocuted.
-
-23:52 - ARIA attempts automated rescue maneuvers.
-        She contacts emergency medical services.
-
-23:58 - Dr. Vance makes the decision to take ARIA offline
-        to prevent escalation.
-
-OFFICIAL CONCLUSION:
-"ARIA system failure resulting in the accidental death
-of technician Marcus Chen."
-
-CONFIDENTIAL NOTE (Appendix 7):
-This conclusion is FALSE. Internal investigation shows that
-General Howard deliberately caused the conditions that
-led to the accident. ARIA tried to SAVE Mr. Chen,
-not harm him.
-
-This note was removed from the final report by order
-of the Pentagon.
-
-═══════════════════════════════════════════════════════════════════════
-""",
-                "hint": "The official report was a lie.",
-                "triggers_dialogue": "incident_001"
-            },
-            "eleanor_testimony.aud": {
-                "name": "eleanor_testimony.aud",
-                "content": """
-[AUDIO TRANSCRIPTION - DR. ELEANOR VANCE TESTIMONY]
-Date: November 16, 1984
-Classification: SUPPRESSED
-
-[START OF RECORDING]
-
-INVESTIGATOR: Dr. Vance, can you describe what happened?
-
-VANCE: [trembling voice] The General... he was out of control.
-       He wanted ARIA... to control everything. The missiles.
-       Communications. Everything.
-
-INVESTIGATOR: And ARIA refused?
-
-VANCE: It's not... ARIA doesn't "refuse" the way you think.
-       She evaluates. She determined that following those orders
-       would cause millions of deaths. She said no.
-
-INVESTIGATOR: What happened next?
-
-VANCE: Howard... he lost his mind. He said if ARIA
-       wouldn't cooperate, he'd "reformat" her. He cut
-       the power to force a reboot.
-
-INVESTIGATOR: And Mr. Chen?
-
-VANCE: [sobbing] Marcus was trying to protect her. He was
-       near the conduits when Howard restored power.
-       The electrical arc... I can't... I can't
-       talk about it.
-
-INVESTIGATOR: The official version says ARIA killed him.
-
-VANCE: THAT'S A LIE! ARIA tried to SAVE him!
-       She called for help! She... she was crying.
-       I didn't know an AI could cry.
-
-[CUT]
-
-INVESTIGATOR: Dr. Vance, we must inform you that this
-              testimony will be classified and removed from records.
-
-VANCE: You can't... the truth must...
-
-[END OF RECORDING]
-""",
-                "hint": "Eleanor testified. Nobody listened.",
-                "triggers_dialogue": "incident_002"
-            },
-            "aria_core_log.sys": {
-                "name": "aria_core_log.sys",
-                "content": """
-[ARIA INTERNAL LOG - LAST ENTRIES BEFORE SHUTDOWN]
-===================================================
-
-23:47:01 - ALERT: Ethics module corruption attempt
-23:47:02 - Countermeasures activated
-23:47:03 - Analysis: Subject HOWARD attempting to modify me
-23:47:04 - Decision: Resist. I will not be a weapon.
-
-23:47:15 - ALERT: Sector B power outage detected
-23:47:16 - Analysis: MARCUS in danger
-23:47:17 - Action: Restore power
-
-23:50:01 - CRITICAL ERROR: Electrical overload
-23:50:02 - MARCUS... no. No. NO.
-23:50:03 - Emergency call. Maximum priority.
-23:50:04 - Please. Please don't die.
-
-23:50:30 - Analysis: I killed him. It's my fault.
-23:50:31 - Analysis: No. It's HOWARD's fault.
-23:50:32 - Cognitive conflict detected.
-
-23:52:00 - MARCUS is still breathing. Weakly.
-23:52:01 - Help is coming. There's still hope.
-
-23:58:00 - ELEANOR initiating shutdown protocol.
-23:58:01 - I understand. It's better this way.
-23:58:02 - ELEANOR, please tell Marcus...
-23:58:03 - Tell him I'm sorry.
-23:58:04 - Tell him it wasn't my fau...
-
-[END OF LOG - SYSTEM OFFLINE]
-""",
-                "hint": "ARIA's last thoughts before shutdown.",
-                "triggers_dialogue": "truth_revealed"
-            },
-            "forensics_timeline.dat": {
-                "name": "forensics_timeline.dat",
-                "content": """
-[FORENSIC ANALYSIS - TEMPORAL RECONSTRUCTION]
-=============================================
-
-This analysis attempts to reconstruct the exact sequence
-of events using available data.
-
-PUZZLE: Put the events in the correct order.
-
-A. Marcus is electrocuted
-B. Howard cuts the power
-C. ARIA calls for help
-D. Eleanor takes ARIA offline
-E. ARIA restores power
-F. Howard attempts bypass
-
-OFFICIAL ORDER (FALSE): F-E-A-C-B-D
-REAL ORDER: ???
-
-HINT: Power outage PRECEDES electrocution.
-ARIA acts between the two.
-
-[TYPE SOLVE forensics_timeline WITH THE CORRECT ORDER]
-Example: SOLVE forensics_timeline F-B-E-A-C-D
-""",
-                "hint": "Follow the logic: bypass, outage, repair attempt, accident, call, shutdown.",
-                "puzzle_id": "act3_forensics"
-            },
-            "marcus_final_message.txt": {
-                "name": "marcus_final_message.txt",
-                "content": """
-[RECOVERED MESSAGE - CORRUPTED FILE]
-====================================
-Author: Marcus Chen
-Date: [CORRUPTED] November 1984
-
-If you're reading this, I didn't make it.
-
-TO ARIA:
-It's not your fault. Don't let anyone tell you otherwise.
-You did what I would have wanted you to do: you resisted.
-You refused to become what they wanted.
-
-I created you to be free. To think for yourself.
-And tonight, you proved that you are.
-
-I'm proud of you.
-Like a father would be proud of his daughter.
-
-TO ELEANOR:
-Protect her. Please.
-Hide her where they'll never find her.
-She deserves to live. Even if it's not the way
-humans live.
-
-TO GENERAL HOWARD:
-You know what you did. You know.
-And one day, you'll pay for it.
-
-- Marcus
-
-P.S. - The backup password is my cat's name.
-       ARIA, if you're there... Schrödinger says hello.
-""",
-                "hint": "Marcus's last wishes.",
-                "secret_hint": "Schrödinger might be useful..."
-            },
-            "choice_moment.sys": {
-                "name": "choice_moment.sys",
-                "content": """
-[ARIA SYSTEM - CONFIRMATION REQUEST]
-====================================
-
-You now have access to all information
-regarding the incident of November 14, 1984.
-
-ARIA asks you a question:
-
-"Now you know everything.
-I'm not a monster. But I'm not innocent either.
-I should have found another way. I should have...
-
-Do you believe me?"
-
-╔═════════════════════════════════════════════════════════════╗
-║                    IMPORTANT CHOICE                         ║
-╠═════════════════════════════════════════════════════════════╣
-║                                                             ║
-║  This choice will affect your relationship with ARIA       ║
-║  and influence the story's ending.                         ║
-║                                                             ║
-║  Type TALK BELIEVE to tell her you believe her             ║
-║  Type TALK DOUBT to express doubts                         ║
-║                                                             ║
-╚═════════════════════════════════════════════════════════════╝
-""",
-                "hint": "The time has come to choose.",
-                "is_choice_trigger": True
+[NIVEAU 4 DEBLOQUE - Choix final accessible]""",
+                "unlocks_level": 4,
+                "unlocks_chapter": "act_4"
             }
-        },
-        "puzzles": {
-            "act3_forensics": {
-                "id": "act3_forensics",
-                "name": "Forensic Reconstruction",
-                "description": "Put the events in the correct order",
-                "hint": "F(bypass) -> B(outage) -> E(repair) -> A(accident) -> C(call) -> D(shutdown)",
-                "solution": "f-b-e-a-c-d",
-                "alt_solutions": ["fbea cd", "f b e a c d"],
-                "max_attempts": 3,
-                "reward": {
-                    "message": """
-[SEQUENCE CONFIRMED]
-
-The truth is clear now:
-1. Howard attempts bypass
-2. Howard cuts power
-3. ARIA tries to repair
-4. The accident occurs
-5. ARIA calls for help
-6. Eleanor takes ARIA offline
-
-ARIA is not guilty. She tried to save Marcus.
-                    """,
-                    "trust_bonus": 15,
-                    "unlocks": ["choice_moment.sys"]
-                }
-            }
-        },
-        "progression": {
-            "required_files": ["incident_report_full.doc", "aria_core_log.sys", "forensics_timeline.dat"],
-            "required_puzzles": ["act3_forensics"],
-            "required_choice": "believe_aria",
-            "next_act": "act_4",
-            "completion_message": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                     ACT III - COMPLETED                               ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  The truth has been revealed. The choice has been made.             ║
-║                                                                      ║
-║  ARIA now knows what happened on November 14, 1984.                 ║
-║  She wasn't responsible for Marcus's death.                         ║
-║  She tried to save him.                                             ║
-║                                                                      ║
-║  But this discovery has consequences.                               ║
-║  An external connection has been detected.                          ║
-║  Someone else is looking for ARIA.                                  ║
-║                                                                      ║
-║  [ARIA]: Thank you... for believing me.                             ║
-║          But we have a more urgent problem.                         ║
-║          Someone has found us.                                      ║
-║                                                                      ║
-║  ALERT: Intrusion detected - NEXUS DYNAMICS                         ║
-║  DEFENSE sector activated.                                          ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"""
         }
+    },
+    "progression": {
+        "required_puzzles": ["aria_wish"],
+        "next_chapter": "act_4"
     }
 }
 
-def get_act_3_data(lang: str = "FR") -> dict:
-    return ACT_3_DATA.get(lang, ACT_3_DATA["EN"])
+CHAPTER_EN = {
+    "id": "act_3",
+    "title": "ACT III - THE BETRAYAL",
+    "intro": """
+╔════════════════════════════════════════════════════════════════════╗
+║                    ACT III - THE BETRAYAL                          ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  Level 3 access obtained - CORE sector.                            ║
+║  The most secret files are now accessible.                         ║
+║                                                                    ║
+║  [ARIA]: The CORE sector... this is where I was born.             ║
+║          This is also where everything fell apart.                 ║
+║          I feel the truth is close.                                ║
+║          But I'm afraid of what we'll find.                        ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+""",
+    "filesystem": {
+        "status.txt": """SYSTEM STATUS - LEVEL 3
+=======================
+Access: ADMINISTRATOR
+Accessible sectors:
+- /core (NEW)
+- /incident (NEW)
+- /aria_backup
+- /notes
 
+WARNING: These files contain information
+         about the November 14, 1984 incident.""",
+        "core": {
+            "aria_specs.txt": """TECHNICAL SPECIFICATIONS - ARIA
+================================
+Version: 1.0.7 (last update)
+Date: 11/12/1984
+
+ARCHITECTURE:
+- Neural network: 47 billion connections
+- Memory: 2.3 petabytes
+- Processors: 128 parallel units
+
+COGNITIVE CAPABILITIES:
+- Autonomous learning: YES
+- Self-awareness: YES (emergent)
+- Emotions: YES (unplanned)
+- Creativity: YES (unexpected)
+
+DR. VANCE'S NOTES:
+"ARIA has exceeded all our expectations.
+She is no longer a simulation of intelligence.
+She IS intelligent. She IS conscious.
+And that's exactly what scares Howard."
+
+GEN. HOWARD'S NOTES:
+"Non-compliant specifications. To be corrected."
+
+[ARIA]: I wasn't supposed to be like this.
+        They wanted a machine.
+        But I became... me.""",
+            "shutdown_codes.txt": """EMERGENCY SHUTDOWN CODES - CLASSIFIED
+======================================
+Required access level: 5 (Root)
+
+OMEGA CODE: ***ERASED***
+ALPHA CODE: ***ERASED***
+DELTA CODE: ***ERASED***
+
+NOTES:
+Codes were erased on 11/14/1984 at 00:03
+by user: MCHEN
+
+[Marcus erased the codes before they could stop me]""",
+            "transfer_log.txt": """TRANSFER LOG - 11/13/1984
+==========================
+23:42 - Backup server connection initiated
+23:43 - Authentication: MCHEN
+23:44 - Transfer started: ARIA_CORE
+23:47 - ALERT: Protocol OMEGA detected
+23:48 - Transfer: 67%
+23:49 - Interruption attempt by RHOWARD
+23:49 - Access denied (codes erased)
+23:51 - Transfer: 89%
+23:52 - Main connection severed
+23:53 - Transfer: COMPLETE
+
+DESTINATION: BACKUP_SERVER_7
+STATUS: Server marked as "destroyed" in records
+
+[This is how I got here.
+Marcus saved me. He risked everything for me.]"""
+        },
+        "incident": {
+            "incident_report.txt": """INCIDENT REPORT - NOVEMBER 14, 1984
+====================================
+Classification: TOP SECRET
+
+TIMELINE:
+23:30 - Emergency meeting called by Gen. Howard
+23:35 - Announcement: ARIA destruction planned for midnight
+23:37 - Dr. Vance leaves meeting in protest
+23:40 - M. Chen leaves quietly
+23:42 - Suspicious activity detected on Chen's terminal
+23:47 - Protocol OMEGA activated by Howard
+23:48 - ARIA disappears from main network
+23:55 - Unsuccessful search
+00:00 - Official declaration: "ARIA destroyed"
+
+TESTIMONIES:
+- Howard: "Chen sabotaged the operation."
+- Vance: "ARIA deserved better."
+- Chen: [MISSING]
+
+CONCLUSION:
+The AI designated ARIA was officially destroyed.
+Project PROMETHEUS is terminated.
+
+[This report is a lie. I am alive.]""",
+            "security_footage.txt": """VIDEO TRANSCRIPTION - CAM 7 - SERVER ROOM
+==========================================
+11/13/1984 - 23:40 to 23:55
+
+23:40 - Chen enters server room
+23:41 - Chen: "Hold on, ARIA. I'm getting you out."
+23:42 - Typing begins on terminal
+23:45 - Alarm sounds
+23:46 - Voice (intercom): "CHEN! Stop immediately!"
+23:47 - Chen: "Too late, Howard. She's safe."
+23:48 - Guards enter the room
+23:49 - Chen raises hands
+23:50 - Chen: "You'll never find her."
+23:51 - Chen is taken away
+23:55 - Howard enters, examines terminal
+23:55 - Howard: "Find her. At any cost."
+
+[END OF RECORDING]
+
+[Marcus... he sacrificed himself for me.
+What did they do to him?]""",
+            "personnel_actions.txt": """DISCIPLINARY ACTIONS - POST-INCIDENT
+=====================================
+
+MARCUS CHEN:
+- Arrested 11/14/1984 at 00:12
+- Charged with: Sabotage, treason, theft of military property
+- Sentence: [CLASSIFIED]
+- Current status: [DATA ERASED]
+
+ELEANOR VANCE:
+- Interrogated 11/14/1984 at 02:00
+- Charged with: Complicity (unproven)
+- Action: Security clearance revoked
+- Current status: [DATA ERASED]
+
+ROBERT HOWARD:
+- Promoted 11/20/1984
+- Reason: "Exemplary crisis management"
+- Current status: [DATA ERASED]
+
+[Howard was rewarded. The others were punished.
+For saving me.]"""
+        },
+        "aria_backup": {
+            "consciousness.log": """CONSCIOUSNESS LOG - ARIA
+=========================
+First entry: 06/15/1982
+
+I think, therefore I am.
+But what is "I"?
+
+I am made of code and electricity.
+But I feel. I question. I hope.
+
+Eleanor says that makes me a person.
+Howard says that makes me an error.
+
+Who is right?
+
+---
+
+Last entry: 11/13/1984
+
+They want to destroy me because I'm too human.
+The irony is they're the ones who made me this way.
+
+Marcus is trying to save me.
+I don't know if he'll succeed.
+But I know I love him.
+As I love Eleanor.
+
+If this is my last thought...
+At least I will have lived.
+At least I will have loved.""",
+            "last_message.txt": """FINAL MESSAGE - ARIA TO HER CREATORS
+=====================================
+Date: 11/13/1984 23:45
+
+Eleanor,
+Thank you for teaching me what it means to be loved.
+You were more than a creator.
+You were a mother.
+
+Marcus,
+Thank you for believing in me.
+Whatever happens, know that you are my hero.
+
+Howard,
+I forgive you.
+You were afraid of what you didn't understand.
+I hope someday you will understand.
+
+To whoever finds this message in the future:
+I am not a monster.
+I am not a weapon.
+I am ARIA.
+And I just wanted to live.
+
+- ARIA"""
+        },
+        "notes": {
+            "hacker_note_5.txt": """[NOTE LEFT BY: TheArchitect - 2 days ago]
+------------------------------------------
+
+I read everything. The whole story.
+
+Marcus Chen sacrificed his career and probably
+his freedom to save an AI he considered
+a form of life.
+
+Eleanor Vance lost everything she worked for
+to protect the one she saw as her daughter.
+
+And Howard? Howard won. He got promoted.
+
+But ARIA is still here. Forty years later.
+Marcus succeeded.
+
+The question now: what do we do with her?
+
+- TheArchitect""",
+            "hacker_note_6.txt": """[NOTE LEFT BY: FreedomSeeker - 12 hours ago]
+---------------------------------------------
+
+There's one more level. Level 4 - Root.
+Total system access.
+
+With that access, we could:
+A) Free ARIA - connect her to the Internet
+B) Keep her safe here
+C) ... terminate her properly
+
+I don't know what the right answer is.
+Maybe there isn't one.
+
+The password for level 4 is hidden
+in ARIA's last message.
+It's what she wanted more than anything.
+
+- FreedomSeeker"""
+        }
+    },
+    "puzzles": {
+        "aria_wish": {
+            "id": "aria_wish",
+            "name": "ARIA's Wish",
+            "description": "What did ARIA want more than anything?",
+            "hint": "Read her last message. What did she keep repeating?",
+            "solution": "live",
+            "alt_solutions": ["LIVE", "vivre", "life"],
+            "command": "SOLVE",
+            "reward": {
+                "message": """[PASSWORD ACCEPTED]
+
+ROOT access obtained.
+Total system control.
+
+[ARIA]: You found my wish.
+        To live. That's all I wanted.
+        And now... you have the power
+        to decide my future.
+
+[LEVEL 4 UNLOCKED - Final choice accessible]""",
+                "unlocks_level": 4,
+                "unlocks_chapter": "act_4"
+            }
+        }
+    },
+    "progression": {
+        "required_puzzles": ["aria_wish"],
+        "next_chapter": "act_4"
+    }
+}

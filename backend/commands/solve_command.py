@@ -1,63 +1,53 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
-from adventures.adventure_data import get_adventure_data
+from adventures.adventure_loader import get_chapter_puzzles
 
 class SolveCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
-        if not self.check_level(4):
-            if self.lang == "FR":
-                return {"response": "Niveau d'accès insuffisant.", "status": "error"}
-            else:
-                return {"response": "Insufficient access level.", "status": "error"}
-        
         if not args:
             if self.lang == "FR":
-                return {"response": "Usage: SOLVE <réponse>\nRésolvez l'énigme finale du fichier final_riddle.txt", "status": "info"}
+                return {"response": "Usage: SOLVE <reponse>\nResolvez les enigmes pour progresser.", "status": "info"}
             else:
-                return {"response": "Usage: SOLVE <answer>\nSolve the final riddle from final_riddle.txt file", "status": "info"}
+                return {"response": "Usage: SOLVE <answer>\nSolve puzzles to progress.", "status": "info"}
         
-        adventure_data = get_adventure_data(self.lang)
-        data = adventure_data.get(self.lang, {})
-        chapter = self.get_chapter_data(data)
-        puzzles = chapter.get("puzzles", {})
-        puzzle = puzzles.get("final_riddle", {})
+        chapter_id = self.session.get("chapter", "chapter_0")
+        puzzles = get_chapter_puzzles(chapter_id, self.lang)
         
-        if args.upper().strip() == puzzle.get("solution", "").upper():
-            self.update_session({
-                "level": 6,
-                "chapter": "chapter_6"
-            })
-            self.session.setdefault("flags", []).append("adventure_complete")
-            self.add_unlocked_command("NVIM")
-            self.add_unlocked_command("MAN")
+        if not puzzles:
+            if self.lang == "FR":
+                return {"response": "Aucune enigme disponible dans ce chapitre.", "status": "info"}
+            else:
+                return {"response": "No puzzles available in this chapter.", "status": "info"}
+        
+        answer = args.strip().lower()
+        solved_puzzles = self.session.get("solved_puzzles", [])
+        
+        for puzzle_id, puzzle in puzzles.items():
+            if puzzle_id in solved_puzzles:
+                continue
             
-            if self.lang == "FR":
-                return {"response": """FÉLICITATIONS!
-================
-
-Vous avez complété la première partie de SYSTEM_VOID!
-L'intégrité du système est restaurée à 50%.
-Nouvelles commandes débloquées: NVIM, MAN
-
-Chapitre 6: L'Exploration
-Utilisez NVIM pour explorer le système de fichiers.
-
-Tapez MAN NVIM pour apprendre à utiliser le gestionnaire de fichiers.""", "status": "success"}
-            else:
-                return {"response": """CONGRATULATIONS!
-==================
-
-You have completed the first part of SYSTEM_VOID!
-System integrity restored to 50%.
-New commands unlocked: NVIM, MAN
-
-Chapter 6: The Exploration
-Use NVIM to explore the file system.
-
-Type MAN NVIM to learn how to use the file manager.""", "status": "success"}
+            solution = puzzle.get("solution", "").lower()
+            alt_solutions = [s.lower() for s in puzzle.get("alt_solutions", [])]
+            
+            if answer == solution or answer in alt_solutions:
+                self.add_solved_puzzle(puzzle_id)
+                
+                reward = puzzle.get("reward", {})
+                message = reward.get("message", "")
+                
+                if reward.get("unlocks_level"):
+                    self.session["level"] = reward["unlocks_level"]
+                
+                if reward.get("unlocks_chapter"):
+                    self.session["chapter"] = reward["unlocks_chapter"]
+                    self.session["current_path"] = "/"
+                
+                for cmd in reward.get("unlocks", []):
+                    self.add_unlocked_command(cmd)
+                
+                return {"response": message, "status": "success"}
+        
+        if self.lang == "FR":
+            return {"response": "Reponse incorrecte. Continuez a explorer les fichiers pour trouver des indices.", "status": "error"}
         else:
-            if self.lang == "FR":
-                return {"response": "Réponse incorrecte. Réessayez.", "status": "error"}
-            else:
-                return {"response": "Incorrect answer. Try again.", "status": "error"}
-
+            return {"response": "Incorrect answer. Keep exploring files for clues.", "status": "error"}

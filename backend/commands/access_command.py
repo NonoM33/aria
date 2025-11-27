@@ -10,10 +10,11 @@ class AccessCommand(BaseCommand):
             else:
                 return {"response": "Usage: CAT <filename>\nExample: CAT readme.txt", "status": "info"}
         
-        adventure_data = get_adventure_data(self.lang)
-        data = adventure_data.get(self.lang, {})
-        chapter = self.get_chapter_data(data)
-        filesystem = chapter.get("filesystem", {})
+        chapter_id = self.session.get("chapter", "chapter_0")
+        filesystem = get_chapter_filesystem(chapter_id, self.lang)
+        
+        if not filesystem:
+            filesystem = {}
         
         current_path = self.session.get("current_path", "/")
         target = args.strip()
@@ -34,7 +35,7 @@ class AccessCommand(BaseCommand):
             filename = target.split("/")[-1]
             self.add_accessed_file(file_path)
             
-            if filename == "corrupted_data.b64":
+            if "crypte" in filename.lower() or "encrypted" in filename.lower() or filename.endswith(".b64"):
                 if self.lang == "FR":
                     content += "\n\n[Indice: Utilisez DECODE pour decoder ce fichier]"
                 else:
@@ -61,4 +62,3 @@ class AccessCommand(BaseCommand):
             return current
         else:
             return None
-

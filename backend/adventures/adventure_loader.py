@@ -96,3 +96,21 @@ def get_act_progression(act_id: str, language: str = "FR") -> Dict[str, Any]:
         return act_data.get("progression", {})
     return {}
 
+def get_chapter_filesystem(chapter_id: str, language: str = "FR") -> Dict[str, Any]:
+    chapter_data = get_chapter(chapter_id, language)
+    if chapter_data:
+        return chapter_data.get("filesystem", {})
+    return {}
+
+def get_chapter_intro(chapter_id: str, language: str = "FR") -> str:
+    chapter_data = get_chapter(chapter_id, language)
+    if chapter_data:
+        return chapter_data.get("intro", "")
+    return ""
+
+def get_chapter_puzzles(chapter_id: str, language: str = "FR") -> Dict[str, Any]:
+    chapter_data = get_chapter(chapter_id, language)
+    if chapter_data:
+        return chapter_data.get("puzzles", {})
+    return {}
+

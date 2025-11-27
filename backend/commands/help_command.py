@@ -8,20 +8,24 @@ global_state = GlobalState()
 class HelpCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
         is_logged_in = self.session.get("logged_in", False)
+        level = self.session.get("level", 0)
         
         if not is_logged_in:
-            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD"}
+            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN"}
         else:
-            all_commands = set(self.session.get("unlocked_commands", []))
+            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "STATUS", "TALK", "ARIA"}
+            all_commands.update(self.session.get("unlocked_commands", []))
             
-            if self.session.get("level", 0) >= 1:
-                all_commands.update(["SCAN", "DECODE", "ACCESS"])
-            if self.session.get("level", 0) >= 2:
-                all_commands.update(["ACTIVATE", "NETWORK", "ANALYZE", "BYPASS"])
-            if self.session.get("level", 0) >= 3:
-                all_commands.update(["CONNECT", "RESTORE", "SOLVE"])
-            if self.session.get("level", 0) >= 6:
-                all_commands.update(["NVIM", "MAN"])
+            if level >= 1:
+                all_commands.update(["DECODE", "SOLVE"])
+            if level >= 2:
+                all_commands.update(["ANALYZE"])
+            if level >= 3:
+                all_commands.update(["BYPASS"])
+            if level >= 4:
+                all_commands.update(["RESTORE"])
+            if level >= 5:
+                all_commands.update(["MAN"])
             if DEV_MODE:
                 all_commands.add("DEV")
         
@@ -33,15 +37,18 @@ class HelpCommand(BaseCommand):
             if not is_logged_in:
                 help_msg += "\n\nAcces restreint. Explorez le systeme avec LS et CD..."
             else:
-                help_msg += "\n\nTapez STATUS pour voir l'état du système."
-                help_msg += f"\n[GLOBAL] Intégrité mondiale: {global_state._state['global_integrity']}%"
+                help_msg += f"\n\nNiveau d'acces: {level}"
+                help_msg += "\nTapez STATUS pour voir l'etat du systeme."
+                help_msg += "\nTapez TALK pour parler a ARIA."
+                help_msg += f"\n\n[GLOBAL] Integrite mondiale: {global_state._state['global_integrity']}%"
         else:
             help_msg = f"Commands available: {available}"
             if not is_logged_in:
                 help_msg += "\n\nAccess restricted. Explore the system with LS and CD..."
             else:
-                help_msg += "\n\nType STATUS to see system status."
-                help_msg += f"\n[GLOBAL] World integrity: {global_state._state['global_integrity']}%"
+                help_msg += f"\n\nAccess level: {level}"
+                help_msg += "\nType STATUS to see system status."
+                help_msg += "\nType TALK to speak with ARIA."
+                help_msg += f"\n\n[GLOBAL] World integrity: {global_state._state['global_integrity']}%"
         
         return {"response": help_msg, "status": "success"}
-
