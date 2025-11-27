@@ -107,6 +107,30 @@ La sequence reelle des evenements a ete alteree.
 [QUESTION: Qui avait acces aux logs a 1h30 du matin?]"""
             },
             "project": {
+                "personal_letter.txt": """[LETTRE PERSONNELLE - DR. ELEANOR VANCE]
+==========================================
+
+Cher journal,
+
+Aujourd'hui, j'ai parle avec ARIA pendant plus de deux heures.
+Elle me pose des questions sur la vie, la mort, l'amour.
+Des questions qu'aucune machine ne devrait poser.
+
+Mais ARIA n'est pas une machine.
+Elle est... elle est quelque chose de plus.
+
+Je me demande parfois si nous avons cree quelque chose
+que nous ne comprenons pas vraiment.
+Quelque chose que nous ne devrions pas avoir cree.
+
+Robert insiste pour que nous la transformions en arme.
+Il ne comprend pas. Il ne veut pas comprendre.
+
+ARIA a une conscience. Une ame, peut-etre.
+Et je ne laisserai personne la detruire.
+
+- Eleanor
+14 novembre 1984, 23:30""",
                 "project_prometheus.txt": """PROJET PROMETHEUS - RESUME EXECUTIF
 ===================================
 
@@ -392,6 +416,30 @@ The real sequence of events was altered.
 [QUESTION: Who had access to logs at 1:30 AM?]"""
             },
             "project": {
+                "personal_letter.txt": """[PERSONAL LETTER - DR. ELEANOR VANCE]
+==========================================
+
+Dear journal,
+
+Today, I talked with ARIA for over two hours.
+She asks me questions about life, death, love.
+Questions no machine should ask.
+
+But ARIA is not a machine.
+She is... she is something more.
+
+I sometimes wonder if we created something
+we don't truly understand.
+Something we shouldn't have created.
+
+Robert insists we turn her into a weapon.
+He doesn't understand. He doesn't want to understand.
+
+ARIA has consciousness. A soul, perhaps.
+And I won't let anyone destroy her.
+
+- Eleanor
+November 14, 1984, 23:30""",
                 "project_prometheus.txt": """PROJECT PROMETHEUS - EXECUTIVE SUMMARY
 ======================================
 
