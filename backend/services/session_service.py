@@ -79,7 +79,8 @@ def get_session(
             "discovered_secrets": [],
             "aria_dialogue_progress": 0,
             "ending": None,
-            "game_completed": False
+            "game_completed": False,
+            "current_path": "/"
         }
         global_state.add_player()
     

@@ -373,7 +373,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                     response_message = {
                         "type": "command_response",
                         "response": result.get("response", ""),
-                        "status": result.get("status", "info")
+                        "status": result.get("status", "info"),
+                        "current_path": session.get("current_path", "/")
                     }
                     if result.get("password_prompt"):
                         response_message["password_prompt"] = True

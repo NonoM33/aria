@@ -386,7 +386,7 @@ const Terminal = () => {
           onClose={() => setFileViewerData(null)}
         />
       )}
-      <div className="terminal-content">
+      <div className="terminal-content" ref={terminalContentRef}>
         {username && (
           <AriaDisplay 
             state={ariaState}
@@ -438,7 +438,7 @@ const Terminal = () => {
           {isTyping && (
             <div className="terminal-input-line">
               <span className="prompt">
-                {username ? `${username}@system-void > ` : '> '}
+                {username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `}
               </span>
               <span className="cursor"></span>
             </div>
