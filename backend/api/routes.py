@@ -420,6 +420,11 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                         response_message["username"] = result.get("username")
                     if result.get("token"):
                         response_message["token"] = result.get("token")
+                    if result.get("aria_message"):
+                        response_message["aria_message"] = result.get("aria_message")
+                        response_message["aria_emotion"] = result.get("aria_emotion", "neutral")
+                    if result.get("aria_choices"):
+                        response_message["aria_choices"] = result.get("aria_choices")
                     
                     await manager.send_personal_message(response_message, connection_id)
                     

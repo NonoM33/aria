@@ -98,7 +98,6 @@ const ManPage = ({ command, onClose }) => {
   const handleCloseClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    e.stopImmediatePropagation()
     onClose()
   }
 
@@ -106,7 +105,6 @@ const ManPage = ({ command, onClose }) => {
     if (e.key === 'Escape' || e.key === 'q' || e.key === 'Q') {
       e.preventDefault()
       e.stopPropagation()
-      e.stopImmediatePropagation()
       onClose()
     }
   }

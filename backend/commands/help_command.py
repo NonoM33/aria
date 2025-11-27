@@ -13,7 +13,7 @@ class HelpCommand(BaseCommand):
         if not is_logged_in:
             all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "EDIT", "ALIAS"}
         else:
-            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "STATUS", "TALK", "ARIA", "EDIT", "ALIAS"}
+            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD", "SCAN", "STATUS", "EDIT", "ALIAS"}
             all_commands.update(self.session.get("unlocked_commands", []))
             
             if level >= 1:
@@ -39,7 +39,7 @@ class HelpCommand(BaseCommand):
             else:
                 help_msg += f"\n\nNiveau d'acces: {level}"
                 help_msg += "\nTapez STATUS pour voir l'etat du systeme."
-                help_msg += "\nTapez TALK pour parler a ARIA."
+                help_msg += "\nARIA vous parlera automatiquement..."
                 help_msg += f"\n\n[GLOBAL] Integrite mondiale: {global_state._state['global_integrity']}%"
         else:
             help_msg = f"Commands available: {available}"
@@ -48,7 +48,7 @@ class HelpCommand(BaseCommand):
             else:
                 help_msg += f"\n\nAccess level: {level}"
                 help_msg += "\nType STATUS to see system status."
-                help_msg += "\nType TALK to speak with ARIA."
+                help_msg += "\nARIA will speak to you automatically..."
                 help_msg += f"\n\n[GLOBAL] World integrity: {global_state._state['global_integrity']}%"
         
         return {"response": help_msg, "status": "success"}
