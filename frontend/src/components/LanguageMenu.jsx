@@ -10,7 +10,7 @@ const LanguageMenu = () => {
         className="language-button"
         title={language === 'FR' ? 'Switch to English' : 'Passer en français'}
       >
-        {language === 'FR' ? 'EN' : 'FR'}
+        {language}
       </button>
     </div>
   )
