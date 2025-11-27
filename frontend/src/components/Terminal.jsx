@@ -3,6 +3,7 @@ import { useTerminal } from '../hooks/useTerminal'
 import { useLanguage } from '../contexts/LanguageContext'
 import LanguageMenu from './LanguageMenu'
 import ManPage from './ManPage'
+import FileViewer from './FileViewer'
 
 const Terminal = () => {
   const { 
@@ -13,7 +14,8 @@ const Terminal = () => {
     sendCommand, 
     navigateHistory, 
     handleTab,
-    autocompleteOptions 
+    autocompleteOptions,
+    installedPackages
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
@@ -21,6 +23,7 @@ const Terminal = () => {
   const [showInput, setShowInput] = useState(true)
   const [welcomeShown, setWelcomeShown] = useState(false)
   const [manPageCommand, setManPageCommand] = useState(null)
+  const [fileViewerData, setFileViewerData] = useState(null)
 
   const welcomeSentRef = useRef(false)
   const languageRef = useRef(language)
@@ -83,8 +86,8 @@ const Terminal = () => {
   }
 
   const handleKeyDown = (e) => {
-    // Ne pas traiter les touches si la modal MAN est ouverte
-    if (manPageCommand) {
+    // Ne pas traiter les touches si la modal MAN ou FileViewer est ouverte
+    if (manPageCommand || fileViewerData) {
       return
     }
     if (isTyping) return
@@ -117,6 +120,65 @@ const Terminal = () => {
     }
   }, [history])
 
+  useEffect(() => {
+    const hasFileViewer = installedPackages.includes('file-viewer')
+    
+    if (hasFileViewer) {
+      const lastUserCommand = history.filter(e => e.type === 'user').slice(-1)[0]
+      const lastSystemResponse = history.filter(e => e.type === 'system').slice(-1)[0]
+      
+      if (lastUserCommand && lastUserCommand.content.toUpperCase().startsWith('ACCESS ')) {
+        const filename = lastUserCommand.content.split(' ').slice(1).join(' ')
+        
+        if (lastSystemResponse && lastSystemResponse.content) {
+          const responseContent = lastSystemResponse.content
+          
+          if (responseContent.includes('Fichier:') || responseContent.includes('File:')) {
+            const lines = responseContent.split('\n')
+            let fileContent = ''
+            let inFileContent = false
+            let skipNextEmpty = false
+            
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i]
+              
+              if (line.includes('Fichier:') || line.includes('File:')) {
+                inFileContent = true
+                skipNextEmpty = true
+                continue
+              }
+              
+              if (inFileContent) {
+                if (line.trim() === '' && skipNextEmpty) {
+                  skipNextEmpty = false
+                  continue
+                }
+                
+                if (line.includes('[Indice:') || line.includes('[Hint:') || line.includes('[')) {
+                  break
+                }
+                
+                fileContent += line + '\n'
+                skipNextEmpty = false
+              }
+            }
+            
+            if (fileContent.trim()) {
+              setFileViewerData({
+                filename: filename,
+                content: fileContent.trim()
+              })
+            }
+          }
+        }
+      } else if (!lastUserCommand || !lastUserCommand.content.toUpperCase().startsWith('ACCESS ')) {
+        setFileViewerData(null)
+      }
+    } else {
+      setFileViewerData(null)
+    }
+  }, [history, installedPackages])
+
   return (
     <div className="terminal-container">
       <div className="scanlines"></div>
@@ -125,6 +187,13 @@ const Terminal = () => {
         <ManPage 
           command={manPageCommand} 
           onClose={() => setManPageCommand(null)} 
+        />
+      )}
+      {fileViewerData && (
+        <FileViewer
+          filename={fileViewerData.filename}
+          content={fileViewerData.content}
+          onClose={() => setFileViewerData(null)}
         />
       )}
       <div className="terminal-content">

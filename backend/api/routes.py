@@ -68,21 +68,32 @@ async def handle_command_route(
         except:
             pass
     
-    result = handle_command(command, args, session, db, lang)
-    
-    if result.get("token"):
-        session["ssh_token"] = result.get("token")
-    
-    if db and (player or session.get("player_id")):
-        try:
-            save_session_to_db(db, session, player)
-        except:
-            pass
-    
-    if token and result.get("token"):
-        result["token"] = result.get("token")
-    
-    return result
+    try:
+        result = handle_command(command, args, session, db, lang, token)
+        
+        if result.get("token"):
+            session["ssh_token"] = result.get("token")
+        
+        if db and (player or session.get("player_id")):
+            try:
+                save_session_to_db(db, session, player)
+            except Exception as e:
+                pass
+        
+        return result
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        if lang == "FR":
+            return {
+                "response": f"Erreur lors de l'exécution de la commande: {error_msg}",
+                "status": "error"
+            }
+        else:
+            return {
+                "response": f"Error executing command: {error_msg}",
+                "status": "error"
+            }
 
 @router.get("/api/man/{command}")
 async def get_man_page(command: str, language: str = DEFAULT_LANGUAGE):
@@ -128,6 +139,25 @@ async def get_available_files(session_id: str, language: str = DEFAULT_LANGUAGE)
     
     files = list(chapter.get("files", {}).keys())
     return {"files": files}
+
+@router.get("/api/packages")
+async def get_installed_packages(
+    session_id: str,
+    language: str = DEFAULT_LANGUAGE,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_database)
+):
+    lang = normalize_language(language)
+    
+    token = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization[7:]
+    
+    username = None
+    session = get_session(session_id, lang, db, username, token)
+    
+    installed_packages = session.get("installed_packages", [])
+    return {"packages": installed_packages}
 
 @router.get("/api/global-status")
 async def get_global_status(session_id: Optional[str] = None):

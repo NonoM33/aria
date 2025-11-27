@@ -307,3 +307,313 @@ body {
   opacity: 0.7;
 }
 
+.wiki-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  color: #00FF00;
+  overflow-y: auto;
+}
+
+.wiki-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.wiki-header {
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #00FF00;
+  padding-bottom: 20px;
+}
+
+.wiki-title {
+  color: #00FF00;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.wiki-back-link {
+  color: #00FF00;
+  text-decoration: none;
+  border: 1px solid #00FF00;
+  padding: 8px 16px;
+  transition: all 0.2s;
+}
+
+.wiki-back-link:hover {
+  background: rgba(0, 255, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.wiki-body {
+  color: #00FF00;
+}
+
+.wiki-intro {
+  margin-bottom: 40px;
+  line-height: 1.8;
+}
+
+.wiki-intro p {
+  margin-bottom: 12px;
+}
+
+.wiki-intro code {
+  background: rgba(0, 255, 0, 0.1);
+  padding: 2px 6px;
+  border: 1px solid #00FF00;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+}
+
+.wiki-note {
+  color: #00AA00;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+.wiki-section-title {
+  color: #00FF00;
+  font-size: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #00FF00;
+  padding-bottom: 10px;
+}
+
+.wiki-packages {
+  margin-bottom: 40px;
+}
+
+.wiki-package-card {
+  border: 2px solid #00FF00;
+  margin-bottom: 24px;
+  background: rgba(0, 255, 0, 0.02);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+}
+
+.wiki-package-header {
+  background: #001100;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #00FF00;
+}
+
+.wiki-package-name {
+  color: #00FF00;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.wiki-package-version {
+  color: #00AA00;
+  font-size: 14px;
+}
+
+.wiki-package-body {
+  padding: 20px;
+}
+
+.wiki-package-description {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.wiki-package-meta {
+  margin-bottom: 16px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.wiki-package-install {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.wiki-install-command {
+  display: block;
+  background: rgba(0, 255, 0, 0.1);
+  padding: 12px;
+  border: 1px solid #00FF00;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  color: #00FF00;
+}
+
+.wiki-commands {
+  margin-bottom: 40px;
+}
+
+.wiki-command-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wiki-command-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  background: rgba(0, 255, 0, 0.02);
+}
+
+.wiki-command-item code {
+  background: rgba(0, 255, 0, 0.1);
+  padding: 4px 8px;
+  border: 1px solid #00FF00;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  min-width: 200px;
+}
+
+.file-viewer-overlay {
+  outline: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.file-viewer-container {
+  background: #000000;
+  border: 2px solid #00FF00;
+  width: 90%;
+  max-width: 1000px;
+  height: 85%;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+}
+
+.file-viewer-header {
+  background: #001100;
+  border-bottom: 1px solid #00FF00;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-viewer-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-viewer-title {
+  color: #00FF00;
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.file-viewer-filename {
+  color: #00AA00;
+  font-size: 14px;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+}
+
+.file-viewer-close {
+  background: transparent;
+  border: 1px solid #00FF00;
+  color: #00FF00;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.file-viewer-close:hover {
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.file-viewer-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  color: #00FF00;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: #000000;
+}
+
+.file-viewer-content::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.file-viewer-content::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+.file-viewer-content::-webkit-scrollbar-thumb {
+  background: #00FF00;
+  opacity: 0.3;
+}
+
+.file-viewer-content::-webkit-scrollbar-thumb:hover {
+  opacity: 0.5;
+}
+
+.file-viewer-lines {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-viewer-line {
+  display: flex;
+  min-height: 20px;
+}
+
+.file-viewer-line-number {
+  color: #00AA00;
+  opacity: 0.6;
+  padding-right: 16px;
+  user-select: none;
+  min-width: 60px;
+  text-align: right;
+  font-size: 12px;
+}
+
+.file-viewer-line-content {
+  color: #00FF00;
+  white-space: pre;
+  flex: 1;
+}
+
+.file-viewer-footer {
+  background: #001100;
+  border-top: 1px solid #00FF00;
+  padding: 8px 20px;
+  color: #00FF00;
+  font-size: 11px;
+  text-align: center;
+  opacity: 0.7;
+}
+

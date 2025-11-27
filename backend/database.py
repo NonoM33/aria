@@ -16,7 +16,6 @@ class Player(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, default=datetime.utcnow)
     
-    # Progression du joueur
     level = Column(Integer, default=0)
     chapter = Column(String, default="chapter_1")
     logged_in = Column(Boolean, default=False)
@@ -28,9 +27,8 @@ class Player(Base):
     language = Column(String, default="FR")
     installed_packages = Column(JSON, default=list)
     
-    # Statistiques
     total_commands = Column(Integer, default=0)
-    total_playtime = Column(Integer, default=0)  # en secondes
+    total_playtime = Column(Integer, default=0)
     achievements = Column(JSON, default=list)
 
 class GlobalEvent(Base):
@@ -39,9 +37,9 @@ class GlobalEvent(Base):
     id = Column(Integer, primary_key=True, index=True)
     event_type = Column(String, nullable=False)
     event_data = Column(JSON, default=dict)
-    triggered_by = Column(String)  # username du joueur qui a déclenché
+    triggered_by = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
-    impact_level = Column(Integer, default=1)  # 1-10, impact sur tous les joueurs
+    impact_level = Column(Integer, default=1)
 
 class PlayerEvent(Base):
     __tablename__ = "player_events"
@@ -52,7 +50,6 @@ class PlayerEvent(Base):
     event_data = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# Base de données SQLite
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./system_void.db")
 
 engine = create_engine(

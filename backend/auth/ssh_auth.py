@@ -36,20 +36,28 @@ def hack_database_and_create_user(db: Session, username: str, password: str) -> 
         }
 
 def ssh_connect(db: Session, username: str, password: Optional[str] = None, token: Optional[str] = None) -> Dict[str, Any]:
-    if token:
-        payload = verify_jwt_token(token)
-        if payload and payload.get("username") == username:
-            player = get_player_by_username(db, username)
-            if player:
-                new_token = create_jwt_token(player.username, player.id)
-                return {
-                    "success": True,
-                    "username": player.username,
-                    "token": new_token,
-                    "player_id": player.id
-                }
-    
-    if password:
+    try:
+        if token:
+            payload = verify_jwt_token(token)
+            if payload:
+                token_username = payload.get("username")
+                if token_username == username:
+                    player = get_player_by_username(db, username)
+                    if player:
+                        new_token = create_jwt_token(player.username, player.id)
+                        return {
+                            "success": True,
+                            "username": player.username,
+                            "token": new_token,
+                            "player_id": player.id
+                        }
+        
+        if not password:
+            return {
+                "success": False,
+                "message": "SSH connection failed: Password required (or valid token)"
+            }
+        
         try:
             from auth.player_service import authenticate_player
             player = authenticate_player(db, username, password)
@@ -61,12 +69,16 @@ def ssh_connect(db: Session, username: str, password: Optional[str] = None, toke
                 "player_id": player.id
             }
         except ValueError:
-            pass
-    
-    return {
-        "success": False,
-        "message": "SSH connection failed: Invalid credentials or token"
-    }
+            return {
+                "success": False,
+                "message": "SSH connection failed: Invalid credentials"
+            }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"SSH connection error: {str(e)}"
+        }
 
 def validate_ssh_token(token: str) -> Optional[Dict[str, Any]]:
     return verify_jwt_token(token)

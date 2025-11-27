@@ -8,8 +8,10 @@ const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
   'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
-  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER'
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG'
 ]
+
+const AVAILABLE_PACKAGES = ['file-viewer']
 
 export const useTerminal = () => {
   const { language } = useLanguage()
@@ -21,6 +23,7 @@ export const useTerminal = () => {
   const [autocompleteOptions, setAutocompleteOptions] = useState([])
   const [availableFiles, setAvailableFiles] = useState([])
   const [unlockedCommands, setUnlockedCommands] = useState(['HELP', 'STATUS', 'LOGIN'])
+  const [installedPackages, setInstalledPackages] = useState([])
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -89,11 +92,42 @@ export const useTerminal = () => {
       }
     }
     
+    const fetchPackages = async () => {
+      try {
+        let currentLanguage = language || localStorage.getItem('system_void_language') || 'FR'
+        currentLanguage = currentLanguage.toUpperCase()
+        if (currentLanguage !== 'FR' && currentLanguage !== 'EN') {
+          currentLanguage = 'FR'
+        }
+        
+        const token = localStorage.getItem('system_void_token')
+        const headers = {}
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`
+        }
+        
+        const response = await axios.get(`${API_URL}/api/packages`, {
+          params: {
+            session_id: sessionIdRef.current,
+            language: currentLanguage
+          },
+          headers
+        })
+        if (response.data && response.data.packages) {
+          setInstalledPackages(response.data.packages)
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    }
+    
     fetchFiles()
     fetchCommands()
+    fetchPackages()
     const interval = setInterval(() => {
       fetchFiles()
       fetchCommands()
+      fetchPackages()
     }, 5000)
     return () => clearInterval(interval)
   }, [language])
@@ -154,6 +188,27 @@ export const useTerminal = () => {
         )
       } else {
         return unlockedCommands
+      }
+    }
+    
+    // Auto-complétion pour PKG INSTALL/UNINSTALL
+    if (command === 'PKG') {
+      const subcommand = arg.split(' ')[0]?.toUpperCase()
+      const packageArg = arg.split(' ').slice(1).join(' ')
+      
+      if (subcommand === 'INSTALL' || subcommand === 'UNINSTALL') {
+        if (packageArg) {
+          const lowerArg = packageArg.toLowerCase()
+          return AVAILABLE_PACKAGES.filter(pkg => 
+            pkg.startsWith(lowerArg) && pkg !== lowerArg
+          )
+        } else {
+          return AVAILABLE_PACKAGES
+        }
+      } else if (!subcommand || subcommand === '') {
+        return ['INSTALL', 'UNINSTALL', 'LIST'].filter(cmd => 
+          cmd.startsWith(arg.toUpperCase()) && cmd !== arg.toUpperCase()
+        )
       }
     }
     
@@ -281,6 +336,32 @@ export const useTerminal = () => {
             })
             if (fileResponse.data && fileResponse.data.files) {
               setAvailableFiles(fileResponse.data.files)
+            }
+          } catch (error) {
+            // Silently fail
+          }
+        }, 100)
+      }
+      
+      // Mettre à jour les packages après PKG
+      if (userCommand.toUpperCase().startsWith('PKG')) {
+        setTimeout(async () => {
+          try {
+            const token = localStorage.getItem('system_void_token')
+            const headers = {}
+            if (token) {
+              headers['Authorization'] = `Bearer ${token}`
+            }
+            
+            const packagesResponse = await axios.get(`${API_URL}/api/packages`, {
+              params: {
+                session_id: sessionIdRef.current,
+                language: currentLanguage
+              },
+              headers
+            })
+            if (packagesResponse.data && packagesResponse.data.packages) {
+              setInstalledPackages(packagesResponse.data.packages)
             }
           } catch (error) {
             // Silently fail
@@ -429,7 +510,8 @@ export const useTerminal = () => {
     sendCommand,
     navigateHistory,
     handleTab,
-    autocompleteOptions
+    autocompleteOptions,
+    installedPackages
   }
 }
 

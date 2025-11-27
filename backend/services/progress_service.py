@@ -26,11 +26,16 @@ def save_session_to_db(db: Session, session: Dict[str, Any], player: Optional[Pl
         player.collected_items = session.get("collected_items", [])
         player.flags = session.get("flags", [])
         player.language = session.get("language", "FR")
-        player.installed_packages = session.get("installed_packages", [])
         player.total_commands = (player.total_commands or 0) + 1
+        
+        if hasattr(player, 'installed_packages'):
+            try:
+                player.installed_packages = session.get("installed_packages", [])
+            except (AttributeError, KeyError):
+                pass
         
         save_player_progress(db, player)
         return True
-    except:
+    except Exception as e:
         return False
 
