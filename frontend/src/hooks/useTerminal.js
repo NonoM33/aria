@@ -612,6 +612,17 @@ export const useTerminal = () => {
     setAutocompleteIndex(-1)
   }, [])
 
+  const navigateAutocomplete = useCallback((direction) => {
+    if (autocompleteOptions.length === 0) return false
+    
+    if (direction === 'up' || direction === 'left') {
+      setAutocompleteIndex(prev => prev <= 0 ? autocompleteOptions.length - 1 : prev - 1)
+    } else if (direction === 'down' || direction === 'right') {
+      setAutocompleteIndex(prev => prev >= autocompleteOptions.length - 1 ? 0 : prev + 1)
+    }
+    return true
+  }, [autocompleteOptions])
+
   const confirmAutocomplete = useCallback(() => {
     if (autocompleteOptions.length > 0 && autocompleteIndex >= 0) {
       selectAutocompleteOption(input, autocompleteOptions[autocompleteIndex])
@@ -664,7 +675,9 @@ export const useTerminal = () => {
     sendAriaChoice,
     clearAriaChoices,
     ariaMessage,
-    clearAriaMessage: () => setAriaMessage(null)
+    clearAriaMessage: () => setAriaMessage(null),
+    navigateAutocomplete,
+    hasAutocompleteOptions: autocompleteOptions.length > 0
   }
 }
 
