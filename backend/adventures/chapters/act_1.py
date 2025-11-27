@@ -286,7 +286,7 @@ Le message cache disait:
     },
     "progression": {
         "required_puzzles": ["act1_crypto"],
-        "next_chapter": "act_2"
+        "next_chapter": "act_1_5"
     }
 }
 

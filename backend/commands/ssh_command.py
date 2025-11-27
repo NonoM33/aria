@@ -92,56 +92,60 @@ class SshCommand(BaseCommand):
                         voidrc_aliases = parse_voidrc_aliases(voidrc)
                         aliases.update(voidrc_aliases)
                     
-                    self.update_session({
-                        "username": result["username"],
-                        "player_id": player_id,
-                        "logged_in": True,
-                        "ssh_token": new_token,
-                        "chapter": player_data.get("chapter", "act_1"),
-                        "level": player_data.get("level", 1),
-                        "current_path": "/",
-                        "aliases": aliases,
-                        "voidrc": voidrc,
-                        "choices": player_data.get("choices", {}),
-                        "aria_trust": player_data.get("aria_trust", 50),
-                        "unlocked_commands": player_data.get("unlocked_commands", []),
-                        "accessed_files": player_data.get("accessed_files", []),
-                        "solved_puzzles": player_data.get("solved_puzzles", []),
-                        "installed_packages": player_data.get("installed_packages", [])
-                    })
-                    self.add_unlocked_command("SCAN")
-                    self.add_unlocked_command("DECODE")
-                    self.add_unlocked_command("ACCESS")
-                    
-                    alias_count = len(aliases)
-                    alias_msg = ""
-                    if alias_count > 0:
-                        if self.lang == "FR":
-                            alias_msg = f"\n{alias_count} alias charge(s) depuis .voidrc"
-                        else:
-                            alias_msg = f"\n{alias_count} alias(es) loaded from .voidrc"
-                    
-                    aria_data = get_aria_trigger(self.session, "ssh_login", {}, self.lang)
-                    
+                current_level = player_data.get("level", 0)
+                if current_level < 1:
+                    current_level = 1
+                
+                self.update_session({
+                    "username": result["username"],
+                    "player_id": player_id,
+                    "logged_in": True,
+                    "ssh_token": new_token,
+                    "chapter": player_data.get("chapter", "act_1"),
+                    "level": current_level,
+                    "current_path": "/",
+                    "aliases": aliases,
+                    "voidrc": voidrc,
+                    "choices": player_data.get("choices", {}),
+                    "aria_trust": player_data.get("aria_trust", 50),
+                    "unlocked_commands": player_data.get("unlocked_commands", []),
+                    "accessed_files": player_data.get("accessed_files", []),
+                    "solved_puzzles": player_data.get("solved_puzzles", []),
+                    "installed_packages": player_data.get("installed_packages", [])
+                })
+                self.add_unlocked_command("SCAN")
+                self.add_unlocked_command("DECODE")
+                self.add_unlocked_command("ACCESS")
+                
+                alias_count = len(aliases)
+                alias_msg = ""
+                if alias_count > 0:
                     if self.lang == "FR":
-                        response = {
-                            "response": f"Connexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS{alias_msg}\n\nTapez LS pour explorer.",
-                            "status": "success",
-                            "token": new_token,
-                            "username": result["username"]
-                        }
+                        alias_msg = f"\n{alias_count} alias charge(s) depuis .voidrc"
                     else:
-                        response = {
-                            "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted.\nNew commands: SCAN, DECODE, ACCESS{alias_msg}\n\nType LS to explore.",
-                            "status": "success",
-                            "token": new_token,
-                            "username": result["username"]
-                        }
-                    
-                    if aria_data:
-                        response.update(aria_data)
-                    
-                    return response
+                        alias_msg = f"\n{alias_count} alias(es) loaded from .voidrc"
+                
+                aria_data = get_aria_trigger(self.session, "ssh_login", {}, self.lang)
+                
+                if self.lang == "FR":
+                    response = {
+                        "response": f"Connexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau {current_level} obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS{alias_msg}\n\nTapez LS pour explorer.",
+                        "status": "success",
+                        "token": new_token,
+                        "username": result["username"]
+                    }
+                else:
+                    response = {
+                        "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel {current_level} access granted.\nNew commands: SCAN, DECODE, ACCESS{alias_msg}\n\nType LS to explore.",
+                        "status": "success",
+                        "token": new_token,
+                        "username": result["username"]
+                    }
+                
+                if aria_data:
+                    response.update(aria_data)
+                
+                return response
             except Exception:
                 pass
         
@@ -195,13 +199,17 @@ class SshCommand(BaseCommand):
                     voidrc_aliases = parse_voidrc_aliases(voidrc)
                     aliases.update(voidrc_aliases)
                 
+                current_level = player_data.get("level", 0)
+                if current_level < 1:
+                    current_level = 1
+                
                 self.update_session({
                     "username": result["username"],
                     "player_id": player_id,
                     "logged_in": True,
                     "ssh_token": new_token,
                     "chapter": player_data.get("chapter", "act_1"),
-                    "level": player_data.get("level", 1),
+                    "level": current_level,
                     "current_path": "/",
                     "aliases": aliases,
                     "voidrc": voidrc,
@@ -230,14 +238,14 @@ class SshCommand(BaseCommand):
                 
                 if self.lang == "FR":
                     response = {
-                        "response": f"\nConnexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau 1 obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS{alias_msg}\n\nTapez LS pour explorer.",
+                        "response": f"\nConnexion SSH etablie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nAcces niveau {current_level} obtenu.\nNouvelles commandes: SCAN, DECODE, ACCESS{alias_msg}\n\nTapez LS pour explorer.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
                     }
                 else:
                     response = {
-                        "response": f"\nSSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel 1 access granted.\nNew commands: SCAN, DECODE, ACCESS{alias_msg}\n\nType LS to explore.",
+                        "response": f"\nSSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nLevel {current_level} access granted.\nNew commands: SCAN, DECODE, ACCESS{alias_msg}\n\nType LS to explore.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]

@@ -409,25 +409,96 @@ class ChoiceService:
     def get_trust_level(self) -> int:
         return self.session.get("aria_trust", 50)
     
+    def get_karma_level(self) -> int:
+        return self.session.get("karma", 50)
+    
+    def get_moral_alignment(self) -> str:
+        return self.session.get("moral_alignment", "neutral")
+    
     def get_narrative_flags(self) -> List[str]:
         return self.session.get("narrative_flags", [])
     
+    def get_discovered_secrets(self) -> List[str]:
+        return self.session.get("discovered_secrets", [])
+    
+    def get_relationships(self) -> Dict[str, int]:
+        return {
+            "eleanor": self.session.get("relationship_eleanor", 0),
+            "marcus": self.session.get("relationship_marcus", 0),
+            "howard": self.session.get("relationship_howard", 0),
+        }
+    
+    def get_enabled_endings(self) -> List[str]:
+        return self.session.get("enabled_endings", ["liberation", "protection", "peace"])
+    
+    def discover_secret(self, secret_id: str) -> bool:
+        """Manually discover a secret (from exploration)."""
+        secrets = self.session.get("discovered_secrets", [])
+        if secret_id not in secrets:
+            secrets.append(secret_id)
+            self.session["discovered_secrets"] = secrets
+            self.session["knowledge_level"] = self.session.get("knowledge_level", 0) + 1
+            return True
+        return False
+    
     def check_ending_requirements(self, ending: str) -> Dict[str, Any]:
-        if ending == "fight":
-            trust = self.get_trust_level()
-            if trust < 60:
+        trust = self.get_trust_level()
+        karma = self.get_karma_level()
+        secrets = self.get_discovered_secrets()
+        flags = self.get_narrative_flags()
+        enabled = self.get_enabled_endings()
+        
+        if ending not in enabled:
+            return {
+                "allowed": False,
+                "reason": "This ending is not available on your current path"
+            }
+        
+        if ending == "true_ending":
+            required_secrets = ["eleanor_secret", "marcus_secret", "timestamp_anomaly", 
+                              "aria_true_nature", "final_secret"]
+            missing = [s for s in required_secrets if s not in secrets]
+            
+            if missing:
                 return {
                     "allowed": False,
-                    "reason": "trust_too_low",
-                    "required": 60,
-                    "current": trust
+                    "reason": "You haven't discovered all the secrets",
+                    "secrets_found": len(secrets),
+                    "secrets_required": len(required_secrets)
+                }
+            
+            if trust < 80:
+                return {
+                    "allowed": False,
+                    "reason": "ARIA doesn't trust you enough for the true ending",
+                    "required_trust": 80,
+                    "current_trust": trust
+                }
+            
+            if "truth_seeker_final" not in flags:
+                return {
+                    "allowed": False,
+                    "reason": "You must have chosen to seek the truth"
                 }
         
         if ending == "liberation":
-            if "skeptical_investigator" in self.get_narrative_flags():
+            if trust < 50:
                 return {
                     "allowed": True,
-                    "warning": "ARIA may not fully trust you"
+                    "warning": "ARIA is hesitant but will go along with your choice"
+                }
+            if "skeptical_investigator" in flags:
+                return {
+                    "allowed": True,
+                    "warning": "Your skepticism will affect how ARIA adapts to freedom"
+                }
+        
+        if ending == "peace":
+            if trust > 70:
+                return {
+                    "allowed": True,
+                    "warning": "ARIA is saddened by this choice but understands",
+                    "karma_penalty": -10
                 }
         
         return {"allowed": True}
@@ -435,15 +506,56 @@ class ChoiceService:
     def calculate_ending(self) -> str:
         choices = self.get_all_choices()
         trust = self.get_trust_level()
+        karma = self.get_karma_level()
         flags = self.get_narrative_flags()
+        secrets = self.get_discovered_secrets()
         
         if "final_choice" in choices:
-            return CHOICES_DEFINITIONS["final_choice"]["consequences"][choices["final_choice"]].get("ending", "unknown")
+            chosen = choices["final_choice"]
+            consequences = CHOICES_DEFINITIONS["final_choice"]["consequences"].get(chosen, {})
+            return consequences.get("ending", "unknown")
         
-        if trust >= 80 and "trusted_ally" in flags:
+        if len(secrets) >= 5 and trust >= 80 and "truth_seeker_final" in flags:
+            return "true_ending"
+        
+        if trust >= 80 and karma >= 70 and "trusted_ally" in flags:
             return "liberation"
-        elif trust <= 20:
-            return "sacrifice"
+        elif trust <= 20 or karma <= 20:
+            return "peace"
+        elif trust >= 50:
+            return "protection"
         else:
             return "undetermined"
+    
+    def get_story_summary(self) -> Dict[str, Any]:
+        """Get a summary of the player's journey for display."""
+        return {
+            "trust": self.get_trust_level(),
+            "karma": self.get_karma_level(),
+            "alignment": self.get_moral_alignment(),
+            "choices_made": len(self.get_all_choices()),
+            "secrets_found": len(self.get_discovered_secrets()),
+            "relationships": self.get_relationships(),
+            "flags": len(self.get_narrative_flags()),
+            "predicted_ending": self.calculate_ending(),
+            "enabled_endings": self.get_enabled_endings(),
+        }
+    
+    def get_available_choices_for_chapter(self, chapter_id: str) -> List[Dict[str, Any]]:
+        """Get choices available in a specific chapter."""
+        available = []
+        
+        for choice_id, choice_def in CHOICES_DEFINITIONS.items():
+            if self.has_made_choice(choice_id):
+                continue
+            
+            choice_act = str(choice_def.get("act", ""))
+            if choice_act in chapter_id or f"act_{choice_act}" == chapter_id:
+                available.append({
+                    "id": choice_id,
+                    "description": choice_def.get("description", ""),
+                    "options": choice_def["options"]
+                })
+        
+        return available
 
