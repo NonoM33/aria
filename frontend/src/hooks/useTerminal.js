@@ -80,10 +80,11 @@ export const useTerminal = () => {
     localStorage.setItem('session_id', sessionIdRef.current)
   }
 
-  const addToHistory = useCallback((type, content) => {
+  const addToHistory = useCallback((type, content, path = null) => {
     setHistory(prev => [...prev, {
       type,
       content,
+      path: path || currentPathRef.current || '/',
       timestamp: new Date().toISOString()
     }])
   }, [])
@@ -138,11 +139,12 @@ export const useTerminal = () => {
         setInput('')
         setIsTyping(false)
         
-        setHistory(prev => [...prev, {
-          type: 'system',
-          content: systemResponse,
-          timestamp: new Date().toISOString()
-        }])
+      setHistory(prev => [...prev, {
+        type: 'system',
+        content: systemResponse,
+        path: currentPathRef.current || '/',
+        timestamp: new Date().toISOString()
+      }])
         
         window.dispatchEvent(new CustomEvent('passwordPrompt', { detail: { username: data.username } }))
         
@@ -172,6 +174,7 @@ export const useTerminal = () => {
       setHistory(prev => [...prev, {
         type: 'system',
         content: '',
+        path: currentPathRef.current || '/',
         timestamp: new Date().toISOString()
       }])
       
@@ -188,7 +191,8 @@ export const useTerminal = () => {
           if (lastIndex >= 0 && newHistory[lastIndex].type === 'system') {
             newHistory[lastIndex] = {
               ...newHistory[lastIndex],
-              content: partialText
+              content: partialText,
+              path: newHistory[lastIndex].path || currentPathRef.current || '/'
             }
           }
           return newHistory
