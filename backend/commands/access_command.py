@@ -35,6 +35,9 @@ class AccessCommand(BaseCommand):
             filename = target.split("/")[-1]
             self.add_accessed_file(file_path)
             
+            if "vulnerability_log" in filename.lower() or "vulnerability" in filename.lower():
+                self.add_unlocked_command("EXPLOIT")
+            
             if "crypte" in filename.lower() or "encrypted" in filename.lower() or filename.endswith(".b64"):
                 if self.lang == "FR":
                     content += "\n\n[Indice: Utilisez DECODE pour decoder ce fichier]"

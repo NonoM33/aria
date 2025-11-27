@@ -396,14 +396,28 @@ const Terminal = () => {
       {manPageCommand && (
         <ManPage 
           command={manPageCommand} 
-          onClose={() => setManPageCommand(null)} 
+          onClose={() => {
+            setManPageCommand(null)
+            setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.focus()
+              }
+            }, 100)
+          }} 
         />
       )}
       {fileViewerData && (
         <FileViewer
           filename={fileViewerData.filename}
           content={fileViewerData.content}
-          onClose={() => setFileViewerData(null)}
+          onClose={() => {
+            setFileViewerData(null)
+            setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.focus()
+              }
+            }, 100)
+          }}
         />
       )}
       <div className="terminal-content" ref={terminalContentRef}>

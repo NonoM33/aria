@@ -4,6 +4,13 @@ from auth.ssh_auth import hack_database_and_create_user
 
 class CreateUserCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
+        unlocked_commands = self.session.get("unlocked_commands", [])
+        if "CREATE_USER" not in unlocked_commands:
+            if self.lang == "FR":
+                return {"response": "Commande inconnue. Accès refusé.\n\nTapez HELP pour voir les commandes disponibles.", "status": "error"}
+            else:
+                return {"response": "Unknown command. Access Denied.\n\nType HELP to see available commands.", "status": "error"}
+        
         if not args:
             if self.lang == "FR":
                 return {"response": "Usage: CREATE_USER <username> <password>\nExemple: CREATE_USER hacker password123", "status": "info"}
