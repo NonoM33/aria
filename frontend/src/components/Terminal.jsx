@@ -190,7 +190,6 @@ const Terminal = () => {
   }
 
   const handleKeyDown = (e) => {
-    // Ne pas traiter les touches si la modal MAN ou FileViewer est ouverte
     if (manPageCommand || fileViewerData) {
       return
     }
@@ -198,19 +197,35 @@ const Terminal = () => {
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      if (autocompleteOptions.length > 0 && autocompleteIndex >= 0) {
+        confirmAutocomplete()
+      } else {
+        handleSubmit(e)
+      }
     } else if (e.key === 'ArrowUp' && !isPasswordMode) {
       e.preventDefault()
-      navigateHistory('up')
+      if (autocompleteOptions.length > 0) {
+        handleTab(input, true)
+      } else {
+        navigateHistory('up')
+      }
     } else if (e.key === 'ArrowDown' && !isPasswordMode) {
       e.preventDefault()
-      navigateHistory('down')
+      if (autocompleteOptions.length > 0) {
+        handleTab(input, false)
+      } else {
+        navigateHistory('down')
+      }
     } else if (e.key === 'Tab' && !isPasswordMode) {
       e.preventDefault()
-      handleTab(input)
+      handleTab(input, e.shiftKey)
     } else if (e.key === 'Escape') {
       e.preventDefault()
-      setInput('')
+      if (autocompleteOptions.length > 0) {
+        cancelAutocomplete()
+      } else {
+        setInput('')
+      }
     }
   }
 
@@ -418,25 +433,56 @@ const Terminal = () => {
             </div>
           ))}
           {showInput && !isTyping && (
-            <div className="terminal-input-line">
-              <span className="prompt">
-                {isPasswordMode ? `${passwordUsername || 'user'}@system-void.local's password: ` : (username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `)}
-              </span>
-              <input
-                ref={inputRef}
-                type={isPasswordMode ? "password" : "text"}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isTyping}
-                className="terminal-input-inline"
-                autoFocus
-                autoComplete="off"
-                spellCheck="false"
-                placeholder={isPasswordMode ? "" : ""}
-              />
-              <span className="cursor"></span>
-            </div>
+            <>
+              <div className="terminal-input-line">
+                <span className="prompt">
+                  {isPasswordMode ? `${passwordUsername || 'user'}@system-void.local's password: ` : (username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `)}
+                </span>
+                <input
+                  ref={inputRef}
+                  type={isPasswordMode ? "password" : "text"}
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value)
+                    cancelAutocomplete()
+                  }}
+                  onKeyDown={handleKeyDown}
+                  disabled={isTyping}
+                  className="terminal-input-inline"
+                  autoFocus
+                  autoComplete="off"
+                  spellCheck="false"
+                  placeholder={isPasswordMode ? "" : ""}
+                />
+                <span className="cursor"></span>
+              </div>
+              {autocompleteOptions.length > 0 && (
+                <div className="autocomplete-menu">
+                  {autocompleteOptions.map((option, idx) => (
+                    <span
+                      key={idx}
+                      className={`autocomplete-option ${idx === autocompleteIndex ? 'autocomplete-selected' : ''}`}
+                      onClick={() => {
+                        const parts = input.trim().split(/\s+/)
+                        const command = parts[0]?.toUpperCase() || ''
+                        const fileCommands = ['ACCESS', 'DECODE', 'CAT', 'NVIM', 'ENCRYPT', 'DECRYPT', 'CD', 'LS']
+                        if (fileCommands.includes(command)) {
+                          setInput(`${command} ${option}`)
+                        } else if (command === 'MAN') {
+                          setInput(`MAN ${option}`)
+                        } else {
+                          setInput(option)
+                        }
+                        cancelAutocomplete()
+                        inputRef.current?.focus()
+                      }}
+                    >
+                      {option.split('/').filter(p => p).pop() || option}{option.endsWith('/') ? '/' : ''}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
           {isTyping && (
             <div className="terminal-input-line">
