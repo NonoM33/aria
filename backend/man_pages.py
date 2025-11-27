@@ -789,7 +789,57 @@ ARGUMENTS
     <fichier>    Le nom du fichier à afficher
 
 VOIR AUSSI
-    ACCESS(1)"""
+    ACCESS(1)""",
+
+        "EDIT": """EDIT(1)                  Manuel SYSTEM_VOID                 EDIT(1)
+
+NOM
+    EDIT - Editer des fichiers de configuration
+
+SYNOPSIS
+    EDIT <fichier> [SAVE|ADD|CLEAR|RELOAD]
+
+DESCRIPTION
+    Permet d'editer les fichiers de configuration du systeme, notamment
+    le fichier .voidrc qui contient vos alias personnalises.
+    
+    Les alias definis dans .voidrc sont automatiquement charges a chaque
+    connexion SSH.
+
+FICHIERS EDITABLES
+    .voidrc    Fichier de configuration contenant les alias
+
+FORMAT DU FICHIER .VOIDRC
+    # Commentaire
+    alias <nom>=<commande>
+    
+    Exemple:
+    alias l=ls
+    alias ll="ls -la"
+    alias home="cd /"
+
+SOUS-COMMANDES
+    EDIT .voidrc              Afficher le contenu du fichier
+    EDIT .voidrc ADD <ligne>  Ajouter une ligne au fichier
+    EDIT .voidrc CLEAR        Reinitialiser le fichier
+    EDIT .voidrc RELOAD       Recharger les alias depuis le fichier
+
+EXEMPLES
+    > EDIT .voidrc
+    # ~/.voidrc - SYSTEM_VOID Configuration File
+    alias l=ls
+    
+    > EDIT .voidrc ADD alias ll="ls -la"
+    Fichier .voidrc sauvegarde.
+    2 alias charge(s).
+    
+    > EDIT .voidrc RELOAD
+    Alias recharges:
+      L -> ls
+      LL -> ls -la
+
+VOIR AUSSI
+    ALIAS(1), SSH(1)"""
     },
     "EN": {
         "HELP": """HELP(1)                    SYSTEM_VOID Manual                  HELP(1)
@@ -1580,7 +1630,57 @@ ARGUMENTS
     <file>    The name of the file to display
 
 SEE ALSO
-    ACCESS(1)"""
+    ACCESS(1)""",
+
+        "EDIT": """EDIT(1)                  SYSTEM_VOID Manual                 EDIT(1)
+
+NAME
+    EDIT - Edit configuration files
+
+SYNOPSIS
+    EDIT <file> [SAVE|ADD|CLEAR|RELOAD]
+
+DESCRIPTION
+    Allows editing system configuration files, particularly the .voidrc
+    file which contains your custom aliases.
+    
+    Aliases defined in .voidrc are automatically loaded on each SSH
+    connection.
+
+EDITABLE FILES
+    .voidrc    Configuration file containing aliases
+
+.VOIDRC FILE FORMAT
+    # Comment
+    alias <name>=<command>
+    
+    Example:
+    alias l=ls
+    alias ll="ls -la"
+    alias home="cd /"
+
+SUBCOMMANDS
+    EDIT .voidrc              Display file content
+    EDIT .voidrc ADD <line>   Add a line to the file
+    EDIT .voidrc CLEAR        Reset the file
+    EDIT .voidrc RELOAD       Reload aliases from file
+
+EXAMPLES
+    > EDIT .voidrc
+    # ~/.voidrc - SYSTEM_VOID Configuration File
+    alias l=ls
+    
+    > EDIT .voidrc ADD alias ll="ls -la"
+    File .voidrc saved.
+    2 alias(es) loaded.
+    
+    > EDIT .voidrc RELOAD
+    Aliases reloaded:
+      L -> ls
+      LL -> ls -la
+
+SEE ALSO
+    ALIAS(1), SSH(1)"""
     }
 }
 

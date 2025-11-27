@@ -33,6 +33,7 @@ def get_session(
             if player:
                 existing_path = existing_session.get("current_path")
                 existing_aliases = existing_session.get("aliases")
+                existing_voidrc = existing_session.get("voidrc")
                 session_dict = player_to_session_dict(player)
                 session_dict["language"] = lang
                 if ssh_pending_username:
@@ -41,6 +42,8 @@ def get_session(
                     session_dict["current_path"] = existing_path
                 if existing_aliases:
                     session_dict["aliases"] = existing_aliases
+                if existing_voidrc:
+                    session_dict["voidrc"] = existing_voidrc
                 sessions[session_id] = session_dict
                 return session_dict
         except:
@@ -55,6 +58,7 @@ def get_session(
                 if player:
                     existing_path = existing_session.get("current_path")
                     existing_aliases = existing_session.get("aliases")
+                    existing_voidrc = existing_session.get("voidrc")
                     session_dict = player_to_session_dict(player)
                     session_dict["language"] = lang
                     if ssh_pending_username:
@@ -63,6 +67,8 @@ def get_session(
                         session_dict["current_path"] = existing_path
                     if existing_aliases:
                         session_dict["aliases"] = existing_aliases
+                    if existing_voidrc:
+                        session_dict["voidrc"] = existing_voidrc
                     sessions[session_id] = session_dict
                     return session_dict
         except:
@@ -75,7 +81,7 @@ def get_session(
             "level": 0,
             "chapter": "chapter_0",
             "logged_in": False,
-            "unlocked_commands": ["HELP", "STATUS", "SCAN", "LS", "SSH", "EXIT"],
+            "unlocked_commands": ["HELP", "STATUS", "SCAN", "LS", "SSH", "EXIT", "EDIT"],
             "accessed_files": [],
             "solved_puzzles": [],
             "collected_items": [],
@@ -93,7 +99,8 @@ def get_session(
             "ending": None,
             "game_completed": False,
             "current_path": "/",
-            "aliases": {}
+            "aliases": {},
+            "voidrc": ""
         }
         global_state.add_player()
     

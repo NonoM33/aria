@@ -104,6 +104,11 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
     except (AttributeError, KeyError):
         aliases = {}
     
+    try:
+        voidrc = player.voidrc or ""
+    except (AttributeError, KeyError):
+        voidrc = ""
+    
     return {
         "level": player.level,
         "chapter": player.chapter,
@@ -125,6 +130,7 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
         "aria_dialogue_progress": aria_dialogue_progress,
         "ending": ending,
         "game_completed": game_completed,
-        "aliases": aliases
+        "aliases": aliases,
+        "voidrc": voidrc
     }
 
