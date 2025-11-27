@@ -375,10 +375,6 @@ const Terminal = () => {
     return () => clearTimeout(timeoutId)
   }, [history, installedPackages, isTyping])
 
-  const isAriaMessage = (content) => {
-    return content && (content.includes('[ARIA]') || content.startsWith('ARIA:'))
-  }
-
   if (showIntro) {
     return (
       <IntroSequence 

@@ -15,9 +15,33 @@ from api.websocket_manager import manager
 from config import DEFAULT_LANGUAGE
 import json
 import uuid
+import re
 
 router = APIRouter()
 global_state = GlobalState()
+
+
+def extract_aria_message(result: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract [ARIA]: messages from response and put in aria_message field"""
+    if "response" not in result or not result["response"]:
+        return result
+    
+    response = result["response"]
+    
+    aria_pattern = r'\n?\[ARIA\]:.*?(?=\n[A-Z]|\Z)'
+    aria_matches = re.findall(aria_pattern, response, re.DOTALL)
+    
+    if aria_matches:
+        aria_text = "\n".join(match.strip() for match in aria_matches)
+        clean_response = re.sub(aria_pattern, '', response, flags=re.DOTALL).strip()
+        
+        result["response"] = clean_response
+        if "aria_message" not in result:
+            result["aria_message"] = aria_text
+        else:
+            result["aria_message"] = result["aria_message"] + "\n\n" + aria_text
+    
+    return result
 
 def get_directory_contents(filesystem: dict, path: str) -> dict:
     if path == "/":
@@ -88,6 +112,8 @@ async def handle_command_route(
     
     try:
         result = handle_command(command, args, session, db, lang, token)
+        
+        result = extract_aria_message(result)
         
         if result.get("token"):
             session["ssh_token"] = result.get("token")
@@ -303,6 +329,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 
                 if password and session.get("ssh_pending_username"):
                     result = handle_command("", password, session, db, lang, token)
+                    result = extract_aria_message(result)
                     
                     if result.get("token"):
                         session["ssh_token"] = result.get("token")
@@ -378,6 +405,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 
                 try:
                     result = handle_command(cmd, args, session, db, lang, token)
+                    result = extract_aria_message(result)
                     
                     if result.get("token"):
                         session["ssh_token"] = result.get("token")
