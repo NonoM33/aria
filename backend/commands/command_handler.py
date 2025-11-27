@@ -22,6 +22,8 @@ from commands.pkg_command import PkgCommand
 from commands.exit_command import ExitCommand
 from commands.ls_command import LsCommand
 from commands.talk_command import TalkCommand, AriaCommand
+from commands.cd_command import CdCommand
+from commands.pwd_command import PwdCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -32,6 +34,7 @@ COMMAND_MAP = {
     "LOGIN": LoginCommand,
     "SCAN": ScanCommand,
     "ACCESS": AccessCommand,
+    "CAT": AccessCommand,
     "DECODE": DecodeCommand,
     "ACTIVATE": ActivateCommand,
     "NETWORK": NetworkCommand,
@@ -49,6 +52,8 @@ COMMAND_MAP = {
     "LS": LsCommand,
     "TALK": TalkCommand,
     "ARIA": AriaCommand,
+    "CD": CdCommand,
+    "PWD": PwdCommand,
 }
 
 def handle_command(

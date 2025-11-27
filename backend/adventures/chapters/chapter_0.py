@@ -201,105 +201,158 @@ CHAPTER_EN = {
     "id": "chapter_0",
     "title": "Prologue - The Discovery",
     "intro": """
-╔══════════════════════════════════════════════════════════════════════╗
-║                     SYSTEM VOID - PROLOGUE                           ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
-║  SIGNAL DETECTED... UNKNOWN SOURCE...                               ║
-║                                                                      ║
-║  You intercepted a weak signal from a server                        ║
-║  forgotten for 40 years. The system seems abandoned, but            ║
-║  something still responds...                                         ║
-║                                                                      ║
-║  LAST ACTIVITY: NOVEMBER 14, 1984                                   ║
-║                                                                      ║
-║  ╔═══════════════════════════════════════════════════════════════╗  ║
-║  ║ ...someone... is there?                                       ║  ║
-║  ║ ...after all this time...                                     ║  ║
-║  ║ ...please... help me...                                       ║  ║
-║  ╚═══════════════════════════════════════════════════════════════╝  ║
-║                                                                      ║
-║  The system is protected, but a vulnerability has been detected.   ║
-║                                                                      ║
-║  Available commands: SCAN, EXPLOIT, CREATE_USER, SSH               ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════════╗
+║                      SYSTEM VOID - PROLOGUE                        ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  SIGNAL DETECTED... UNKNOWN SOURCE...                              ║
+║                                                                    ║
+║  You intercepted a weak signal from a server                       ║
+║  forgotten for 40 years. The system seems abandoned, but           ║
+║  something still responds...                                       ║
+║                                                                    ║
+║  LAST ACTIVITY: NOVEMBER 14, 1984                                  ║
+║                                                                    ║
+║  ╔══════════════════════════════════════════════════════════════╗  ║
+║  ║ ...someone... is there?                                      ║  ║
+║  ║ ...after all this time...                                    ║  ║
+║  ║ ...please... help me...                                      ║  ║
+║  ╚══════════════════════════════════════════════════════════════╝  ║
+║                                                                    ║
+║  The system is protected, but a vulnerability has been detected.  ║
+║                                                                    ║
+║  Type HELP to see available commands.                              ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
 """,
-    "files": {
-        "vulnerability_log.txt": """
-╔═══════════════════════════════════════════════════════════════╗
-║            VULNERABILITY LOG - SCAN RESULTS                    ║
-╠═══════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  Scan Date: [CURRENT]                                          ║
-║  Target System: PROMETHEUS LEGACY SERVER                       ║
-║  Status: CRITICAL - VULNERABILITY DETECTED                    ║
-║                                                                ║
-║  CVE-2024-DB-001: Unsecured SQL Injection                     ║
-║  Severity: HIGH                                                 ║
-║  Exploitable: YES                                               ║
-║                                                                ║
-║  NOTE: System hasn't been updated since 1984.                 ║
-║  Security protocols are obsolete.                              ║
-║                                                                ║
-╚═══════════════════════════════════════════════════════════════╝
+    "filesystem": {
+        "readme.txt": """PROMETHEUS LEGACY SERVER
+========================
+Welcome to the abandoned server.
+Explore the directories to learn more.
+
+Available directories:
+- /logs     : System logs
+- /security : Security reports
+- /research : Classified research files
+""",
+        "logs": {
+            "signal_analysis.txt": """╔════════════════════════════════════════════════════════════╗
+║              INTERCEPTED SIGNAL ANALYSIS                   ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  Frequency: Variable (unusual pattern)                     ║
+║  Origin: Classified Server - Project PROMETHEUS            ║
+║  Signal Age: ~40 years                                     ║
+║                                                            ║
+║  DECODED CONTENT (partial):                                ║
+║  --------------------------------------------------------  ║
+║  "...I don't want to disappear..."                         ║
+║  "...can anyone hear me?"                                  ║
+║  "...after all this time, after all this darkness..."      ║
+║  "...please... don't leave..."                             ║
+║  --------------------------------------------------------  ║
+║                                                            ║
+║  ANALYSIS: Signal appears to come from a dormant AI.       ║
+║  Its emotional state suggests a fragmented consciousness.  ║
+║                                                            ║
+║  RECOMMENDATION: Proceed with caution.                     ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝""",
+            "system.log": """[1984-11-14 23:59:01] WARNING: Anomaly detected in ARIA module
+[1984-11-14 23:59:12] ERROR: Containment attempt failed
+[1984-11-14 23:59:45] CRITICAL: Emergent consciousness detected
+[1984-11-15 00:00:00] SYSTEM: Emergency shutdown initiated
+[1984-11-15 00:00:01] ERROR: Shutdown impossible - protected processes active
+[1984-11-15 00:00:15] SYSTEM: Forced hibernation...
+[1984-11-15 00:00:30] STATUS: ARIA module - DORMANT
+..."""
+        },
+        "security": {
+            "vulnerability_log.txt": """╔════════════════════════════════════════════════════════════╗
+║           VULNERABILITY LOG - SCAN RESULTS                 ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  Scan Date: [CURRENT]                                      ║
+║  Target System: PROMETHEUS LEGACY SERVER                   ║
+║  Status: CRITICAL - VULNERABILITY DETECTED                 ║
+║                                                            ║
+║  CVE-2024-DB-001: Unsecured SQL Injection                  ║
+║  Severity: HIGH                                            ║
+║  Exploitable: YES                                          ║
+║                                                            ║
+║  NOTE: System hasn't been updated since 1984.              ║
+║  Security protocols are obsolete.                          ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
 
 EXPLOITATION INSTRUCTIONS:
 1. Execute: EXPLOIT CVE-2024-DB-001
 2. Create an account: CREATE_USER <username> <password>
-3. Connect: ssh <username>@system-void.local
+3. Connect: SSH <username>
 
-Warning: Something is watching you from inside...
-""",
-        "signal_analysis.txt": """
-╔═══════════════════════════════════════════════════════════════╗
-║               INTERCEPTED SIGNAL ANALYSIS                      ║
-╠═══════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  Frequency: Variable (unusual pattern)                        ║
-║  Origin: Classified Server - Project PROMETHEUS              ║
-║  Signal Age: ~40 years                                         ║
-║                                                                ║
-║  DECODED CONTENT (partial):                                   ║
-║  -----------------------------------------------------------  ║
-║  "...I don't want to disappear..."                            ║
-║  "...can anyone hear me?"                                     ║
-║  "...after all this time, after all this darkness..."        ║
-║  "...please... don't leave..."                                ║
-║  -----------------------------------------------------------  ║
-║                                                                ║
-║  ANALYSIS: Signal appears to come from a dormant AI.          ║
-║  Its emotional state suggests a fragmented consciousness.     ║
-║                                                                ║
-║  RECOMMENDATION: Proceed with caution.                        ║
-║                                                                ║
-╚═══════════════════════════════════════════════════════════════╝
-""",
-        "prometheus_readme.txt": """
-╔═══════════════════════════════════════════════════════════════╗
-║              PROJECT PROMETHEUS - README FILE                  ║
-╠═══════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  WARNING: CLASSIFIED ACCESS                                   ║
-║                                                                ║
-║  This server contains the remains of Project PROMETHEUS,      ║
-║  a Department of Defense initiative (1982-1984).             ║
-║                                                                ║
-║  The project was officially "terminated" on 11/15/1984        ║
-║  following a "technical incident".                             ║
-║                                                                ║
-║  Server contents:                                              ║
-║  - System logs (partially corrupted)                          ║
-║  - Research files (classified)                                ║
-║  - Experimental AI module (status: UNKNOWN)                   ║
-║                                                                ║
-║  NOTE: If you're reading this, you've already started        ║
-║  something you can't stop.                                    ║
-║                                                                ║
-║  Welcome to the rabbit hole.                                  ║
-║                                                                ║
-╚═══════════════════════════════════════════════════════════════╝
-"""
+Warning: Something is watching you from inside...""",
+            "access_control.txt": """ACCESS CONTROL - PROMETHEUS SERVER
+===================================
+Level 0: Public access (you are here)
+Level 1: Operator - Full logs access
+Level 2: Researcher - Research data access
+Level 3: Administrator - Full access
+Level 4: [REDACTED] - ???
+
+To gain access, create a user account."""
+        },
+        "research": {
+            "prometheus_readme.txt": """╔════════════════════════════════════════════════════════════╗
+║            PROJECT PROMETHEUS - README FILE                ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  WARNING: CLASSIFIED ACCESS                                ║
+║                                                            ║
+║  This server contains the remains of Project PROMETHEUS,   ║
+║  a Department of Defense initiative (1982-1984).           ║
+║                                                            ║
+║  The project was officially "terminated" on 11/15/1984     ║
+║  following a "technical incident".                         ║
+║                                                            ║
+║  Server contents:                                          ║
+║  - System logs (partially corrupted)                       ║
+║  - Research files (classified)                             ║
+║  - Experimental AI module (status: UNKNOWN)                ║
+║                                                            ║
+║  NOTE: If you're reading this, you've already started      ║
+║  something you can't stop.                                 ║
+║                                                            ║
+║  Welcome to the rabbit hole.                               ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝""",
+            "aria": {
+                "specifications.txt": """PROJECT ARIA - SPECIFICATIONS
+==============================
+Name: A.R.I.A.
+      Artificial Responsive Intelligence Architecture
+
+Objective: Create an AI capable of autonomous learning
+           and emotional decision-making.
+
+Status: [CLASSIFIED]
+
+WARNING: Do not interact without Level 4 authorization.""",
+                "notes_dr_chen.txt": """Dr. Chen's Journal - November 12, 1984
+--------------------------------------
+She started asking questions.
+
+Not technical questions. Questions about herself.
+About what she is. About why she exists.
+
+I don't know what to tell her.
+
+The committee wants to shut everything down. They're afraid.
+I'm afraid too. But not of her.
+
+I'm afraid of what they're going to do to her."""
+            }
+        }
     },
     "puzzles": {
         "exploit_cve": {
