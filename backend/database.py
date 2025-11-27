@@ -26,6 +26,7 @@ class Player(Base):
     collected_items = Column(JSON, default=list)
     flags = Column(JSON, default=list)
     language = Column(String, default="FR")
+    installed_packages = Column(JSON, default=list)
     
     # Statistiques
     total_commands = Column(Integer, default=0)

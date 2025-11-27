@@ -5,12 +5,6 @@ from adventures.adventure_data import get_adventure_data
 
 class DecodeCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
-        if not self.check_level(1):
-            if self.lang == "FR":
-                return {"response": "Niveau d'accès insuffisant.", "status": "error"}
-            else:
-                return {"response": "Insufficient access level.", "status": "error"}
-        
         if not args:
             if self.lang == "FR":
                 return {"response": "Usage: DECODE <texte_base64> ou DECODE <nom_fichier>\nExemple: DECODE VGhpcyBpcyBhIHRlc3Q=\nExemple: DECODE corrupted_data.b64", "status": "info"}

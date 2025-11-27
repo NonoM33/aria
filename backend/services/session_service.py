@@ -52,16 +52,17 @@ def get_session(
     if is_new_session:
         sessions[session_id] = {
             "level": 0,
-            "chapter": "chapter_1",
+            "chapter": "chapter_0",
             "logged_in": False,
-            "unlocked_commands": ["HELP", "STATUS", "LOGIN"],
+            "unlocked_commands": ["HELP", "STATUS", "SCAN", "EXPLOIT", "CREATE_USER", "SSH"],
             "accessed_files": [],
             "solved_puzzles": [],
             "collected_items": [],
             "flags": [],
             "language": lang,
             "username": None,
-            "player_id": None
+            "player_id": None,
+            "installed_packages": []
         }
         global_state.add_player()
     

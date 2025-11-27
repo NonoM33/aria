@@ -22,7 +22,8 @@ def create_player(db: Session, username: str, password: str) -> Player:
         solved_puzzles=[],
         collected_items=[],
         flags=[],
-        language="FR"
+        language="FR",
+        installed_packages=[]
     )
     
     db.add(player)
@@ -64,6 +65,7 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
         "flags": player.flags or [],
         "language": player.language or "FR",
         "username": player.username,
-        "player_id": player.id
+        "player_id": player.id,
+        "installed_packages": player.installed_packages or []
     }
 
