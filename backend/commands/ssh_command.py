@@ -1,6 +1,35 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
 from auth.ssh_auth import ssh_connect
+from auth.player_service import get_player_by_id, player_to_session_dict
+import re
+
+
+def parse_voidrc_aliases(content: str) -> Dict[str, str]:
+    aliases = {}
+    if not content:
+        return aliases
+    
+    for line in content.split("\n"):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        
+        alias_match = re.match(r'^alias\s+([a-zA-Z0-9_-]+)\s*=\s*(.+)$', line, re.IGNORECASE)
+        if alias_match:
+            alias_name = alias_match.group(1).upper()
+            alias_command = alias_match.group(2).strip()
+            
+            if alias_command.startswith('"') and alias_command.endswith('"'):
+                alias_command = alias_command[1:-1]
+            elif alias_command.startswith("'") and alias_command.endswith("'"):
+                alias_command = alias_command[1:-1]
+            
+            if alias_name not in ["ALIAS", "HELP", "EXIT", "EDIT"]:
+                aliases[alias_name] = alias_command
+    
+    return aliases
+
 
 class SshCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:

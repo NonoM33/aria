@@ -25,6 +25,7 @@ from commands.talk_command import TalkCommand, AriaCommand
 from commands.cd_command import CdCommand
 from commands.pwd_command import PwdCommand
 from commands.alias_command import AliasCommand
+from commands.edit_command import EditCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -56,6 +57,7 @@ COMMAND_MAP = {
     "CD": CdCommand,
     "PWD": PwdCommand,
     "ALIAS": AliasCommand,
+    "EDIT": EditCommand,
 }
 
 def handle_command(

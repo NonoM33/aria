@@ -291,11 +291,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 existing_session_data = sessions.get(session_id, {})
                 existing_current_path = existing_session_data.get("current_path")
                 existing_aliases = existing_session_data.get("aliases")
+                existing_voidrc = existing_session_data.get("voidrc")
                 session = get_session(session_id, lang, db, username, token)
                 if existing_current_path:
                     session["current_path"] = existing_current_path
                 if existing_aliases:
                     session["aliases"] = existing_aliases
+                if existing_voidrc:
+                    session["voidrc"] = existing_voidrc
                 session["language"] = lang
                 
                 if password and session.get("ssh_pending_username"):

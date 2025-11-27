@@ -36,6 +36,7 @@ class Player(Base):
     ending = Column(String, nullable=True)
     game_completed = Column(Boolean, default=False)
     aliases = Column(JSON, default=dict)
+    voidrc = Column(Text, default="")
     
     total_commands = Column(Integer, default=0)
     total_playtime = Column(Integer, default=0)
@@ -96,6 +97,7 @@ def _migrate_installed_packages():
                 ("ending", "TEXT"),
                 ("game_completed", "BOOLEAN DEFAULT 0"),
                 ("aliases", "TEXT DEFAULT '{}'"),
+                ("voidrc", "TEXT DEFAULT ''"),
             ]
             
             for col_name, col_def in new_columns:
