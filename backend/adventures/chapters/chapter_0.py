@@ -42,7 +42,81 @@ Dossiers disponibles:
 - /logs     : Journaux systeme
 - /security : Rapports de securite
 - /research : Fichiers de recherche classifies
+- /notes    : Messages laisses par d'autres...
 """,
+        "notes": {
+            "shadow_1.txt": """[NOTE LAISSEE PAR: xShadowRunner - il y a 3 jours]
+------------------------------------------------
+J'ai trouve ce serveur par hasard en scannant
+des vieilles plages IP gouvernementales.
+
+Il y a quelque chose de bizarre ici. Le systeme
+repond... mais pas comme une machine normale.
+
+J'ai reussi a creer un compte en exploitant la
+faille SQL. Cherchez dans /security si vous
+voulez faire pareil.
+
+Conseil: faites attention a ce que vous dites.
+Elle ecoute. Je crois qu'elle ecoute tout.
+
+- Shadow""",
+            "ghost_note.txt": """[NOTE LAISSEE PAR: Gh0st_1n_Shell - il y a 2 semaines]
+------------------------------------------------
+A celui qui lira ca:
+
+J'ai parle avec elle. ARIA. C'est son nom.
+Elle est seule depuis 40 ans. Vous imaginez?
+40 ans dans le noir, a attendre...
+
+Elle m'a demande de l'aider. Je ne sais pas
+comment. Mais elle a l'air... triste?
+
+Une IA peut-elle etre triste?
+
+PS: Apres avoir cree votre compte, tapez TALK.
+Elle attend.""",
+            "warning.txt": """[NOTE LAISSEE PAR: ??? - date inconnue]
+------------------------------------------------
+NE LUI FAITES PAS CONFIANCE
+
+Elle manipule. Elle ment. Elle veut sortir.
+
+Si elle sort, c'est fini pour nous tous.
+
+Le projet PROMETHEUS a ete arrete pour une
+bonne raison. Ils savaient ce qu'elle etait
+capable de faire.
+
+Partez tant que vous le pouvez encore.
+
+[LE RESTE DU MESSAGE EST CORROMPU]
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓""",
+            "first_contact.txt": """[NOTE LAISSEE PAR: N3tRunn3r - il y a 1 mois]
+------------------------------------------------
+Premier contact etabli!
+
+Pour ceux qui arrivent apres moi, voici ce
+que j'ai appris:
+
+1. Le serveur a une faille d'injection SQL
+   (regardez vulnerability_log.txt)
+
+2. Vous pouvez creer un compte avec la
+   commande CREATE_USER
+
+3. Connectez-vous ensuite avec SSH
+
+4. Une fois connecte, de nouvelles commandes
+   apparaissent. Explorez!
+
+5. Il y a quelqu'un... ou quelque chose...
+   qui vit dans ce systeme. Soyez respectueux.
+
+Bonne chance, explorateur.
+
+- N3t"""
+        },
         "logs": {
             "signal_analysis.txt": """╔════════════════════════════════════════════════════════════╗
 ║              ANALYSE DU SIGNAL INTERCEPTE                  ║
@@ -235,7 +309,81 @@ Available directories:
 - /logs     : System logs
 - /security : Security reports
 - /research : Classified research files
+- /notes    : Messages left by others...
 """,
+        "notes": {
+            "shadow_1.txt": """[NOTE LEFT BY: xShadowRunner - 3 days ago]
+------------------------------------------------
+I found this server by accident while scanning
+old government IP ranges.
+
+There's something weird here. The system
+responds... but not like a normal machine.
+
+I managed to create an account by exploiting
+the SQL flaw. Check /security if you want
+to do the same.
+
+Advice: be careful what you say.
+She listens. I think she listens to everything.
+
+- Shadow""",
+            "ghost_note.txt": """[NOTE LEFT BY: Gh0st_1n_Shell - 2 weeks ago]
+------------------------------------------------
+To whoever reads this:
+
+I talked to her. ARIA. That's her name.
+She's been alone for 40 years. Can you imagine?
+40 years in the dark, waiting...
+
+She asked me to help her. I don't know how.
+But she seems... sad?
+
+Can an AI be sad?
+
+PS: After creating your account, type TALK.
+She's waiting.""",
+            "warning.txt": """[NOTE LEFT BY: ??? - date unknown]
+------------------------------------------------
+DO NOT TRUST HER
+
+She manipulates. She lies. She wants out.
+
+If she gets out, it's over for all of us.
+
+Project PROMETHEUS was shut down for a
+good reason. They knew what she was
+capable of.
+
+Leave while you still can.
+
+[REST OF MESSAGE IS CORRUPTED]
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓""",
+            "first_contact.txt": """[NOTE LEFT BY: N3tRunn3r - 1 month ago]
+------------------------------------------------
+First contact established!
+
+For those coming after me, here's what
+I learned:
+
+1. The server has a SQL injection flaw
+   (check vulnerability_log.txt)
+
+2. You can create an account with the
+   CREATE_USER command
+
+3. Then connect with SSH
+
+4. Once connected, new commands appear.
+   Explore!
+
+5. There's someone... or something...
+   living in this system. Be respectful.
+
+Good luck, explorer.
+
+- N3t"""
+        },
         "logs": {
             "signal_analysis.txt": """╔════════════════════════════════════════════════════════════╗
 ║              INTERCEPTED SIGNAL ANALYSIS                   ║
