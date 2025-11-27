@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
-from database import Player, SessionLocal
+from database import Player, SessionLocal, Connection
 from sqlalchemy import func
 from services.session_service import sessions
 from datetime import datetime, timedelta
