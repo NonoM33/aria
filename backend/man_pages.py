@@ -111,20 +111,193 @@ NOM
     DECODE - Décoder du texte en Base64
 
 SYNOPSIS
-    DECODE <texte_base64>
+    DECODE <texte_base64> ou DECODE <nom_fichier>
 
 DESCRIPTION
-    Décode une chaîne encodée en Base64.
+    Décode une chaîne encodée en Base64 ou décode le contenu d'un fichier Base64.
 
 ARGUMENTS
     <texte_base64>    Le texte encodé en Base64
+    <nom_fichier>     Un fichier contenant du Base64 (ex: corrupted_data.b64)
 
 EXEMPLES
     > DECODE SGVsbG8gV29ybGQ=
     Décodé: Hello World
+    
+    > DECODE corrupted_data.b64
+    Fichier corrupted_data.b64 décodé:
+    [Contenu décodé]
 
 VOIR AUSSI
-    ENCRYPT(1), DECRYPT(1)""",
+    ACCESS(1), SCAN(1)""",
+
+        "ACTIVATE": """ACTIVATE(1)             Manuel SYSTEM_VOID             ACTIVATE(1)
+
+NOM
+    ACTIVATE - Activer un protocole système
+
+SYNOPSIS
+    ACTIVATE <nom_protocole>
+
+DESCRIPTION
+    Active un protocole système pour débloquer de nouveaux niveaux d'accès.
+
+ARGUMENTS
+    <nom_protocole>    Le nom du protocole à activer (ex: PROTOCOL_XYZ)
+
+EXEMPLES
+    > ACTIVATE PROTOCOL_XYZ
+    Niveau 2 débloqué! Nouvelles commandes: NETWORK, ANALYZE, BYPASS
+
+NOTES
+    Le nom du protocole se trouve généralement dans les fichiers décodés.
+
+VOIR AUSSI
+    DECODE(1), NETWORK(1)""",
+
+        "NETWORK": """NETWORK(1)              Manuel SYSTEM_VOID              NETWORK(1)
+
+NOM
+    NETWORK - Afficher la carte du réseau
+
+SYNOPSIS
+    NETWORK
+
+DESCRIPTION
+    Affiche la carte du réseau avec tous les serveurs détectés et leur statut.
+
+EXEMPLES
+    > NETWORK
+    CARTE DU RÉSEAU
+    ================
+    
+    Serveurs détectés:
+    - SERVER_ALPHA (192.168.1.10) - Status: OFFLINE
+    - SERVER_BETA (192.168.1.20) - Status: ONLINE
+    - SERVER_GAMMA (192.168.1.30) - Status: LOCKED
+
+VOIR AUSSI
+    CONNECT(1), ANALYZE(1)""",
+
+        "ANALYZE": """ANALYZE(1)              Manuel SYSTEM_VOID              ANALYZE(1)
+
+NOM
+    ANALYZE - Analyser un sujet spécifique
+
+SYNOPSIS
+    ANALYZE <sujet>
+
+DESCRIPTION
+    Analyse un sujet spécifique du système (sécurité, réseau, etc.)
+
+ARGUMENTS
+    <sujet>    Le sujet à analyser (ex: security, sécurité, network, réseau)
+
+EXEMPLES
+    > ANALYZE security
+    Analyse de sécurité:
+    [Logs de sécurité]
+
+VOIR AUSSI
+    NETWORK(1), BYPASS(1)""",
+
+        "BYPASS": """BYPASS(1)               Manuel SYSTEM_VOID               BYPASS(1)
+
+NOM
+    BYPASS - Contourner un système de sécurité
+
+SYNOPSIS
+    BYPASS <code>
+
+DESCRIPTION
+    Contourne un système de sécurité en utilisant un code spécifique.
+
+ARGUMENTS
+    <code>    Le code de contournement (généralement trouvé dans une énigme)
+
+EXEMPLES
+    > BYPASS 15
+    Code correct!
+    Niveau 3 débloqué!
+
+NOTES
+    Le code est généralement la solution d'une énigme (ex: carré magique).
+
+VOIR AUSSI
+    ANALYZE(1), CONNECT(1)""",
+
+        "CONNECT": """CONNECT(1)             Manuel SYSTEM_VOID             CONNECT(1)
+
+NOM
+    CONNECT - Se connecter à un serveur
+
+SYNOPSIS
+    CONNECT <serveur> <mot_de_passe>
+
+DESCRIPTION
+    Se connecte à un serveur distant avec un mot de passe.
+
+ARGUMENTS
+    <serveur>        Le nom du serveur (ex: SERVER_GAMMA)
+    <mot_de_passe>   Le mot de passe du serveur
+
+EXEMPLES
+    > CONNECT SERVER_GAMMA DIOV
+    Serveur GAMMA connecté!
+    Niveau 4 débloqué!
+
+VOIR AUSSI
+    NETWORK(1), RESTORE(1)""",
+
+        "RESTORE": """RESTORE(1)             Manuel SYSTEM_VOID             RESTORE(1)
+
+NOM
+    RESTORE - Restaurer le système
+
+SYNOPSIS
+    RESTORE <code>
+
+DESCRIPTION
+    Restaure le système à 100% en utilisant un code de restauration.
+
+ARGUMENTS
+    <code>    Le code de restauration (généralement une somme)
+
+EXEMPLES
+    > RESTORE 55
+    Code de restauration correct!
+    Système restauré à 100%.
+
+NOTES
+    Le code est généralement une somme de nombres trouvés dans les fichiers.
+
+VOIR AUSSI
+    CONNECT(1), SOLVE(1)""",
+
+        "SOLVE": """SOLVE(1)                Manuel SYSTEM_VOID                SOLVE(1)
+
+NOM
+    SOLVE - Résoudre l'énigme finale
+
+SYNOPSIS
+    SOLVE <réponse>
+
+DESCRIPTION
+    Résout l'énigme finale pour compléter l'aventure.
+
+ARGUMENTS
+    <réponse>    La réponse à l'énigme finale
+
+EXEMPLES
+    > SOLVE VOID
+    FÉLICITATIONS!
+    Vous avez complété la première partie de SYSTEM_VOID!
+
+NOTES
+    La réponse se trouve généralement dans les fichiers du chapitre final.
+
+VOIR AUSSI
+    RESTORE(1), ACCESS(1)""",
 
         "NVIM": """NVIM(1)                   Manuel SYSTEM_VOID                  NVIM(1)
 
@@ -201,7 +374,7 @@ ARGUMENTS
 
 RACCOURCIS
     Ctrl+B puis %    Split vertical
-    Ctrl+B puis "    Split horizontal
+    Ctrl+B puis guillemet    Split horizontal
     Ctrl+B puis flèches    Naviguer entre panneaux
     Ctrl+B puis x    Fermer le panneau actuel
 
@@ -401,20 +574,193 @@ NAME
     DECODE - Decode Base64 text
 
 SYNOPSIS
-    DECODE <base64_text>
+    DECODE <base64_text> or DECODE <filename>
 
 DESCRIPTION
-    Decodes a Base64 encoded string.
+    Decodes a Base64 encoded string or decodes the content of a Base64 file.
 
 ARGUMENTS
     <base64_text>    The Base64 encoded text
+    <filename>       A file containing Base64 (ex: corrupted_data.b64)
 
 EXAMPLES
     > DECODE SGVsbG8gV29ybGQ=
     Decoded: Hello World
+    
+    > DECODE corrupted_data.b64
+    File corrupted_data.b64 decoded:
+    [Decoded content]
 
 SEE ALSO
-    ENCRYPT(1), DECRYPT(1)""",
+    ACCESS(1), SCAN(1)""",
+
+        "ACTIVATE": """ACTIVATE(1)             SYSTEM_VOID Manual             ACTIVATE(1)
+
+NAME
+    ACTIVATE - Activate a system protocol
+
+SYNOPSIS
+    ACTIVATE <protocol_name>
+
+DESCRIPTION
+    Activates a system protocol to unlock new access levels.
+
+ARGUMENTS
+    <protocol_name>    The name of the protocol to activate (ex: PROTOCOL_XYZ)
+
+EXAMPLES
+    > ACTIVATE PROTOCOL_XYZ
+    Level 2 unlocked! New commands: NETWORK, ANALYZE, BYPASS
+
+NOTES
+    The protocol name is usually found in decoded files.
+
+SEE ALSO
+    DECODE(1), NETWORK(1)""",
+
+        "NETWORK": """NETWORK(1)              SYSTEM_VOID Manual              NETWORK(1)
+
+NAME
+    NETWORK - Display network map
+
+SYNOPSIS
+    NETWORK
+
+DESCRIPTION
+    Displays the network map with all detected servers and their status.
+
+EXAMPLES
+    > NETWORK
+    NETWORK MAP
+    ===========
+    
+    Servers detected:
+    - SERVER_ALPHA (192.168.1.10) - Status: OFFLINE
+    - SERVER_BETA (192.168.1.20) - Status: ONLINE
+    - SERVER_GAMMA (192.168.1.30) - Status: LOCKED
+
+SEE ALSO
+    CONNECT(1), ANALYZE(1)""",
+
+        "ANALYZE": """ANALYZE(1)              SYSTEM_VOID Manual              ANALYZE(1)
+
+NAME
+    ANALYZE - Analyze a specific subject
+
+SYNOPSIS
+    ANALYZE <subject>
+
+DESCRIPTION
+    Analyzes a specific subject of the system (security, network, etc.)
+
+ARGUMENTS
+    <subject>    The subject to analyze (ex: security, network)
+
+EXAMPLES
+    > ANALYZE security
+    Security analysis:
+    [Security logs]
+
+SEE ALSO
+    NETWORK(1), BYPASS(1)""",
+
+        "BYPASS": """BYPASS(1)               SYSTEM_VOID Manual               BYPASS(1)
+
+NAME
+    BYPASS - Bypass a security system
+
+SYNOPSIS
+    BYPASS <code>
+
+DESCRIPTION
+    Bypasses a security system using a specific code.
+
+ARGUMENTS
+    <code>    The bypass code (usually found in a puzzle)
+
+EXAMPLES
+    > BYPASS 15
+    Correct code!
+    Level 3 unlocked!
+
+NOTES
+    The code is usually the solution to a puzzle (ex: magic square).
+
+SEE ALSO
+    ANALYZE(1), CONNECT(1)""",
+
+        "CONNECT": """CONNECT(1)             SYSTEM_VOID Manual             CONNECT(1)
+
+NAME
+    CONNECT - Connect to a server
+
+SYNOPSIS
+    CONNECT <server> <password>
+
+DESCRIPTION
+    Connects to a remote server with a password.
+
+ARGUMENTS
+    <server>      The server name (ex: SERVER_GAMMA)
+    <password>    The server password
+
+EXAMPLES
+    > CONNECT SERVER_GAMMA DIOV
+    Server GAMMA connected!
+    Level 4 unlocked!
+
+SEE ALSO
+    NETWORK(1), RESTORE(1)""",
+
+        "RESTORE": """RESTORE(1)             SYSTEM_VOID Manual             RESTORE(1)
+
+NAME
+    RESTORE - Restore the system
+
+SYNOPSIS
+    RESTORE <code>
+
+DESCRIPTION
+    Restores the system to 100% using a restoration code.
+
+ARGUMENTS
+    <code>    The restoration code (usually a sum)
+
+EXAMPLES
+    > RESTORE 55
+    Restoration code correct!
+    System restored to 100%.
+
+NOTES
+    The code is usually a sum of numbers found in files.
+
+SEE ALSO
+    CONNECT(1), SOLVE(1)""",
+
+        "SOLVE": """SOLVE(1)                SYSTEM_VOID Manual                SOLVE(1)
+
+NAME
+    SOLVE - Solve the final riddle
+
+SYNOPSIS
+    SOLVE <answer>
+
+DESCRIPTION
+    Solves the final riddle to complete the adventure.
+
+ARGUMENTS
+    <answer>    The answer to the final riddle
+
+EXAMPLES
+    > SOLVE VOID
+    CONGRATULATIONS!
+    You have completed the first part of SYSTEM_VOID!
+
+NOTES
+    The answer is usually found in the final chapter files.
+
+SEE ALSO
+    RESTORE(1), ACCESS(1)""",
 
         "NVIM": """NVIM(1)                   SYSTEM_VOID Manual                  NVIM(1)
 
@@ -490,7 +836,7 @@ ARGUMENTS
 
 SHORTCUTS
     Ctrl+B then %    Vertical split
-    Ctrl+B then "    Horizontal split
+    Ctrl+B then quote    Horizontal split
     Ctrl+B then arrows    Navigate between panels
     Ctrl+B then x    Close current panel
 
