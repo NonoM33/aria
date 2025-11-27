@@ -14,9 +14,9 @@ class PkgCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
         if not self.session.get("logged_in") or not self.session.get("player_id"):
             if self.lang == "FR":
-                return {"response": "Accès refusé. Vous devez être authentifié pour utiliser le gestionnaire de packages.\n\nCréez un compte avec CREATE_USER ou connectez-vous avec SSH.", "status": "error"}
+                return {"response": "Acces refuse. Authentification requise.\n\nTrouvez un moyen d'obtenir un acces au systeme...", "status": "error"}
             else:
-                return {"response": "Access denied. You must be authenticated to use the package manager.\n\nCreate an account with CREATE_USER or connect with SSH.", "status": "error"}
+                return {"response": "Access denied. Authentication required.\n\nFind a way to gain access to the system...", "status": "error"}
         
         if not args:
             if self.lang == "FR":

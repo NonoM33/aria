@@ -12,9 +12,9 @@ class CreateUserCommand(BaseCommand):
         
         if "exploit_success" not in self.session.get("flags", []) and "CVE-2024-DB-001" not in str(self.session.get("solved_puzzles", [])):
             if self.lang == "FR":
-                return {"response": "Vous devez d'abord exploiter la vulnérabilité avec: EXPLOIT CVE-2024-DB-001", "status": "error"}
+                return {"response": "Acces refuse. Le systeme est protege.\n\nTrouvez une faille de securite d'abord...", "status": "error"}
             else:
-                return {"response": "You must first exploit the vulnerability with: EXPLOIT CVE-2024-DB-001", "status": "error"}
+                return {"response": "Access denied. System is protected.\n\nFind a security flaw first...", "status": "error"}
         
         parts = args.split(" ", 1)
         if len(parts) < 2:
