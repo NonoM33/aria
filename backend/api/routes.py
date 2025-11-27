@@ -288,10 +288,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                     if payload:
                         username = payload.get("username")
                 
-                existing_current_path = sessions.get(session_id, {}).get("current_path")
+                existing_session_data = sessions.get(session_id, {})
+                existing_current_path = existing_session_data.get("current_path")
+                existing_aliases = existing_session_data.get("aliases")
                 session = get_session(session_id, lang, db, username, token)
                 if existing_current_path:
                     session["current_path"] = existing_current_path
+                if existing_aliases:
+                    session["aliases"] = existing_aliases
                 session["language"] = lang
                 
                 if password and session.get("ssh_pending_username"):

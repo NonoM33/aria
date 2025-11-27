@@ -32,12 +32,15 @@ def get_session(
             player = get_player_by_username(db, username)
             if player:
                 existing_path = existing_session.get("current_path")
+                existing_aliases = existing_session.get("aliases")
                 session_dict = player_to_session_dict(player)
                 session_dict["language"] = lang
                 if ssh_pending_username:
                     session_dict["ssh_pending_username"] = ssh_pending_username
                 if existing_path:
                     session_dict["current_path"] = existing_path
+                if existing_aliases:
+                    session_dict["aliases"] = existing_aliases
                 sessions[session_id] = session_dict
                 return session_dict
         except:
@@ -51,12 +54,15 @@ def get_session(
                 player = get_player_by_id(db, payload.get("player_id"))
                 if player:
                     existing_path = existing_session.get("current_path")
+                    existing_aliases = existing_session.get("aliases")
                     session_dict = player_to_session_dict(player)
                     session_dict["language"] = lang
                     if ssh_pending_username:
                         session_dict["ssh_pending_username"] = ssh_pending_username
                     if existing_path:
                         session_dict["current_path"] = existing_path
+                    if existing_aliases:
+                        session_dict["aliases"] = existing_aliases
                     sessions[session_id] = session_dict
                     return session_dict
         except:
@@ -86,7 +92,8 @@ def get_session(
             "aria_dialogue_progress": 0,
             "ending": None,
             "game_completed": False,
-            "current_path": "/"
+            "current_path": "/",
+            "aliases": {}
         }
         global_state.add_player()
     

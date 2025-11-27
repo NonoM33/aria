@@ -99,6 +99,11 @@ def player_to_session_dict(player: Player) -> Dict[str, Any]:
     except (AttributeError, KeyError):
         game_completed = False
     
+    try:
+        aliases = player.aliases or {}
+    except (AttributeError, KeyError):
+        aliases = {}
+    
     return {
         "level": player.level,
         "chapter": player.chapter,
