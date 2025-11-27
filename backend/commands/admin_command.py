@@ -32,8 +32,22 @@ class AdminStatsCommand(BaseCommand):
             online = get_online_sessions()
             online_count = len(online)
             
+            total_connections = db.query(func.count(Connection.id)).scalar() or 0
+            converted_connections = db.query(func.count(Connection.id)).filter(
+                Connection.converted == True
+            ).scalar() or 0
+            conversion_rate = round(converted_connections / total_connections * 100, 1) if total_connections > 0 else 0
+            
             one_day_ago = datetime.utcnow() - timedelta(days=1)
             one_week_ago = datetime.utcnow() - timedelta(days=7)
+            
+            connections_24h = db.query(func.count(Connection.id)).filter(
+                Connection.created_at >= one_day_ago
+            ).scalar() or 0
+            
+            connections_7d = db.query(func.count(Connection.id)).filter(
+                Connection.created_at >= one_week_ago
+            ).scalar() or 0
             
             active_24h = db.query(func.count(Player.id)).filter(
                 Player.last_login >= one_day_ago
@@ -79,6 +93,17 @@ class AdminStatsCommand(BaseCommand):
 ╔══════════════════════════════════════════════════════════════════╗
 ║                    STATISTIQUES GLOBALES                         ║
 ╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  CONNEXIONS                                                      ║
+║  ────────────────────────────────────────                        ║
+║    Total connexions   : {total_connections:>6}                                   ║
+║    Connexions (24h)   : {connections_24h:>6}                                   ║
+║    Connexions (7j)    : {connections_7d:>6}                                   ║
+║                                                                  ║
+║  CONVERSION                                                      ║
+║  ────────────────────────────────────────                        ║
+║    Comptes crees      : {converted_connections:>6}                                   ║
+║    Taux conversion    : {conversion_rate:>5}%                                   ║
 ║                                                                  ║
 ║  JOUEURS                                                         ║
 ║  ────────────────────────────────────────                        ║
