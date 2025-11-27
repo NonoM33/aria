@@ -6,7 +6,7 @@ const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
   'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
-  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS'
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS', 'CLEAR'
 ]
 
 const AVAILABLE_PACKAGES = ['file-viewer']
@@ -20,7 +20,7 @@ export const useTerminal = () => {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [autocompleteOptions, setAutocompleteOptions] = useState([])
   const [availableFiles, setAvailableFiles] = useState([])
-  const [unlockedCommands, setUnlockedCommands] = useState(['HELP', 'STATUS', 'LOGIN'])
+  const [unlockedCommands, setUnlockedCommands] = useState(['HELP', 'STATUS', 'LOGIN', 'CLEAR'])
   const [installedPackages, setInstalledPackages] = useState([])
   const [isPasswordMode, setIsPasswordMode] = useState(false)
   const [passwordUsername, setPasswordUsername] = useState(null)
@@ -55,9 +55,17 @@ export const useTerminal = () => {
     }, 30)
   }, [])
 
+  const UNKNOWN_RESPONSES = useRef([
+    "Commande inconnue. Accès refusé.\n\nTapez HELP pour voir les commandes disponibles.",
+    "Unknown command. Access Denied.\n\nType HELP to see available commands.",
+    "Commande inconnue. Accès refusé.",
+    "Unknown command. Access denied.",
+  ])
+
   const handleWebSocketMessage = useCallback((data) => {
     if (data.type === 'command_response') {
       const systemResponse = data.response || 'No response from system.'
+      const trimmedResponse = (systemResponse || '').trim()
       
       if (systemResponse.includes("Vous n'êtes pas connecté") || 
           systemResponse.includes("You are not connected") ||
@@ -103,6 +111,11 @@ export const useTerminal = () => {
         setPasswordUsername(null)
       }
       
+      if (UNKNOWN_RESPONSES.current.includes(trimmedResponse)) {
+        setIsTyping(false)
+        return
+      }
+
       setHistory(prev => [...prev, {
         type: 'system',
         content: '',
@@ -269,9 +282,18 @@ export const useTerminal = () => {
     }
     
     const userCommand = command.trim()
+    if (!userCommand) {
+      const message = language === 'FR'
+        ? "Commande inconnue. Accès refusé.\n\nTapez HELP pour voir les commandes disponibles."
+        : "Unknown command. Access denied.\n\nType HELP to see available commands."
+      addToHistory('system', message)
+      return
+    }
     
-    if (userCommand) {
-      addToHistory('user', userCommand)
+    const userCommandUpper = userCommand.toUpperCase()
+    
+    if (userCommandUpper === 'CLEAR') {
+      setHistory([])
       setCommandHistory(prev => {
         const newHistory = [...prev]
         if (newHistory[newHistory.length - 1] !== userCommand) {
@@ -280,6 +302,27 @@ export const useTerminal = () => {
         return newHistory.slice(-50)
       })
       setHistoryIndex(-1)
+      setInput('')
+      setAutocompleteOptions([])
+      setIsTyping(false)
+      return
+    }
+    
+    addToHistory('user', userCommand)
+    setCommandHistory(prev => {
+      const newHistory = [...prev]
+      if (newHistory[newHistory.length - 1] !== userCommand) {
+        newHistory.push(userCommand)
+      }
+      return newHistory.slice(-50)
+    })
+    setHistoryIndex(-1)
+    
+    if (userCommandUpper === 'MAN' || userCommandUpper.startsWith('MAN ')) {
+      setInput('')
+      setAutocompleteOptions([])
+      setIsTyping(false)
+      return
     }
     
     setInput('')
