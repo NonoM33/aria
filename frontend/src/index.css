@@ -1658,6 +1658,41 @@ body {
   background: rgba(0, 255, 255, 0.25);
 }
 
+.aria-glitch-active {
+  animation: aria-notification-glitch 0.15s ease;
+}
+
+@keyframes aria-notification-glitch {
+  0% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: translate(-1px, 1px);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: translate(1px, -1px);
+    filter: hue-rotate(180deg);
+  }
+  60% {
+    transform: translate(-1px, 0);
+    filter: hue-rotate(270deg);
+  }
+  80% {
+    transform: translate(1px, 0);
+    filter: hue-rotate(360deg);
+  }
+  100% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+.aria-glitch-active .aria-notification-message {
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 12px rgba(255, 0, 255, 0.4);
+}
+
 /* ========================================
    ADMIN MODE - FALLOUT TERMINAL STYLE
    ======================================== */
