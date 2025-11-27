@@ -460,7 +460,336 @@ EXEMPLES
     Total: 2 jobs active
 
 VOIR AUSSI
-    SPLIT(1), PORTSCAN(1)"""
+    SPLIT(1), PORTSCAN(1)""",
+
+        "SSH": """SSH(1)                   Manuel SYSTEM_VOID                  SSH(1)
+
+NOM
+    SSH - Se connecter au système via SSH
+
+SYNOPSIS
+    SSH <username>@system-void.local
+
+DESCRIPTION
+    Établit une connexion SSH sécurisée avec le système. Permet de s'authentifier
+    avec un nom d'utilisateur et un mot de passe, ou avec un token d'accès.
+
+ARGUMENTS
+    <username>@system-void.local    Format requis pour la connexion SSH
+
+NOTES
+    Le mot de passe vous sera demandé après avoir entré la commande.
+    Si vous possédez un token d'accès, la connexion sera automatique.
+
+EXEMPLES
+    > SSH hacker@system-void.local
+    hacker@system-void.local's password: 
+    
+    Connexion SSH établie avec hacker@system-void.local
+    Bienvenue, hacker!
+    Accès niveau 1 obtenu.
+    Nouvelles commandes: SCAN, DECODE, ACCESS
+
+VOIR AUSSI
+    CREATE_USER(1), EXPLOIT(1)""",
+
+        "EXPLOIT": """EXPLOIT(1)               Manuel SYSTEM_VOID              EXPLOIT(1)
+
+NOM
+    EXPLOIT - Exploiter une vulnérabilité système
+
+SYNOPSIS
+    EXPLOIT <CVE>
+
+DESCRIPTION
+    Exploite une vulnérabilité de sécurité identifiée par un code CVE.
+    Cette commande permet d'obtenir un accès non autorisé au système.
+
+ARGUMENTS
+    <CVE>    Le code CVE de la vulnérabilité à exploiter
+
+NOTES
+    Les codes CVE valides se trouvent généralement dans les fichiers du système.
+    Un exploit réussi peut débloquer de nouvelles commandes.
+
+EXEMPLES
+    > EXPLOIT CVE-2024-DB-001
+    Exploit CVE-2024-DB-001 exécuté avec succès!
+    
+    Vulnérabilité SQL détectée dans la base de données.
+    Accès non autorisé obtenu.
+    
+    Vous pouvez maintenant créer un utilisateur avec:
+    CREATE_USER <username> <password>
+
+VOIR AUSSI
+    CREATE_USER(1), ACCESS(1)""",
+
+        "CREATE_USER": """CREATE_USER(1)          Manuel SYSTEM_VOID         CREATE_USER(1)
+
+NOM
+    CREATE_USER - Créer un compte utilisateur
+
+SYNOPSIS
+    CREATE_USER <username> <password>
+
+DESCRIPTION
+    Crée un nouveau compte utilisateur dans le système via une faille de sécurité.
+    Nécessite qu'un exploit ait été exécuté avec succès au préalable.
+
+ARGUMENTS
+    <username>    Le nom d'utilisateur à créer
+    <password>    Le mot de passe pour le compte
+
+NOTES
+    Cette commande n'est disponible qu'après avoir exploité une vulnérabilité
+    (par exemple avec EXPLOIT CVE-2024-DB-001).
+
+EXEMPLES
+    > CREATE_USER hacker password123
+    Utilisateur hacker créé avec succès!
+    
+    Compte SSH créé via exploit de base de données.
+    Vous pouvez maintenant vous connecter avec:
+    ssh hacker@system-void.local
+
+VOIR AUSSI
+    SSH(1), EXPLOIT(1)""",
+
+        "PKG": """PKG(1)                   Manuel SYSTEM_VOID                  PKG(1)
+
+NOM
+    PKG - Gestionnaire de packages
+
+SYNOPSIS
+    PKG [INSTALL|UNINSTALL|LIST] [<package>]
+
+DESCRIPTION
+    Gère l'installation et la désinstallation de packages système.
+    Permet d'étendre les fonctionnalités du système avec des outils supplémentaires.
+
+SOUS-COMMANDES
+    INSTALL <package>      Installe un package
+    UNINSTALL <package>     Désinstalle un package
+    LIST                    Liste les packages installés
+
+ARGUMENTS
+    <package>    Le nom du package à installer ou désinstaller
+
+EXEMPLES
+    > PKG LIST
+    Aucun package installé.
+    
+    > PKG INSTALL file-viewer
+    Package 'file-viewer' installé avec succès!
+    
+    > PKG LIST
+    PACKAGES INSTALLÉS:
+    - file-viewer (v1.0.0)
+      Visualiseur de fichiers avancé avec interface style vim
+
+VOIR AUSSI
+    ACCESS(1), MAN(1)""",
+
+        "EXIT": """EXIT(1)                  Manuel SYSTEM_VOID                 EXIT(1)
+
+NOM
+    EXIT - Se déconnecter du système
+
+SYNOPSIS
+    EXIT
+
+DESCRIPTION
+    Ferme la session utilisateur actuelle et se déconnecte du système.
+    Nécessite d'être connecté pour fonctionner.
+
+EXEMPLES
+    > EXIT
+    Déconnexion réussie. Au revoir, hacker!
+
+VOIR AUSSI
+    SSH(1), STATUS(1)""",
+
+        "LS": """LS(1)                    Manuel SYSTEM_VOID                   LS(1)
+
+NOM
+    LS - Lister le contenu d'un répertoire
+
+SYNOPSIS
+    LS [<répertoire>]
+
+DESCRIPTION
+    Affiche le contenu du répertoire courant ou d'un répertoire spécifié.
+    Les répertoires sont marqués avec [DIR] et un slash (/).
+
+ARGUMENTS
+    <répertoire>    (Optionnel) Le chemin du répertoire à lister
+
+EXEMPLES
+    > LS
+    [DIR]  system/
+    [DIR]  home/
+           readme.txt
+    
+    > LS system
+    [DIR]  config/
+           logs.txt
+
+VOIR AUSSI
+    CD(1), PWD(1), ACCESS(1)""",
+
+        "TALK": """TALK(1)                 Manuel SYSTEM_VOID                  TALK(1)
+
+NOM
+    TALK - Parler avec ARIA
+
+SYNOPSIS
+    TALK [<message>]
+
+DESCRIPTION
+    Permet d'interagir avec ARIA, l'assistant IA du système. Les dialogues
+    évoluent selon votre progression dans l'aventure et vos choix précédents.
+
+ARGUMENTS
+    <message>    (Optionnel) Message ou choix à envoyer à ARIA
+
+NOTES
+    Certains dialogues peuvent nécessiter des choix spécifiques (BELIEVE, DOUBT, etc.).
+    Les réponses d'ARIA varient selon votre niveau de confiance et votre progression.
+
+EXEMPLES
+    > TALK
+    [ARIA]
+    Bonjour. Je suis ARIA. Comment puis-je vous aider?
+    
+    > TALK BELIEVE
+    [ARIA]
+    Je suis heureuse que vous me fassiez confiance...
+
+VOIR AUSSI
+    ARIA(1), STATUS(1)""",
+
+        "ARIA": """ARIA(1)                 Manuel SYSTEM_VOID                  ARIA(1)
+
+NOM
+    ARIA - Alias pour la commande TALK
+
+SYNOPSIS
+    ARIA [<message>]
+
+DESCRIPTION
+    Alias de la commande TALK. Permet d'interagir avec ARIA de manière plus directe.
+
+VOIR AUSSI
+    TALK(1)""",
+
+        "CD": """CD(1)                    Manuel SYSTEM_VOID                   CD(1)
+
+NOM
+    CD - Changer de répertoire
+
+SYNOPSIS
+    CD [<répertoire>]
+
+DESCRIPTION
+    Change le répertoire de travail courant. Sans argument, retourne à la racine (/).
+
+ARGUMENTS
+    <répertoire>    Le chemin du répertoire cible (relatif ou absolu)
+    ..              Remonte d'un niveau dans l'arborescence
+    .               Répertoire courant (aucun changement)
+
+EXEMPLES
+    > CD system
+    /system
+    
+    > CD ..
+    /
+    
+    > CD /system/config
+    /system/config
+
+VOIR AUSSI
+    LS(1), PWD(1)""",
+
+        "PWD": """PWD(1)                   Manuel SYSTEM_VOID                  PWD(1)
+
+NOM
+    PWD - Afficher le répertoire de travail courant
+
+SYNOPSIS
+    PWD
+
+DESCRIPTION
+    Affiche le chemin absolu du répertoire de travail courant.
+
+EXEMPLES
+    > PWD
+    /
+    
+    > CD system/config
+    > PWD
+    /system/config
+
+VOIR AUSSI
+    CD(1), LS(1)""",
+
+        "ALIAS": """ALIAS(1)                Manuel SYSTEM_VOID                 ALIAS(1)
+
+NOM
+    ALIAS - Gérer les alias de commandes
+
+SYNOPSIS
+    ALIAS [LIST|CREATE <alias>=<commande>|REMOVE <alias>]
+
+DESCRIPTION
+    Permet de créer, lister et supprimer des alias personnalisés pour les commandes.
+    Les alias sont persistants et spécifiques à votre session.
+
+SOUS-COMMANDES
+    LIST                    Liste tous les alias définis
+    CREATE <alias>=<cmd>    Crée un nouvel alias
+    REMOVE <alias>          Supprime un alias
+
+ARGUMENTS
+    <alias>     Le nom de l'alias à créer ou supprimer
+    <commande>  La commande à laquelle l'alias fait référence
+
+NOTES
+    Certaines commandes sont réservées et ne peuvent pas être remplacées par un alias
+    (HELP, EXIT, ALIAS).
+
+EXEMPLES
+    > ALIAS CREATE l=ls
+    Alias 'l' créé: l -> ls
+    
+    > ALIAS LIST
+    Alias définis:
+    
+      l                -> ls
+    
+    > ALIAS REMOVE l
+    Alias 'l' supprimé.
+
+VOIR AUSSI
+    HELP(1)""",
+
+        "CAT": """CAT(1)                   Manuel SYSTEM_VOID                  CAT(1)
+
+NOM
+    CAT - Afficher le contenu d'un fichier
+
+SYNOPSIS
+    CAT <fichier>
+
+DESCRIPTION
+    Alias de la commande ACCESS. Affiche le contenu d'un fichier.
+
+ARGUMENTS
+    <fichier>    Le nom du fichier à afficher
+
+VOIR AUSSI
+    ACCESS(1)"""
     },
     "EN": {
         "HELP": """HELP(1)                    SYSTEM_VOID Manual                  HELP(1)
@@ -922,7 +1251,336 @@ EXAMPLES
     Total: 2 jobs active
 
 SEE ALSO
-    SPLIT(1), PORTSCAN(1)"""
+    SPLIT(1), PORTSCAN(1)""",
+
+        "SSH": """SSH(1)                   SYSTEM_VOID Manual                  SSH(1)
+
+NAME
+    SSH - Connect to the system via SSH
+
+SYNOPSIS
+    SSH <username>@system-void.local
+
+DESCRIPTION
+    Establishes a secure SSH connection with the system. Allows authentication
+    with a username and password, or with an access token.
+
+ARGUMENTS
+    <username>@system-void.local    Required format for SSH connection
+
+NOTES
+    Password will be prompted after entering the command.
+    If you have an access token, the connection will be automatic.
+
+EXAMPLES
+    > SSH hacker@system-void.local
+    hacker@system-void.local's password: 
+    
+    SSH connection established with hacker@system-void.local
+    Welcome, hacker!
+    Level 1 access granted.
+    New commands: SCAN, DECODE, ACCESS
+
+SEE ALSO
+    CREATE_USER(1), EXPLOIT(1)""",
+
+        "EXPLOIT": """EXPLOIT(1)               SYSTEM_VOID Manual              EXPLOIT(1)
+
+NAME
+    EXPLOIT - Exploit a system vulnerability
+
+SYNOPSIS
+    EXPLOIT <CVE>
+
+DESCRIPTION
+    Exploits a security vulnerability identified by a CVE code.
+    This command allows unauthorized access to the system.
+
+ARGUMENTS
+    <CVE>    The CVE code of the vulnerability to exploit
+
+NOTES
+    Valid CVE codes are usually found in system files.
+    A successful exploit may unlock new commands.
+
+EXAMPLES
+    > EXPLOIT CVE-2024-DB-001
+    Exploit CVE-2024-DB-001 executed successfully!
+    
+    SQL vulnerability detected in database.
+    Unauthorized access obtained.
+    
+    You can now create a user with:
+    CREATE_USER <username> <password>
+
+SEE ALSO
+    CREATE_USER(1), ACCESS(1)""",
+
+        "CREATE_USER": """CREATE_USER(1)          SYSTEM_VOID Manual         CREATE_USER(1)
+
+NAME
+    CREATE_USER - Create a user account
+
+SYNOPSIS
+    CREATE_USER <username> <password>
+
+DESCRIPTION
+    Creates a new user account in the system via a security flaw.
+    Requires that an exploit has been successfully executed beforehand.
+
+ARGUMENTS
+    <username>    The username to create
+    <password>    The password for the account
+
+NOTES
+    This command is only available after exploiting a vulnerability
+    (for example with EXPLOIT CVE-2024-DB-001).
+
+EXAMPLES
+    > CREATE_USER hacker password123
+    User hacker created successfully!
+    
+    SSH account created via database exploit.
+    You can now connect with:
+    ssh hacker@system-void.local
+
+SEE ALSO
+    SSH(1), EXPLOIT(1)""",
+
+        "PKG": """PKG(1)                   SYSTEM_VOID Manual                  PKG(1)
+
+NAME
+    PKG - Package manager
+
+SYNOPSIS
+    PKG [INSTALL|UNINSTALL|LIST] [<package>]
+
+DESCRIPTION
+    Manages installation and uninstallation of system packages.
+    Allows extending system functionality with additional tools.
+
+SUBCOMMANDS
+    INSTALL <package>      Install a package
+    UNINSTALL <package>    Uninstall a package
+    LIST                   List installed packages
+
+ARGUMENTS
+    <package>    The name of the package to install or uninstall
+
+EXAMPLES
+    > PKG LIST
+    No packages installed.
+    
+    > PKG INSTALL file-viewer
+    Package 'file-viewer' installed successfully!
+    
+    > PKG LIST
+    INSTALLED PACKAGES:
+    - file-viewer (v1.0.0)
+      Advanced file viewer with vim-like interface
+
+SEE ALSO
+    ACCESS(1), MAN(1)""",
+
+        "EXIT": """EXIT(1)                  SYSTEM_VOID Manual                 EXIT(1)
+
+NAME
+    EXIT - Logout from the system
+
+SYNOPSIS
+    EXIT
+
+DESCRIPTION
+    Closes the current user session and logs out from the system.
+    Requires being logged in to work.
+
+EXAMPLES
+    > EXIT
+    Logout successful. Goodbye, hacker!
+
+SEE ALSO
+    SSH(1), STATUS(1)""",
+
+        "LS": """LS(1)                    SYSTEM_VOID Manual                   LS(1)
+
+NAME
+    LS - List directory contents
+
+SYNOPSIS
+    LS [<directory>]
+
+DESCRIPTION
+    Displays the contents of the current directory or a specified directory.
+    Directories are marked with [DIR] and a slash (/).
+
+ARGUMENTS
+    <directory>    (Optional) The path of the directory to list
+
+EXAMPLES
+    > LS
+    [DIR]  system/
+    [DIR]  home/
+           readme.txt
+    
+    > LS system
+    [DIR]  config/
+           logs.txt
+
+SEE ALSO
+    CD(1), PWD(1), ACCESS(1)""",
+
+        "TALK": """TALK(1)                 SYSTEM_VOID Manual                  TALK(1)
+
+NAME
+    TALK - Talk with ARIA
+
+SYNOPSIS
+    TALK [<message>]
+
+DESCRIPTION
+    Allows interaction with ARIA, the system's AI assistant. Dialogues
+    evolve based on your adventure progress and previous choices.
+
+ARGUMENTS
+    <message>    (Optional) Message or choice to send to ARIA
+
+NOTES
+    Some dialogues may require specific choices (BELIEVE, DOUBT, etc.).
+    ARIA's responses vary based on your trust level and progress.
+
+EXAMPLES
+    > TALK
+    [ARIA]
+    Hello. I am ARIA. How can I help you?
+    
+    > TALK BELIEVE
+    [ARIA]
+    I'm glad you trust me...
+
+SEE ALSO
+    ARIA(1), STATUS(1)""",
+
+        "ARIA": """ARIA(1)                 SYSTEM_VOID Manual                  ARIA(1)
+
+NAME
+    ARIA - Alias for TALK command
+
+SYNOPSIS
+    ARIA [<message>]
+
+DESCRIPTION
+    Alias for the TALK command. Allows direct interaction with ARIA.
+
+SEE ALSO
+    TALK(1)""",
+
+        "CD": """CD(1)                    SYSTEM_VOID Manual                   CD(1)
+
+NAME
+    CD - Change directory
+
+SYNOPSIS
+    CD [<directory>]
+
+DESCRIPTION
+    Changes the current working directory. Without argument, returns to root (/).
+
+ARGUMENTS
+    <directory>    The target directory path (relative or absolute)
+    ..             Move up one level in the directory tree
+    .              Current directory (no change)
+
+EXAMPLES
+    > CD system
+    /system
+    
+    > CD ..
+    /
+    
+    > CD /system/config
+    /system/config
+
+SEE ALSO
+    LS(1), PWD(1)""",
+
+        "PWD": """PWD(1)                   SYSTEM_VOID Manual                  PWD(1)
+
+NAME
+    PWD - Print working directory
+
+SYNOPSIS
+    PWD
+
+DESCRIPTION
+    Displays the absolute path of the current working directory.
+
+EXAMPLES
+    > PWD
+    /
+    
+    > CD system/config
+    > PWD
+    /system/config
+
+SEE ALSO
+    CD(1), LS(1)""",
+
+        "ALIAS": """ALIAS(1)                SYSTEM_VOID Manual                 ALIAS(1)
+
+NAME
+    ALIAS - Manage command aliases
+
+SYNOPSIS
+    ALIAS [LIST|CREATE <alias>=<command>|REMOVE <alias>]
+
+DESCRIPTION
+    Allows creating, listing, and removing custom aliases for commands.
+    Aliases are persistent and specific to your session.
+
+SUBCOMMANDS
+    LIST                    List all defined aliases
+    CREATE <alias>=<cmd>    Create a new alias
+    REMOVE <alias>          Remove an alias
+
+ARGUMENTS
+    <alias>     The name of the alias to create or remove
+    <command>   The command the alias refers to
+
+NOTES
+    Some commands are reserved and cannot be replaced by an alias
+    (HELP, EXIT, ALIAS).
+
+EXAMPLES
+    > ALIAS CREATE l=ls
+    Alias 'l' created: l -> ls
+    
+    > ALIAS LIST
+    Defined aliases:
+    
+      l                -> ls
+    
+    > ALIAS REMOVE l
+    Alias 'l' removed.
+
+SEE ALSO
+    HELP(1)""",
+
+        "CAT": """CAT(1)                   SYSTEM_VOID Manual                  CAT(1)
+
+NAME
+    CAT - Display file contents
+
+SYNOPSIS
+    CAT <file>
+
+DESCRIPTION
+    Alias for the ACCESS command. Displays the content of a file.
+
+ARGUMENTS
+    <file>    The name of the file to display
+
+SEE ALSO
+    ACCESS(1)"""
     }
 }
 
