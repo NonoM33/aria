@@ -6,7 +6,7 @@ const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
   'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
-  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS', 'CD', 'PWD', 'CLEAR'
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS', 'CD', 'PWD', 'CLEAR', 'ALIAS'
 ]
 
 const AVAILABLE_PACKAGES = ['file-viewer']
@@ -71,6 +71,7 @@ export const useTerminal = () => {
   const [passwordUsername, setPasswordUsername] = useState(null)
   const [currentPath, setCurrentPath] = useState('/')
   const currentPathRef = useRef('/')
+  const lastManualInputRef = useRef('')
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`

@@ -24,6 +24,7 @@ from commands.ls_command import LsCommand
 from commands.talk_command import TalkCommand, AriaCommand
 from commands.cd_command import CdCommand
 from commands.pwd_command import PwdCommand
+from commands.alias_command import AliasCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -54,6 +55,7 @@ COMMAND_MAP = {
     "ARIA": AriaCommand,
     "CD": CdCommand,
     "PWD": PwdCommand,
+    "ALIAS": AliasCommand,
 }
 
 def handle_command(
@@ -62,9 +64,30 @@ def handle_command(
     session: Dict[str, Any],
     db: Optional[Session],
     lang: str,
-    token: Optional[str] = None
+    token: Optional[str] = None,
+    alias_depth: int = 0
 ) -> Dict[str, Any]:
+    if alias_depth > 10:
+        if lang == "FR":
+            return {"response": "Erreur: Boucle infinie détectée dans les alias.", "status": "error"}
+        else:
+            return {"response": "Error: Infinite loop detected in aliases.", "status": "error"}
+    
     command_upper = command.upper()
+    
+    aliases = session.get("aliases", {})
+    if command_upper in aliases:
+        alias_command = aliases[command_upper]
+        if args:
+            full_command = f"{alias_command} {args}"
+        else:
+            full_command = alias_command
+        
+        parts = full_command.split(" ", 1)
+        new_command = parts[0].strip()
+        new_args = parts[1].strip() if len(parts) > 1 else ""
+        
+        return handle_command(new_command, new_args, session, db, lang, token, alias_depth + 1)
     
     if session.get("ssh_pending_username") and command_upper == "":
         if "SSH" in COMMAND_MAP:
