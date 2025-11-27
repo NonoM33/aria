@@ -304,7 +304,9 @@ const Terminal = () => {
           )}
           {isTyping && (
             <div className="terminal-input-line">
-              <span className="prompt">&gt; </span>
+              <span className="prompt">
+                {username ? `${username}@system-void > ` : '> '}
+              </span>
               <span className="cursor"></span>
             </div>
           )}

@@ -44,19 +44,19 @@ async def handle_command_route(
     data = adventure_data.get(lang, {})
     
     if not command or command == "":
-        system_messages = data.get("system_messages", {})
-        welcome_msg = system_messages.get("welcome", "")
-        if not welcome_msg:
-            if lang == "EN":
-                welcome_msg = "SYSTEM_VOID v2.0 initialized.\nType HELP to start."
-            else:
-                welcome_msg = "SYSTEM_VOID v2.0 initialisé.\nTapez HELP pour commencer."
-        
-        if session.get("username"):
+        if session.get("logged_in") and session.get("username"):
             if lang == "FR":
-                welcome_msg += f"\n\nBienvenue de retour, {session['username']}!"
+                welcome_msg = f"SYSTEM_VOID v2.0\n\nBienvenue de retour, {session['username']}!\nVous êtes connecté. Votre progression est sauvegardée.\n\nTapez HELP pour voir les commandes disponibles."
             else:
-                welcome_msg += f"\n\nWelcome back, {session['username']}!"
+                welcome_msg = f"SYSTEM_VOID v2.0\n\nWelcome back, {session['username']}!\nYou are connected. Your progress is saved.\n\nType HELP to see available commands."
+        else:
+            system_messages = data.get("system_messages", {})
+            welcome_msg = system_messages.get("welcome", "")
+            if not welcome_msg:
+                if lang == "EN":
+                    welcome_msg = "SYSTEM_VOID v2.0 initialized.\nType HELP to start."
+                else:
+                    welcome_msg = "SYSTEM_VOID v2.0 initialisé.\nTapez HELP pour commencer."
         
         return {"response": welcome_msg, "status": "info"}
     

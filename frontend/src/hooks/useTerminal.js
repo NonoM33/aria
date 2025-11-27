@@ -283,6 +283,7 @@ export const useTerminal = () => {
           // Si la réponse contient un username (après REGISTER, LOGIN, SSH, CREATE_USER), le sauvegarder
           if (response.data.username) {
             localStorage.setItem('system_void_username', response.data.username)
+            window.dispatchEvent(new Event('localStorageChange'))
           }
           
           // Si la réponse contient une session (après LOGIN), mettre à jour le localStorage
@@ -291,6 +292,7 @@ export const useTerminal = () => {
             if (response.data.session.token) {
               localStorage.setItem('system_void_token', response.data.session.token)
             }
+            window.dispatchEvent(new Event('localStorageChange'))
           }
           
           // Mettre à jour les commandes débloquées après chaque commande
