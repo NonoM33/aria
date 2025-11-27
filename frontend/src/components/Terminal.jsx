@@ -19,11 +19,13 @@ const Terminal = () => {
     autocompleteOptions,
     installedPackages,
     isPasswordMode,
-    passwordUsername
+    passwordUsername,
+    currentPath
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
   const historyEndRef = useRef(null)
+  const terminalContentRef = useRef(null)
   const [showInput, setShowInput] = useState(true)
   const [welcomeShown, setWelcomeShown] = useState(false)
   const [manPageCommand, setManPageCommand] = useState(null)
@@ -152,9 +154,12 @@ const Terminal = () => {
   }, [history, isTyping, isPasswordMode, showInput])
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      historyEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, isTyping ? 150 : 0)
+    const scrollToBottom = () => {
+      if (terminalContentRef.current) {
+        terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight
+      }
+    }
+    const timeout = setTimeout(scrollToBottom, isTyping ? 150 : 50)
     return () => clearTimeout(timeout)
   }, [history, isTyping])
 
@@ -397,7 +402,7 @@ const Terminal = () => {
               {entry.type === 'user' && (
                 <div className="terminal-line">
                   <span className="prompt">
-                    {username ? `${username}@system-void > ` : '> '}
+                    {username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `}
                   </span>
                   <span className="terminal-text">{entry.content}</span>
                 </div>
@@ -412,7 +417,7 @@ const Terminal = () => {
           {showInput && !isTyping && (
             <div className="terminal-input-line">
               <span className="prompt">
-                {isPasswordMode ? `${passwordUsername || 'user'}@system-void.local's password: ` : (username ? `${username}@system-void > ` : '> ')}
+                {isPasswordMode ? `${passwordUsername || 'user'}@system-void.local's password: ` : (username ? `${username}@system-void:${currentPath}$ ` : `guest:${currentPath}$ `)}
               </span>
               <input
                 ref={inputRef}

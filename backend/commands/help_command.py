@@ -10,7 +10,7 @@ class HelpCommand(BaseCommand):
         is_logged_in = self.session.get("logged_in", False)
         
         if not is_logged_in:
-            all_commands = {"HELP", "EXIT"}
+            all_commands = {"HELP", "EXIT", "LS", "CAT", "CD", "PWD"}
         else:
             all_commands = set(self.session.get("unlocked_commands", []))
             
@@ -31,14 +31,14 @@ class HelpCommand(BaseCommand):
         if self.lang == "FR":
             help_msg = f"Commandes disponibles: {available}"
             if not is_logged_in:
-                help_msg += "\n\nAccès restreint. Trouvez un moyen d'entrer dans le système..."
+                help_msg += "\n\nAcces restreint. Explorez le systeme avec LS et CD..."
             else:
                 help_msg += "\n\nTapez STATUS pour voir l'état du système."
                 help_msg += f"\n[GLOBAL] Intégrité mondiale: {global_state._state['global_integrity']}%"
         else:
             help_msg = f"Commands available: {available}"
             if not is_logged_in:
-                help_msg += "\n\nAccess restricted. Find a way into the system..."
+                help_msg += "\n\nAccess restricted. Explore the system with LS and CD..."
             else:
                 help_msg += "\n\nType STATUS to see system status."
                 help_msg += f"\n[GLOBAL] World integrity: {global_state._state['global_integrity']}%"

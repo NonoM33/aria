@@ -6,7 +6,7 @@ const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
   'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
-  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS', 'CLEAR'
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS', 'CD', 'PWD', 'CLEAR'
 ]
 
 const AVAILABLE_PACKAGES = ['file-viewer']
@@ -24,6 +24,7 @@ export const useTerminal = () => {
   const [installedPackages, setInstalledPackages] = useState([])
   const [isPasswordMode, setIsPasswordMode] = useState(false)
   const [passwordUsername, setPasswordUsername] = useState(null)
+  const [currentPath, setCurrentPath] = useState('/')
   const sessionIdRef = useRef(
     localStorage.getItem('session_id') || 
     `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -66,6 +67,10 @@ export const useTerminal = () => {
     if (data.type === 'command_response') {
       const systemResponse = data.response || 'No response from system.'
       const trimmedResponse = (systemResponse || '').trim()
+      
+      if (data.current_path) {
+        setCurrentPath(data.current_path)
+      }
       
       if (systemResponse.includes("Vous n'êtes pas connecté") || 
           systemResponse.includes("You are not connected") ||
@@ -471,7 +476,8 @@ export const useTerminal = () => {
     autocompleteOptions,
     installedPackages,
     isPasswordMode,
-    passwordUsername
+    passwordUsername,
+    currentPath
   }
 }
 
