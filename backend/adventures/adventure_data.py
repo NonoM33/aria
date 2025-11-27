@@ -5,14 +5,14 @@ def get_adventure_data(language: str = "FR"):
     
     system_messages = {
         "FR": {
-            "welcome": "SYSTEM_VOID v2.0 - Système de base de données compromis\n\nVous devez exploiter une vulnérabilité pour créer un accès SSH.\nTapez SCAN pour commencer.",
-            "level_up": "Niveau {level} débloqué!",
+            "welcome": "SYSTEM_VOID v2.0\n\nConnexion au serveur PROMETHEUS...\nSignal detecte. Quelque chose repond.\n\nTapez HELP pour commencer.",
+            "level_up": "Niveau {level} debloque!",
             "file_accessed": "Fichier {filename} ouvert.",
-            "puzzle_solved": "Énigme résolue!",
-            "chapter_complete": "Chapitre '{title}' terminé!"
+            "puzzle_solved": "Enigme resolue!",
+            "chapter_complete": "Chapitre '{title}' termine!"
         },
         "EN": {
-            "welcome": "SYSTEM_VOID v2.0 - Compromised Database System\n\nYou must exploit a vulnerability to create SSH access.\nType SCAN to start.",
+            "welcome": "SYSTEM_VOID v2.0\n\nConnecting to PROMETHEUS server...\nSignal detected. Something responds.\n\nType HELP to start.",
             "level_up": "Level {level} unlocked!",
             "file_accessed": "File {filename} opened.",
             "puzzle_solved": "Riddle solved!",

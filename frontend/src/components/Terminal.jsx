@@ -154,14 +154,14 @@ const Terminal = () => {
   }, [history, isTyping, isPasswordMode, showInput])
 
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (terminalContentRef.current) {
-        terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight
-      }
+    if (terminalContentRef.current) {
+      requestAnimationFrame(() => {
+        if (terminalContentRef.current) {
+          terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight
+        }
+      })
     }
-    const timeout = setTimeout(scrollToBottom, isTyping ? 150 : 50)
-    return () => clearTimeout(timeout)
-  }, [history, isTyping])
+  }, [history])
 
   const handleSubmit = (e) => {
     e.preventDefault()

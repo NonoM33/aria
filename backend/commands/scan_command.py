@@ -7,13 +7,44 @@ class ScanCommand(BaseCommand):
         adventure_data = get_adventure_data(self.lang)
         data = adventure_data.get(self.lang, {})
         chapter = self.get_chapter_data(data)
-        files = chapter.get("files", {})
-        file_list = "\n".join([f"- {name}" for name in files.keys()])
+        filesystem = chapter.get("filesystem", {})
+        current_path = self.session.get("current_path", "/")
+        
+        contents = self._get_directory_contents(filesystem, current_path)
+        
+        dirs = []
+        files = []
+        if contents:
+            for name, value in contents.items():
+                if isinstance(value, dict):
+                    dirs.append(f"[DIR]  {name}/")
+                else:
+                    files.append(f"       {name}")
+        
+        dirs.sort()
+        files.sort()
+        
+        items = dirs + files
+        item_list = "\n".join(items) if items else "(vide)" if self.lang == "FR" else "(empty)"
         
         if self.lang == "FR":
-            response = f"Scan du système en cours...\n\nFichiers détectés:\n{file_list}\n\nUtilisez: ACCESS <nom_fichier> pour lire"
+            response = f"Scan en cours... [{current_path}]\n\n{item_list}"
         else:
-            response = f"Scanning system...\n\nFiles detected:\n{file_list}\n\nUse: ACCESS <filename> to read"
+            response = f"Scanning... [{current_path}]\n\n{item_list}"
         
         return {"response": response, "status": "success"}
+    
+    def _get_directory_contents(self, filesystem: dict, path: str) -> dict:
+        if path == "/":
+            return filesystem
+        parts = path.strip("/").split("/")
+        current = filesystem
+        for part in parts:
+            if isinstance(current, dict) and part in current:
+                current = current[part]
+            else:
+                return {}
+        if isinstance(current, dict):
+            return current
+        return {}
 
