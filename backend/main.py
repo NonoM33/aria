@@ -6,14 +6,23 @@ from api.routes import router
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"] if CORS_ALLOW_ALL else CORS_ORIGINS,
-    allow_origin_regex=None if CORS_ALLOW_ALL else None,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if CORS_ALLOW_ALL:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_origin_regex=".*",
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 print(f"CORS_ORIGINS: {CORS_ORIGINS}, allow_all={CORS_ALLOW_ALL}")
 
 try:
