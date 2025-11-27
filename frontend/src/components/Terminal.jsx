@@ -29,7 +29,9 @@ const Terminal = () => {
     ariaChoices,
     sendAriaChoice,
     ariaMessage,
-    clearAriaMessage
+    clearAriaMessage,
+    navigateAutocomplete,
+    hasAutocompleteOptions
   } = useTerminal()
   const { language } = useLanguage()
   const inputRef = useRef(null)
@@ -217,24 +219,30 @@ const Terminal = () => {
       }
     } else if (e.key === 'ArrowUp' && !isPasswordMode) {
       e.preventDefault()
-      if (autocompleteOptions.length > 0) {
-        handleTab(input, true)
+      if (hasAutocompleteOptions) {
+        navigateAutocomplete('up')
       } else {
         navigateHistory('up', input)
       }
     } else if (e.key === 'ArrowDown' && !isPasswordMode) {
       e.preventDefault()
-      if (autocompleteOptions.length > 0) {
-        handleTab(input, false)
+      if (hasAutocompleteOptions) {
+        navigateAutocomplete('down')
       } else {
         navigateHistory('down', input)
       }
+    } else if (e.key === 'ArrowLeft' && hasAutocompleteOptions && !isPasswordMode) {
+      e.preventDefault()
+      navigateAutocomplete('left')
+    } else if (e.key === 'ArrowRight' && hasAutocompleteOptions && !isPasswordMode) {
+      e.preventDefault()
+      navigateAutocomplete('right')
     } else if (e.key === 'Tab' && !isPasswordMode) {
       e.preventDefault()
       handleTab(input, e.shiftKey)
     } else if (e.key === 'Escape') {
       e.preventDefault()
-      if (autocompleteOptions.length > 0) {
+      if (hasAutocompleteOptions) {
         cancelAutocomplete()
       } else {
         setInput('')
