@@ -8,7 +8,7 @@ const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
   'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
-  'PORTSCAN', 'BRUTEFORCE', 'JOBS'
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER'
 ]
 
 export const useTerminal = () => {
@@ -39,11 +39,18 @@ export const useTerminal = () => {
           currentLanguage = 'FR'
         }
         
+        const token = localStorage.getItem('system_void_token')
+        const headers = {}
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`
+        }
+        
         const response = await axios.get(`${API_URL}/api/files`, {
           params: {
             session_id: sessionIdRef.current,
             language: currentLanguage
-          }
+          },
+          headers
         })
         if (response.data && response.data.files) {
           setAvailableFiles(response.data.files)
@@ -61,11 +68,18 @@ export const useTerminal = () => {
           currentLanguage = 'FR'
         }
         
+        const token = localStorage.getItem('system_void_token')
+        const headers = {}
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`
+        }
+        
         const response = await axios.get(`${API_URL}/api/unlocked-commands`, {
           params: {
             session_id: sessionIdRef.current,
             language: currentLanguage
-          }
+          },
+          headers
         })
         if (response.data && response.data.commands) {
           setUnlockedCommands(response.data.commands)
@@ -188,19 +202,30 @@ export const useTerminal = () => {
       // S'assurer que la langue est bien stockée dans localStorage
       localStorage.setItem('system_void_language', currentLanguage)
       
-      // Récupérer le username depuis localStorage si présent
+      // Récupérer le username et token depuis localStorage si présent
       const username = localStorage.getItem('system_void_username')
+      const token = localStorage.getItem('system_void_token')
+      
+      const headers = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
       
       const response = await axios.post(`${API_URL}/api/command`, {
         command: userCommand,
         session_id: sessionIdRef.current,
         language: currentLanguage,
         username: username || null
-      })
+      }, { headers })
 
           const systemResponse = response.data.response || 'No response from system.'
           
-          // Si la réponse contient un username (après REGISTER ou LOGIN), le sauvegarder
+          // Si la réponse contient un token (après SSH ou CREATE_USER), le sauvegarder
+          if (response.data.token) {
+            localStorage.setItem('system_void_token', response.data.token)
+          }
+          
+          // Si la réponse contient un username (après REGISTER, LOGIN, SSH, CREATE_USER), le sauvegarder
           if (response.data.username) {
             localStorage.setItem('system_void_username', response.data.username)
           }
@@ -208,16 +233,26 @@ export const useTerminal = () => {
           // Si la réponse contient une session (après LOGIN), mettre à jour le localStorage
           if (response.data.session) {
             localStorage.setItem('system_void_username', response.data.session.username)
+            if (response.data.session.token) {
+              localStorage.setItem('system_void_token', response.data.session.token)
+            }
           }
           
           // Mettre à jour les commandes débloquées après chaque commande
       setTimeout(async () => {
         try {
+          const token = localStorage.getItem('system_void_token')
+          const headers = {}
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`
+          }
+          
           const commandsResponse = await axios.get(`${API_URL}/api/unlocked-commands`, {
             params: {
               session_id: sessionIdRef.current,
               language: currentLanguage
-            }
+            },
+            headers
           })
           if (commandsResponse.data && commandsResponse.data.commands) {
             setUnlockedCommands(commandsResponse.data.commands)
@@ -231,11 +266,18 @@ export const useTerminal = () => {
       if (userCommand.toUpperCase().startsWith('SCAN') || userCommand.toUpperCase().startsWith('LOGIN')) {
         setTimeout(async () => {
           try {
+            const token = localStorage.getItem('system_void_token')
+            const headers = {}
+            if (token) {
+              headers['Authorization'] = `Bearer ${token}`
+            }
+            
             const fileResponse = await axios.get(`${API_URL}/api/files`, {
               params: {
                 session_id: sessionIdRef.current,
                 language: currentLanguage
-              }
+              },
+              headers
             })
             if (fileResponse.data && fileResponse.data.files) {
               setAvailableFiles(fileResponse.data.files)

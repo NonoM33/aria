@@ -18,6 +18,10 @@ class SshCommand(BaseCommand):
                 return {"response": "Invalid format. Use: ssh <username>@system-void.local", "status": "error"}
         
         username = parts[0].strip()
+        password = None
+        
+        if " " in username:
+            username, password = username.split(" ", 1)
         
         if not self.db:
             if self.lang == "FR":
@@ -25,26 +29,33 @@ class SshCommand(BaseCommand):
             else:
                 return {"response": "Database not available.", "status": "error"}
         
-        result = ssh_connect(self.db, username)
+        token = None
+        if self.session.get("ssh_token"):
+            token = self.session.get("ssh_token")
+        
+        result = ssh_connect(self.db, username, password, token)
         
         if result.get("success"):
+            new_token = result.get("token")
             self.update_session({
                 "username": result["username"],
                 "player_id": result.get("player_id"),
-                "logged_in": True
+                "logged_in": True,
+                "ssh_token": new_token,
+                "chapter": "chapter_1"
             })
             
             if self.lang == "FR":
                 return {
-                    "response": f"Connexion SSH établie avec {username}@system-void.local\n\nBienvenue, {username}!",
+                    "response": f"Connexion SSH établie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nVous êtes maintenant connecté. Votre progression est sauvegardée.",
                     "status": "success",
-                    "token": result.get("token")
+                    "token": new_token
                 }
             else:
                 return {
-                    "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!",
+                    "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nYou are now connected. Your progress is saved.",
                     "status": "success",
-                    "token": result.get("token")
+                    "token": new_token
                 }
         else:
             if self.lang == "FR":

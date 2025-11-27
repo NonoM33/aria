@@ -4,12 +4,6 @@ from adventures.adventure_data import get_adventure_data
 
 class AccessCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
-        if not self.check_level(1):
-            if self.lang == "FR":
-                return {"response": "Niveau d'accès insuffisant.", "status": "error"}
-            else:
-                return {"response": "Insufficient access level.", "status": "error"}
-        
         if not args:
             if self.lang == "FR":
                 return {"response": "Usage: ACCESS <nom_fichier>\nExemple: ACCESS mission.txt", "status": "info"}
