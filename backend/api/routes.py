@@ -250,6 +250,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
             
             if message_type == "command":
                 command = data.get("command", "")
+                password = data.get("password")
                 language = data.get("language", DEFAULT_LANGUAGE)
                 auth_token = data.get("token")
                 
@@ -264,6 +265,44 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                 
                 session = get_session(session_id, lang, db, username, token)
                 session["language"] = lang
+                
+                if password and session.get("ssh_pending_username"):
+                    result = handle_command("", password, session, db, lang, token)
+                    
+                    if result.get("token"):
+                        session["ssh_token"] = result.get("token")
+                        await manager.send_personal_message({
+                            "type": "token_update",
+                            "token": result.get("token")
+                        }, connection_id)
+                    
+                    if result.get("username"):
+                        await manager.send_personal_message({
+                            "type": "username_update",
+                            "username": result.get("username")
+                        }, connection_id)
+                    
+                    if db:
+                        try:
+                            from auth.player_service import get_player_by_id
+                            player = None
+                            if session.get("player_id"):
+                                player = get_player_by_id(db, session["player_id"])
+                            if player or session.get("player_id"):
+                                from services.progress_service import save_session_to_db
+                                save_session_to_db(db, session, player)
+                                db.commit()
+                        except Exception as e:
+                            db.rollback()
+                    
+                    await manager.send_personal_message({
+                        "type": "command_response",
+                        "response": result.get("response", ""),
+                        "status": result.get("status", "info")
+                    }, connection_id)
+                    
+                    await send_session_updates(connection_id, session_id, session, lang, db)
+                    continue
                 
                 command_parts = command.strip().split(" ", 1) if command.strip() else ["", ""]
                 cmd = command_parts[0].upper() if command_parts[0] else ""
@@ -331,11 +370,22 @@ async def websocket_endpoint(websocket: WebSocket, session_id: Optional[str] = N
                         except Exception as e:
                             db.rollback()
                     
-                    await manager.send_personal_message({
+                    response_message = {
                         "type": "command_response",
                         "response": result.get("response", ""),
                         "status": result.get("status", "info")
-                    }, connection_id)
+                    }
+                    if result.get("password_prompt"):
+                        response_message["password_prompt"] = True
+                        response_message["username"] = result.get("username")
+                    if result.get("logout"):
+                        response_message["logout"] = True
+                    if result.get("username") is not None and not result.get("password_prompt"):
+                        response_message["username"] = result.get("username")
+                    if result.get("token"):
+                        response_message["token"] = result.get("token")
+                    
+                    await manager.send_personal_message(response_message, connection_id)
                     
                     await send_session_updates(connection_id, session_id, session, lang, db)
                     

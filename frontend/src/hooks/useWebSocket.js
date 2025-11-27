@@ -93,14 +93,18 @@ export const useWebSocket = (sessionId, language, onMessage) => {
     }
   }, [reconnectAttempts])
 
-  const sendCommand = useCallback((command, token) => {
+  const sendCommand = useCallback((command, token, password = null) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
+      const message = {
         type: 'command',
         command: command,
         language: languageRef.current,
         token: token || null
-      }))
+      }
+      if (password !== null) {
+        message.password = password
+      }
+      wsRef.current.send(JSON.stringify(message))
       return true
     }
     return false

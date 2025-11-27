@@ -61,7 +61,11 @@ export const useTerminal = () => {
       
       if (systemResponse.includes("Vous n'êtes pas connecté") || 
           systemResponse.includes("You are not connected") ||
-          systemResponse.includes("not connected")) {
+          systemResponse.includes("not connected") ||
+          systemResponse.includes("Échec de la connexion SSH") ||
+          systemResponse.includes("SSH connection failed") ||
+          systemResponse.includes("Invalid credentials") ||
+          systemResponse.includes("Identifiants invalides")) {
         localStorage.removeItem('system_void_username')
         localStorage.removeItem('system_void_token')
         window.dispatchEvent(new Event('localStorageChange'))

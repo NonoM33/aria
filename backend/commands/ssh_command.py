@@ -6,26 +6,24 @@ class SshCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
         if not args:
             if self.lang == "FR":
-                return {"response": "Usage: ssh <username> <password>@system-void.local\nExemple: ssh hacker motdepasse123@system-void.local\n\nNote: Le mot de passe est requis pour la connexion SSH.", "status": "info"}
+                return {"response": "Usage: ssh <username>@system-void.local\nExemple: ssh hacker@system-void.local\n\nLe mot de passe vous sera demandé après.", "status": "info"}
             else:
-                return {"response": "Usage: ssh <username> <password>@system-void.local\nExample: ssh hacker password123@system-void.local\n\nNote: Password is required for SSH connection.", "status": "info"}
+                return {"response": "Usage: ssh <username>@system-void.local\nExample: ssh hacker@system-void.local\n\nPassword will be prompted after.", "status": "info"}
         
         parts = args.split("@")
-        if len(parts) != 2 or parts[1] not in ["system-void.local", "localhost"]:
+        if len(parts) != 2 or parts[1].strip() not in ["system-void.local", "localhost"]:
             if self.lang == "FR":
-                return {"response": "Format invalide. Utilisez: ssh <username> <password>@system-void.local", "status": "error"}
+                return {"response": "Format invalide. Utilisez: ssh <username>@system-void.local", "status": "error"}
             else:
-                return {"response": "Invalid format. Use: ssh <username> <password>@system-void.local", "status": "error"}
+                return {"response": "Invalid format. Use: ssh <username>@system-void.local", "status": "error"}
         
-        username_part = parts[0].strip()
-        password = None
+        username = parts[0].strip()
         
-        username_parts = username_part.split(" ", 1)
-        if len(username_parts) == 2:
-            username = username_parts[0].strip()
-            password = username_parts[1].strip()
-        else:
-            username = username_parts[0].strip()
+        if not username:
+            if self.lang == "FR":
+                return {"response": "Nom d'utilisateur requis.", "status": "error"}
+            else:
+                return {"response": "Username required.", "status": "error"}
         
         if not self.db:
             if self.lang == "FR":
@@ -39,14 +37,69 @@ class SshCommand(BaseCommand):
         elif self.session.get("ssh_token"):
             token = self.session.get("ssh_token")
         
-        if not password and not token:
+        if token:
+            try:
+                result = ssh_connect(self.db, username, None, token)
+                if result.get("success"):
+                    new_token = result.get("token")
+                    self.update_session({
+                        "username": result["username"],
+                        "player_id": result.get("player_id"),
+                        "logged_in": True,
+                        "ssh_token": new_token,
+                        "chapter": "chapter_1"
+                    })
+                    
+                    if self.lang == "FR":
+                        return {
+                            "response": f"Connexion SSH établie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nVous êtes maintenant connecté. Votre progression est sauvegardée.",
+                            "status": "success",
+                            "token": new_token,
+                            "username": result["username"]
+                        }
+                    else:
+                        return {
+                            "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nYou are now connected. Your progress is saved.",
+                            "status": "success",
+                            "token": new_token,
+                            "username": result["username"]
+                        }
+            except Exception:
+                pass
+        
+        self.session["ssh_pending_username"] = username
+        
+        if self.lang == "FR":
+            return {
+                "response": f"{username}@system-void.local's password: ",
+                "status": "password_prompt",
+                "password_prompt": True,
+                "username": username
+            }
+        else:
+            return {
+                "response": f"{username}@system-void.local's password: ",
+                "status": "password_prompt",
+                "password_prompt": True,
+                "username": username
+            }
+    
+    def execute_password(self, password: str) -> Dict[str, Any]:
+        username = self.session.get("ssh_pending_username")
+        if not username:
             if self.lang == "FR":
-                return {"response": "Erreur: Mot de passe requis pour la connexion SSH.\n\nFormat: ssh <username> <password>@system-void.local\nExemple: ssh hacker motdepasse123@system-void.local", "status": "error"}
+                return {"response": "Aucune connexion SSH en attente.", "status": "error"}
             else:
-                return {"response": "Error: Password required for SSH connection.\n\nFormat: ssh <username> <password>@system-void.local\nExample: ssh hacker password123@system-void.local", "status": "error"}
+                return {"response": "No pending SSH connection.", "status": "error"}
+        
+        if not self.db:
+            if self.lang == "FR":
+                return {"response": "Base de données non disponible.", "status": "error"}
+            else:
+                return {"response": "Database not available.", "status": "error"}
         
         try:
-            result = ssh_connect(self.db, username, password, token)
+            result = ssh_connect(self.db, username, password, None)
             
             if result.get("success"):
                 new_token = result.get("token")
@@ -57,29 +110,35 @@ class SshCommand(BaseCommand):
                     "ssh_token": new_token,
                     "chapter": "chapter_1"
                 })
+                if "ssh_pending_username" in self.session:
+                    del self.session["ssh_pending_username"]
                 
                 if self.lang == "FR":
                     return {
-                        "response": f"Connexion SSH établie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nVous êtes maintenant connecté. Votre progression est sauvegardée.",
+                        "response": f"\nConnexion SSH établie avec {username}@system-void.local\n\nBienvenue, {username}!\n\nVous êtes maintenant connecté. Votre progression est sauvegardée.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
                     }
                 else:
                     return {
-                        "response": f"SSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nYou are now connected. Your progress is saved.",
+                        "response": f"\nSSH connection established with {username}@system-void.local\n\nWelcome, {username}!\n\nYou are now connected. Your progress is saved.",
                         "status": "success",
                         "token": new_token,
                         "username": result["username"]
                     }
             else:
+                if "ssh_pending_username" in self.session:
+                    del self.session["ssh_pending_username"]
                 if self.lang == "FR":
-                    return {"response": f"Échec de la connexion SSH: {result.get('message', 'Identifiants invalides')}", "status": "error"}
+                    return {"response": f"\nÉchec de la connexion SSH: {result.get('message', 'Identifiants invalides')}", "status": "error"}
                 else:
-                    return {"response": f"SSH connection failed: {result.get('message', 'Invalid credentials')}", "status": "error"}
+                    return {"response": f"\nSSH connection failed: {result.get('message', 'Invalid credentials')}", "status": "error"}
         except Exception as e:
+            if "ssh_pending_username" in self.session:
+                del self.session["ssh_pending_username"]
             if self.lang == "FR":
-                return {"response": f"Erreur lors de la connexion SSH: {str(e)}", "status": "error"}
+                return {"response": f"\nErreur lors de la connexion SSH: {str(e)}", "status": "error"}
             else:
-                return {"response": f"SSH connection error: {str(e)}", "status": "error"}
+                return {"response": f"\nSSH connection error: {str(e)}", "status": "error"}
 
