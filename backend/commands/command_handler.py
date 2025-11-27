@@ -19,6 +19,8 @@ from commands.ssh_command import SshCommand
 from commands.exploit_command import ExploitCommand
 from commands.create_user_command import CreateUserCommand
 from commands.pkg_command import PkgCommand
+from commands.exit_command import ExitCommand
+from commands.ls_command import LsCommand
 from config import DEV_MODE
 from adventures.adventure_data import get_adventure_data
 from adventures.adventure_loader import get_chapter
@@ -42,6 +44,8 @@ COMMAND_MAP = {
     "EXPLOIT": ExploitCommand,
     "CREATE_USER": CreateUserCommand,
     "PKG": PkgCommand,
+    "EXIT": ExitCommand,
+    "LS": LsCommand,
 }
 
 def handle_command(

@@ -1,14 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import axios from 'axios'
 import { useLanguage } from '../contexts/LanguageContext'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+import { useWebSocket } from './useWebSocket'
 
 const AVAILABLE_COMMANDS = [
   'HELP', 'STATUS', 'LOGIN', 'SCAN', 'DECODE', 'ACCESS', 
   'ACTIVATE', 'NETWORK', 'ANALYZE', 'BYPASS', 'CONNECT', 
   'RESTORE', 'SOLVE', 'CAT', 'MAN', 'NVIM', 'SPLIT', 
-  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG'
+  'PORTSCAN', 'BRUTEFORCE', 'JOBS', 'SSH', 'EXPLOIT', 'CREATE_USER', 'PKG', 'EXIT', 'LS'
 ]
 
 const AVAILABLE_PACKAGES = ['file-viewer']
