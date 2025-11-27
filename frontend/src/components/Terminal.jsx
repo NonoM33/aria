@@ -215,7 +215,9 @@ const Terminal = () => {
           ))}
           {showInput && !isTyping && (
             <div className="terminal-input-line">
-              <span className="prompt">&gt; </span>
+              <span className="prompt">
+                {username ? `${username}@system-void > ` : '> '}
+              </span>
               <input
                 ref={inputRef}
                 type="text"
