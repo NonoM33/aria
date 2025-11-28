@@ -3,6 +3,7 @@ import codecs
 from typing import Dict, Any
 from commands.base_command import BaseCommand
 from adventures.adventure_loader import get_chapter_filesystem
+from services.resource_service import get_resource_manager, get_quest_manager
 
 class DecodeCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
@@ -13,6 +14,21 @@ class DecodeCommand(BaseCommand):
                 return {"response": "Usage: DECODE <text>\nDecodes Base64 or ROT13 text.\nExample: DECODE SGVsbG8gV29ybGQ=", "status": "info"}
         
         text = args.strip()
+        
+        # Consommer des ressources
+        resource_manager = get_resource_manager(self.session)
+        if not resource_manager.consume_resource("cpu", 2.0):
+            if self.lang == "FR":
+                return {"response": "CPU insuffisant. Utilisez RESOURCE RESTORE cpu ou attendez.", "status": "error"}
+            else:
+                return {"response": "Insufficient CPU. Use RESOURCE RESTORE cpu or wait.", "status": "error"}
+        
+        resource_manager.consume_resource("memory", 1.5)
+        resource_manager.consume_resource("energy", 1.0)
+        
+        # Mettre à jour les quêtes
+        quest_manager = get_quest_manager(self.session)
+        quest_manager.update_quest_progress("decode", 1)
         
         rot13_result = codecs.decode(text, 'rot_13')
         

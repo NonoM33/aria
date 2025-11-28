@@ -2,6 +2,7 @@ from typing import Dict, Any
 from commands.base_command import BaseCommand
 from adventures.adventure_loader import get_chapter_filesystem
 from services.aria_service import get_aria_trigger
+from services.resource_service import get_resource_manager, get_quest_manager
 
 class ScanCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
@@ -26,6 +27,21 @@ class ScanCommand(BaseCommand):
         
         dirs.sort()
         files.sort()
+        
+        # Consommer des ressources
+        resource_manager = get_resource_manager(self.session)
+        if not resource_manager.consume_resource("cpu", 1.0):
+            if self.lang == "FR":
+                return {"response": "CPU insuffisant. Utilisez RESOURCE RESTORE cpu ou attendez.", "status": "error"}
+            else:
+                return {"response": "Insufficient CPU. Use RESOURCE RESTORE cpu or wait.", "status": "error"}
+        
+        resource_manager.consume_resource("energy", 0.5)
+        resource_manager.consume_resource("bandwidth", 0.3)
+        
+        # Mettre à jour les quêtes
+        quest_manager = get_quest_manager(self.session)
+        quest_manager.update_quest_progress("scan", 1)
         
         items = dirs + files
         item_list = "\n".join(items) if items else "(vide)" if self.lang == "FR" else "(empty)"

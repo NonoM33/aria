@@ -6,4 +6,5 @@ httpx==0.25.2
 sqlalchemy==2.0.23
 aiosqlite==0.19.0
 PyJWT==2.8.0
+asyncssh==2.14.2
 

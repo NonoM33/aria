@@ -26,6 +26,9 @@ from commands.cd_command import CdCommand
 from commands.pwd_command import PwdCommand
 from commands.alias_command import AliasCommand
 from commands.edit_command import EditCommand
+from commands.monitor_command import MonitorCommand
+from commands.resource_command import ResourceCommand
+from commands.upgrade_command import UpgradeCommand
 from commands.admin_command import (
     AdminStatsCommand, AdminOnlineCommand, 
     AdminListCommand, AdminViewCommand, AdminExitCommand
@@ -63,6 +66,9 @@ COMMAND_MAP = {
     "PWD": PwdCommand,
     "ALIAS": AliasCommand,
     "EDIT": EditCommand,
+    "MONITOR": MonitorCommand,
+    "RESOURCE": ResourceCommand,
+    "UPGRADE": UpgradeCommand,
 }
 
 ADMIN_COMMAND_MAP = {

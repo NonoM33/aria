@@ -120,7 +120,7 @@ def get_session(
             "level": 0,
             "chapter": "chapter_0",
             "logged_in": False,
-            "unlocked_commands": ["HELP", "STATUS", "SCAN", "LS", "SSH", "EXIT", "EDIT"],
+            "unlocked_commands": ["HELP", "STATUS", "SCAN", "LS", "SSH", "EXIT", "EDIT", "MONITOR", "RESOURCE"],
             "accessed_files": [],
             "solved_puzzles": [],
             "collected_items": [],
@@ -139,7 +139,8 @@ def get_session(
             "game_completed": False,
             "current_path": "/",
             "aliases": {},
-            "voidrc": ""
+            "voidrc": "",
+            "credits": 100
         }
         global_state.add_player()
         track_connection(session_id, db)

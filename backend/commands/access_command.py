@@ -2,6 +2,7 @@ from typing import Dict, Any
 from commands.base_command import BaseCommand
 from adventures.adventure_loader import get_chapter_filesystem
 from services.aria_service import get_aria_trigger
+from services.resource_service import get_resource_manager, get_quest_manager, get_achievement_manager
 
 class AccessCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
@@ -34,7 +35,25 @@ class AccessCommand(BaseCommand):
         
         if content is not None:
             filename = target.split("/")[-1]
+            
+            # Consommer des ressources
+            resource_manager = get_resource_manager(self.session)
+            if not resource_manager.consume_resource("cpu", 0.5):
+                if self.lang == "FR":
+                    return {"response": "CPU insuffisant. Utilisez RESOURCE RESTORE cpu ou attendez.", "status": "error"}
+                else:
+                    return {"response": "Insufficient CPU. Use RESOURCE RESTORE cpu or wait.", "status": "error"}
+            
+            resource_manager.consume_resource("energy", 0.3)
+            
             self.add_accessed_file(file_path)
+            
+            # Mettre à jour les quêtes et achievements
+            quest_manager = get_quest_manager(self.session)
+            quest_manager.update_quest_progress("explore", 1)
+            
+            achievement_manager = get_achievement_manager(self.session)
+            achievement_result = achievement_manager.check_achievements("file_access", {"filename": filename})
             
             if "vulnerability_log" in filename.lower() or "vulnerability" in filename.lower():
                 self.add_unlocked_command("EXPLOIT")
@@ -46,6 +65,10 @@ class AccessCommand(BaseCommand):
                     content += "\n\n[Hint: Use DECODE to decode this file]"
             
             response = {"response": content, "status": "success"}
+            
+            if achievement_result:
+                achievement_msg = f"\n\n🏆 Achievement débloqué: {achievement_result['title']} (+{achievement_result.get('credits', 0)} crédits)"
+                response["response"] += achievement_msg
             
             aria_data = get_aria_trigger(
                 self.session, 

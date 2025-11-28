@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from commands.base_command import BaseCommand
 from adventures.adventure_loader import get_chapter_puzzles
+from services.resource_service import get_resource_manager, get_quest_manager, get_achievement_manager
 
 class SolveCommand(BaseCommand):
     def execute(self, args: str) -> Dict[str, Any]:
@@ -30,13 +31,46 @@ class SolveCommand(BaseCommand):
             alt_solutions = [s.lower() for s in puzzle.get("alt_solutions", [])]
             
             if answer == solution or answer in alt_solutions:
+                # Consommer des ressources
+                resource_manager = get_resource_manager(self.session)
+                resource_manager.consume_resource("cpu", 3.0)
+                resource_manager.consume_resource("memory", 2.0)
+                resource_manager.consume_resource("energy", 1.5)
+                
+                # Récompense en crédits
+                credits_reward = 50
+                self.session["credits"] = self.session.get("credits", 0) + credits_reward
+                
                 self.add_solved_puzzle(puzzle_id)
+                
+                # Mettre à jour les quêtes et achievements
+                quest_manager = get_quest_manager(self.session)
+                quest_manager.update_quest_progress("puzzle", 1)
+                
+                achievement_manager = get_achievement_manager(self.session)
+                achievement_result = achievement_manager.check_achievements("puzzle_solved", {"puzzle_id": puzzle_id})
                 
                 reward = puzzle.get("reward", {})
                 message = reward.get("message", "")
                 
+                if credits_reward > 0:
+                    if self.lang == "FR":
+                        message += f"\n\n💰 +{credits_reward} crédits obtenus!"
+                    else:
+                        message += f"\n\n💰 +{credits_reward} credits earned!"
+                
+                if achievement_result:
+                    achievement_msg = f"\n🏆 Achievement débloqué: {achievement_result['title']} (+{achievement_result.get('credits', 0)} crédits)"
+                    message += achievement_msg
+                
                 if reward.get("unlocks_level"):
-                    self.session["level"] = reward["unlocks_level"]
+                    new_level = reward["unlocks_level"]
+                    self.session["level"] = new_level
+                    
+                    # Vérifier achievement niveau
+                    achievement_result = achievement_manager.check_achievements("level_up", {"level": new_level})
+                    if achievement_result:
+                        message += f"\n🏆 Achievement débloqué: {achievement_result['title']} (+{achievement_result.get('credits', 0)} crédits)"
                 
                 if reward.get("unlocks_chapter"):
                     self.session["chapter"] = reward["unlocks_chapter"]

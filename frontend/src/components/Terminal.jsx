@@ -6,6 +6,7 @@ import ManPage from './ManPage'
 import FileViewer from './FileViewer'
 import AriaFloatingPanel from './AriaFloatingPanel'
 import IntroSequence from './IntroSequence'
+import SplitTerminal from './SplitTerminal'
 
 const Terminal = () => {
   const { 
@@ -53,6 +54,8 @@ const Terminal = () => {
   const [ariaFloatingVisible, setAriaFloatingVisible] = useState(false)
   const [ariaFloatingMessage, setAriaFloatingMessage] = useState('')
   const [ariaFloatingEmotion, setAriaFloatingEmotion] = useState('neutral')
+  const [splitTerminals, setSplitTerminals] = useState([])
+  const [nextTerminalId, setNextTerminalId] = useState(1)
 
   const welcomeSentRef = useRef(false)
   const languageRef = useRef(language)
@@ -280,8 +283,32 @@ const Terminal = () => {
       } else {
         setInput('')
       }
+    } else if (e.key === 't' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      handleSplitTerminal()
+    } else if (e.key === 'w' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      if (splitTerminals.length > 0) {
+        closeLastSplitTerminal()
+      }
     }
   }
+
+  const handleSplitTerminal = useCallback(() => {
+    const newId = nextTerminalId
+    setSplitTerminals(prev => [...prev, newId])
+    setNextTerminalId(prev => prev + 1)
+  }, [nextTerminalId])
+
+  const closeSplitTerminal = useCallback((id) => {
+    setSplitTerminals(prev => prev.filter(termId => termId !== id))
+  }, [])
+
+  const closeLastSplitTerminal = useCallback(() => {
+    if (splitTerminals.length > 0) {
+      setSplitTerminals(prev => prev.slice(0, -1))
+    }
+  }, [splitTerminals])
 
   useEffect(() => {
     const lastUserCommand = history.filter(e => e.type === 'user').slice(-1)[0]
@@ -447,7 +474,7 @@ const Terminal = () => {
         }}
         visible={ariaFloatingVisible}
       />
-      <div className="terminal-content" ref={terminalContentRef}>
+      <div className={`terminal-content ${splitTerminals.length > 0 ? 'has-splits' : ''}`} ref={terminalContentRef}>
         <div className="terminal-history">
           {history.map((entry, index) => (
             <div key={index} className={`terminal-entry terminal-entry-${entry.type}`}>
@@ -536,6 +563,17 @@ const Terminal = () => {
           <div ref={historyEndRef} />
         </div>
       </div>
+      {splitTerminals.length > 0 && (
+        <div className="split-terminals-container">
+          {splitTerminals.map((termId) => (
+            <SplitTerminal
+              key={termId}
+              terminalId={termId}
+              onClose={() => closeSplitTerminal(termId)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

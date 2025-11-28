@@ -1658,6 +1658,125 @@ body {
   background: rgba(0, 255, 255, 0.25);
 }
 
+/* ==========================================
+   SPLIT TERMINALS
+   ========================================== */
+
+.terminal-content.has-splits {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: 10px;
+}
+
+.split-terminals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.split-terminals-container > * {
+  pointer-events: all;
+}
+
+.split-terminal {
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00FF00;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  position: relative;
+  min-width: 400px;
+  min-height: 300px;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.split-terminal.active {
+  border-color: #00FFFF;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  opacity: 1;
+  z-index: 101;
+}
+
+.split-terminal-header {
+  background: rgba(0, 34, 0, 0.8);
+  border-bottom: 1px solid #00FF00;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #00FF00;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+}
+
+.split-terminal.active .split-terminal-header {
+  border-bottom-color: #00FFFF;
+  color: #00FFFF;
+}
+
+.split-terminal-title {
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.split-terminal-close {
+  background: transparent;
+  border: 1px solid #00FF00;
+  color: #00FF00;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.split-terminal.active .split-terminal-close {
+  border-color: #00FFFF;
+  color: #00FFFF;
+}
+
+.split-terminal-close:hover {
+  background: rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.split-terminal.active .split-terminal-close:hover {
+  background: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.split-terminal-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.split-terminal-content .terminal-container {
+  height: 100%;
+  width: 100%;
+}
+
+.split-terminal-content .terminal-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
 .aria-glitch-active {
   animation: aria-notification-glitch 0.15s ease;
 }
